@@ -1,0 +1,148 @@
+.stats-section {
+  background-color: #0e0e0e;
+  padding: 60px 0 80px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.stats-box {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 540px;
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+/* ── 60% — upper right of center ── */
+.stat--60 {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+}
+
+/* ── 30 — upper far-right ── */
+.stat--30 {
+  position: absolute;
+  top: 4%;
+  right: -100px;
+}
+
+/* ── 150k — lower left, flush to edge ── */
+.stat--150 {
+  position: absolute;
+  bottom: 18%;
+  left: -100px;
+}
+
+/* ── 24/7 — lower center-right ── */
+.stat--247 {
+  position: absolute;
+  bottom: -50px;
+  left: 50%;
+}
+
+/* ── shared ── */
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(64px, 7vw, 110px);
+  font-weight: 300;
+  color: rgb(251, 238, 190);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.stat-number--xl {
+  font-size: clamp(80px, 10vw, 150px);
+}
+
+.stat-suffix-small {
+  font-size: 0.35em;
+  vertical-align: super;
+  font-weight: 300;
+}
+
+.stat-sqft {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(14px, 1.6vw, 24px);
+  font-weight: 300;
+  color: rgb(251, 238, 190);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.stat-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(8px, 0.65vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.5);
+  margin: 10px 0 4px;
+}
+
+.stat-sublabel {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(8px, 0.65vw, 11px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: rgba(251, 238, 190, 0.3);
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .stats-box {
+    height: 480px;
+    padding: 0 28px;
+  }
+
+  .stat--60  { top: 4%;     left: 48%;   }
+  .stat--30  { top: 4%;     right: 28px; }
+  .stat--150 { bottom: 20%; left: 28px;  }
+  .stat--247 { bottom: 4%;  left: 48%;   }
+}
+
+@media (max-width: 600px) {
+  .stats-section {
+    padding: 48px 0 64px;
+  }
+
+  .stats-box {
+    position: static;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 44px;
+    padding: 44px 28px;
+  }
+
+  .stat {
+    position: static !important;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .stat-sqft {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: clamp(52px, 14vw, 80px);
+    text-align: center;
+  }
+
+  .stat-number--xl {
+    font-size: clamp(64px, 16vw, 100px);
+    text-align: center;
+  }
+}
