@@ -1,26 +1,33 @@
 import { useState, useEffect, useRef } from 'react'
 import './AmenitiesSection.css'
+import PremiumFinishesImg from './assets/PremiumFinishes.jpeg'
+import SmartLivingImg from './assets/SmartLiving.jpeg'
+import ConciergeServicesImg from './assets/ConciergeServices.jpeg'
 
 const AMENITIES = [
   {
     id: 1,
     title: 'Luxury Amenities',
-    icon: '✨'
+    icon: '✨',
+    image: PremiumFinishesImg
   },
   {
     id: 2,
     title: 'Premium Finishes',
-    icon: '🏆'
+    icon: '🏆',
+    image: PremiumFinishesImg
   },
   {
     id: 3,
     title: 'Smart Living',
-    icon: '🔧'
+    icon: '🔧',
+    image: SmartLivingImg
   },
   {
     id: 4,
     title: 'Concierge Services',
-    icon: '🎩'
+    icon: '🎩',
+    image: ConciergeServicesImg
   }
 ]
 
@@ -73,15 +80,19 @@ export default function AmenitiesSection() {
         <div className="amenities-right">
           <div className="amenities-pills">
             {AMENITIES.map((amenity, index) => (
-              <div 
-                key={amenity.id} 
+              <div
+                key={amenity.id}
                 className={`amenity-pill ${isVisible ? 'animate-slide-in-right' : ''}`}
                 style={{
                   animationDelay: isVisible ? `${index * 120}ms` : '0ms'
                 }}
               >
-                <div className="pill-icon">{amenity.icon}</div>
-                <span className="pill-text">{amenity.title}</span>
+                <div className="pill-image">
+                  <img src={amenity.image} alt={amenity.title} />
+                </div>
+                <div className="pill-content">
+                  <span className="pill-text">{amenity.title}</span>
+                </div>
                 <div className="pill-arrow">⌄</div>
               </div>
             ))}

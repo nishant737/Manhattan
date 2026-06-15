@@ -148,15 +148,16 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 18px 28px;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 50px;
+  border-radius: 12px;
   cursor: pointer;
   opacity: 0;
   transform: translateX(80px);
   width: 100%;
   box-sizing: border-box;
   will-change: transform, opacity;
+  overflow: hidden;
 }
 
 .amenity-pill.animate-slide-in-right {
@@ -171,6 +172,29 @@
 
 .amenity-pill.animate-slide-in-right:hover {
   transform: translateX(8px);
+}
+
+.pill-image {
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.pill-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pill-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
 }
 
 .pill-icon {
@@ -200,6 +224,7 @@
   color: #0e0e0e;
   opacity: 0.5;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .amenity-pill:hover .pill-arrow {
@@ -238,13 +263,13 @@
   }
 
   .amenity-pill {
-    padding: 16px 24px;
+    padding: 10px;
   }
 
-  .pill-icon {
-    width: 45px;
-    height: 45px;
-    font-size: 24px;
+  .pill-image {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
   }
 }
 
@@ -292,17 +317,30 @@
   }
 
   .amenity-pill {
-    padding: 14px 20px;
+    padding: 12px;
+    flex-direction: column;
   }
 
-  .pill-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
+  .pill-image {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    border-radius: 50%;
+  }
+
+  .pill-content {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    text-align: center;
   }
 
   .pill-text {
     font-size: 14px;
+  }
+
+  .pill-arrow {
+    align-self: center;
   }
 }
 
@@ -336,18 +374,30 @@
   }
 
   .amenity-pill {
-    padding: 12px 16px;
-    gap: 16px;
+    padding: 10px;
+    flex-direction: column;
   }
 
-  .pill-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+  .pill-image {
+    width: 90px;
+    height: 90px;
+    min-width: 90px;
+    border-radius: 50%;
+  }
+
+  .pill-content {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    text-align: center;
   }
 
   .pill-text {
     font-size: 13px;
+  }
+
+  .pill-arrow {
+    align-self: center;
   }
 
   .amenities-explore {
