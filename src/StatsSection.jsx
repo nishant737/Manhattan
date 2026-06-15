@@ -3,7 +3,7 @@ import './StatsSection.css'
 
 export default function StatsSection() {
   const sectionRef = useRef(null)
-  const [counts, setCounts] = useState({ c60: 0, c30: 0, c150: 0, c24: 0 })
+  const [counts, setCounts] = useState({ c2: 0, c30: 0, c7035: 0, c24: 0 })
 
   useEffect(() => {
     function onScroll() {
@@ -19,10 +19,10 @@ export default function StatsSection() {
       const eased = Math.min(1, progress * 3.5)
 
       setCounts({
-        c60:  Math.floor(eased * 60),
-        c30:  Math.floor(eased * 30),
-        c150: Math.floor(eased * 150),
-        c24:  Math.floor(eased * 24),
+        c2:     Math.floor(eased * 2),
+        c30:    Math.floor(eased * 30),
+        c7035:  Math.floor(eased * 7035),
+        c24:    Math.floor(eased * 24),
       })
     }
 
@@ -31,19 +31,20 @@ export default function StatsSection() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const { c60, c30, c150, c24 } = counts
+  const { c2, c30, c7035, c24 } = counts
 
   return (
     <section className="stats-section" ref={sectionRef}>
       <div className="stats-box">
 
-        {/* 60% — upper center */}
+        {/* 2 — upper center */}
         <div className="stat stat--60">
           <div className="stat-number">
-            {c60}<span className="stat-suffix-small">%</span>
+            {c2}<span className="stat-suffix-small"></span>
           </div>
-          <p className="stat-label">green spaces</p>
-          <p className="stat-sublabel">for tranquility &amp; wellness.</p>
+          <p className="stat-label">Residences per floor</p>
+          <p className="stat-sublabel">Private luxury living.</p>
+
         </div>
 
         {/* 30 — upper right */}
@@ -53,12 +54,12 @@ export default function StatsSection() {
           <p className="stat-sublabel">each tailored for comfort<br />&amp; elegance.</p>
         </div>
 
-        {/* 150k — lower left */}
+        {/* 7,035k — lower left */}
         <div className="stat stat--150">
-          <div className="stat-number stat-number--xl">{c150}k</div>
+          <div className="stat-number stat-number--xl">{c7035.toLocaleString()}k</div>
           <span className="stat-sqft">sq. ft.</span>
-          <p className="stat-label">of meticulously designed</p>
-          <p className="stat-sublabel">living space.</p>
+          <p className="stat-label">Sky Villas</p>
+          <p className="stat-sublabel">Largest duplex residences</p>
         </div>
 
         {/* 24/7 — lower center */}

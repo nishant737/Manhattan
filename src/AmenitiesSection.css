@@ -1,0 +1,356 @@
+.amenities-section {
+  background-color: #0e0e0e;
+  padding: 100px 0;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  contain: layout style paint;
+}
+
+/* ── Section Header ── */
+.amenities-header {
+  text-align: center;
+  margin-bottom: 80px;
+  padding: 0 60px;
+  box-sizing: border-box;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.amenities-main-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  color: rgb(251, 238, 190);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.amenities-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 80px;
+  align-items: flex-start;
+  height: 100%;
+}
+
+/* ── Left Section ── */
+.amenities-left {
+  flex: 0 0 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* Fade-up animation for left section */
+@keyframes fadeUpAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.amenities-left {
+  will-change: transform, opacity;
+}
+
+.amenities-left.animate-fade-up {
+  animation: fadeUpAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.amenities-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.amenities-explore {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  width: fit-content;
+}
+
+.amenities-explore:hover {
+  gap: 16px;
+  opacity: 0.8;
+}
+
+.explore-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(251, 238, 190);
+  display: inline-block;
+}
+
+.explore-arrow {
+  font-size: 16px;
+}
+
+/* ── Right Section - Pills ── */
+.amenities-right {
+  flex: 0 0 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  overflow: hidden;
+  margin-right: -60px;
+  padding-right: 60px;
+}
+
+.amenities-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Slide-in from right animation - 700ms duration */
+@keyframes slideInRightAnimation {
+  0% {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.amenity-pill {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 28px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50px;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(80px);
+  width: 100%;
+  box-sizing: border-box;
+  will-change: transform, opacity;
+}
+
+.amenity-pill.animate-slide-in-right {
+  animation: slideInRightAnimation 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.amenity-pill:hover {
+  transform: translateX(8px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.amenity-pill.animate-slide-in-right:hover {
+  transform: translateX(8px);
+}
+
+.pill-icon {
+  font-size: 28px;
+  min-width: 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgb(251, 238, 190), rgba(251, 238, 190, 0.7));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pill-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #0e0e0e;
+  flex: 1;
+}
+
+.pill-arrow {
+  font-size: 20px;
+  color: #0e0e0e;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.amenity-pill:hover .pill-arrow {
+  opacity: 1;
+  transform: translateY(4px);
+}
+
+/* ── Responsive: Tablet ── */
+@media (max-width: 1024px) {
+  .amenities-header {
+    padding: 0 48px;
+    margin-bottom: 60px;
+  }
+
+  .amenities-main-title {
+    font-size: clamp(32px, 4vw, 48px);
+  }
+
+  .amenities-container {
+    padding: 0 48px;
+    gap: 60px;
+  }
+
+  .amenities-left {
+    flex: 0 0 40%;
+  }
+
+  .amenities-right {
+    flex: 0 0 60%;
+    margin-right: -48px;
+    padding-right: 48px;
+  }
+
+  .amenities-heading {
+    font-size: clamp(32px, 3.5vw, 44px);
+  }
+
+  .amenity-pill {
+    padding: 16px 24px;
+  }
+
+  .pill-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+  }
+}
+
+/* ── Responsive: Mobile ── */
+@media (max-width: 768px) {
+  .amenities-section {
+    padding: 80px 0;
+    min-height: auto;
+  }
+
+  .amenities-header {
+    padding: 0 32px;
+    margin-bottom: 50px;
+  }
+
+  .amenities-main-title {
+    font-size: clamp(28px, 4vw, 40px);
+  }
+
+  .amenities-container {
+    padding: 0 32px;
+    flex-direction: column;
+    gap: 60px;
+    height: auto;
+  }
+
+  .amenities-left {
+    flex: 1;
+    width: 100%;
+  }
+
+  .amenities-right {
+    flex: 1;
+    width: 100%;
+    margin-right: 0;
+    padding-right: 0;
+  }
+
+  .amenities-heading {
+    font-size: clamp(28px, 4vw, 40px);
+  }
+
+  .amenities-pills {
+    gap: 16px;
+  }
+
+  .amenity-pill {
+    padding: 14px 20px;
+  }
+
+  .pill-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .pill-text {
+    font-size: 14px;
+  }
+}
+
+/* ── Responsive: Small Mobile ── */
+@media (max-width: 480px) {
+  .amenities-section {
+    padding: 60px 0;
+    min-height: auto;
+  }
+
+  .amenities-header {
+    padding: 0 20px;
+    margin-bottom: 40px;
+  }
+
+  .amenities-main-title {
+    font-size: 24px;
+  }
+
+  .amenities-container {
+    padding: 0 20px;
+  }
+
+  .amenities-right {
+    margin-right: 0;
+    padding-right: 0;
+  }
+
+  .amenities-heading {
+    font-size: 24px;
+  }
+
+  .amenity-pill {
+    padding: 12px 16px;
+    gap: 16px;
+  }
+
+  .pill-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .pill-text {
+    font-size: 13px;
+  }
+
+  .amenities-explore {
+    font-size: 12px;
+  }
+}
