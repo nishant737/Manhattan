@@ -1,0 +1,442 @@
+/* ── Backdrop ── */
+.apartment-showcase-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* ── Main Container ── */
+.apartment-showcase {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #0e0e0e;
+  display: flex;
+  overflow: hidden;
+  contain: layout style paint;
+}
+
+/* ── Close Button ── */
+.apartment-close-btn {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  z-index: 1000;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid rgb(251, 238, 190);
+  border-radius: 50%;
+  color: rgb(251, 238, 190);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  padding: 0;
+  will-change: opacity, transform;
+  opacity: 0.65;
+}
+
+.apartment-close-btn:hover {
+  opacity: 1;
+  transform: scale(1.12);
+  box-shadow: 0 0 20px rgba(251, 238, 190, 0.25);
+}
+
+.apartment-close-btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Left Section - Image ── */
+.apartment-image-section {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.apartment-main-image-wrapper {
+  width: 100%;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: opacity;
+}
+
+.apartment-main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  will-change: opacity;
+}
+
+/* ── Thumbnail Strip ── */
+.apartment-thumbnails {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+  justify-content: center;
+  align-items: flex-end;
+  position: relative;
+  z-index: 10;
+}
+
+.apartment-thumbnail {
+  width: 80px;
+  height: 120px;
+  aspect-ratio: 9 / 16;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.apartment-thumbnail:hover:not(.active) {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.apartment-thumbnail.active {
+  border-color: rgb(251, 238, 190);
+  opacity: 1;
+}
+
+.apartment-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Right Section - Info Panel ── */
+.apartment-info-panel {
+  flex: 0 0 30%;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0e0e0e 100%);
+  padding: 60px 40px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-left: 1px solid rgba(251, 238, 190, 0.1);
+}
+
+.apartment-info-content {
+  width: 100%;
+}
+
+/* Brand */
+.apartment-brand {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: rgb(251, 238, 190);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+/* Divider */
+.apartment-divider {
+  width: 60px;
+  height: 1px;
+  background: rgb(251, 238, 190);
+  margin-bottom: 24px;
+}
+
+/* Title */
+.apartment-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 24px 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* Description */
+.apartment-description {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+  color: rgba(251, 238, 190, 0.7);
+  margin: 0 0 32px 0;
+}
+
+/* Specifications */
+.apartment-specs {
+  margin-bottom: 36px;
+  padding: 24px 0;
+  border-top: 1px solid rgba(251, 238, 190, 0.1);
+  border-bottom: 1px solid rgba(251, 238, 190, 0.1);
+}
+
+.apartment-spec {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.apartment-spec:last-child {
+  margin-bottom: 0;
+}
+
+.spec-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(251, 238, 190, 0.5);
+  text-transform: uppercase;
+}
+
+.spec-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* CTA Button */
+.apartment-cta-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: rgb(251, 238, 190);
+  border: none;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #0e0e0e;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform, box-shadow;
+}
+
+.apartment-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(251, 238, 190, 0.3);
+}
+
+.apartment-cta-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Scrollbar Styling ── */
+.apartment-info-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.apartment-info-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.apartment-info-panel::-webkit-scrollbar-thumb {
+  background: rgba(251, 238, 190, 0.2);
+  border-radius: 3px;
+}
+
+.apartment-info-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 238, 190, 0.4);
+}
+
+/* ── Responsive: Tablet ── */
+@media (max-width: 1200px) {
+  .apartment-showcase {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .apartment-image-section {
+    min-height: 500px;
+    flex: none;
+  }
+
+  .apartment-info-panel {
+    flex: none;
+    border-left: none;
+    border-top: 1px solid rgba(251, 238, 190, 0.1);
+    max-height: 50vh;
+  }
+
+  .apartment-title {
+    font-size: 28px;
+  }
+
+  .apartment-close-btn {
+    top: 30px;
+    right: 30px;
+  }
+}
+
+/* ── Responsive: Mobile ── */
+@media (max-width: 768px) {
+  .apartment-showcase {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .apartment-image-section {
+    min-height: 400px;
+    flex: none;
+  }
+
+  .apartment-info-panel {
+    flex: none;
+    padding: 40px 24px 30px;
+    border-top: 1px solid rgba(251, 238, 190, 0.1);
+    max-height: none;
+  }
+
+  .apartment-thumbnails {
+    padding: 16px;
+    gap: 6px;
+  }
+
+  .apartment-thumbnail {
+    width: 60px;
+    height: 90px;
+  }
+
+  .apartment-brand {
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+
+  .apartment-divider {
+    margin-bottom: 16px;
+  }
+
+  .apartment-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .apartment-description {
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .apartment-specs {
+    margin-bottom: 24px;
+    padding: 16px 0;
+  }
+
+  .apartment-spec {
+    margin-bottom: 12px;
+  }
+
+  .spec-label {
+    font-size: 10px;
+  }
+
+  .spec-value {
+    font-size: 16px;
+  }
+
+  .apartment-cta-btn {
+    padding: 14px 20px;
+    font-size: 11px;
+  }
+
+  .apartment-close-btn {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    right: 20px;
+  }
+}
+
+/* ── Responsive: Small Mobile ── */
+@media (max-width: 480px) {
+  .apartment-showcase {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .apartment-image-section {
+    min-height: 300px;
+  }
+
+  .apartment-info-panel {
+    padding: 30px 20px 20px;
+  }
+
+  .apartment-thumbnails {
+    padding: 12px;
+    gap: 4px;
+  }
+
+  .apartment-thumbnail {
+    width: 50px;
+    height: 75px;
+  }
+
+  .apartment-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+
+  .apartment-description {
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
+
+  .apartment-specs {
+    margin-bottom: 20px;
+    padding: 12px 0;
+  }
+
+  .spec-value {
+    font-size: 14px;
+  }
+
+  .apartment-close-btn {
+    width: 36px;
+    height: 36px;
+    top: 15px;
+    right: 15px;
+  }
+
+  .apartment-close-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,8 +1,19 @@
 import { useState } from 'react'
 import './Navbar.css'
 
-export default function Navbar() {
+export default function Navbar({ onNavClick }) {
   const [open, setOpen] = useState(false)
+
+  const navItems = [
+    { id: 'standard', label: 'Standard Apartments' },
+    { id: 'refuge', label: 'Refuge Floor Apartments' },
+    { id: 'lower-duplex', label: 'Lower Duplex Units' },
+    { id: 'upper-duplex', label: 'Upper Duplex Units' }
+  ]
+
+  const handleNavClick = (id) => {
+    onNavClick(id)
+  }
 
   return (
     <>
@@ -11,10 +22,13 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <ul className="navbar-links">
-          <li><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#stats">Stats</a></li>
-          <li><a href="#contact">Contact</a></li>
+          {navItems.map(item => (
+            <li key={item.id}>
+              <a href="#" onClick={(e) => { e.preventDefault(); handleNavClick(item.id) }}>
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
 
         {/* Hamburger — mobile only */}
@@ -32,10 +46,20 @@ export default function Navbar() {
       {/* Mobile drawer */}
       <div className={`mobile-menu ${open ? 'mobile-menu--open' : ''}`}>
         <ul>
-          <li><a href="#home"    onClick={() => setOpen(false)}>Home</a></li>
-          <li><a href="#about"   onClick={() => setOpen(false)}>About</a></li>
-          <li><a href="#stats"   onClick={() => setOpen(false)}>Stats</a></li>
-          <li><a href="#contact" onClick={() => setOpen(false)}>Contact</a></li>
+          {navItems.map(item => (
+            <li key={item.id}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavClick(item.id)
+                  setOpen(false)
+                }}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
     </>
