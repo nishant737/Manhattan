@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import gsap from 'gsap'
 import './LuxuryShowcase.css'
 
 const RESIDENCES = [
@@ -22,7 +23,10 @@ const RESIDENCES = [
 export default function LuxuryShowcase() {
   const [activeIndex, setActiveIndex] = useState(0)
   const autoSlideRef = useRef(null)
+  const carouselRef = useRef(null)
+  const textRef = useRef(null)
 
+  // Auto-slide carousel
   useEffect(() => {
     autoSlideRef.current = setInterval(() => {
       setActiveIndex(prev => (prev + 1) % RESIDENCES.length)
@@ -30,6 +34,27 @@ export default function LuxuryShowcase() {
 
     return () => clearInterval(autoSlideRef.current)
   }, [])
+
+  // Smooth carousel and text animations on index change
+  useEffect(() => {
+    // Animate carousel images
+    if (carouselRef.current) {
+      gsap.fromTo(
+        carouselRef.current.querySelectorAll('.carousel-image-container'),
+        { opacity: 0 },
+        { opacity: 1, duration: 0.8, stagger: 0.15, ease: 'power2.inOut' }
+      )
+    }
+
+    // Animate text with fade and slide
+    if (textRef.current) {
+      gsap.fromTo(
+        textRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
+      )
+    }
+  }, [activeIndex])
 
   const getVisibleIndices = () => {
     const prev = (activeIndex - 1 + RESIDENCES.length) % RESIDENCES.length
@@ -48,12 +73,12 @@ export default function LuxuryShowcase() {
 
       <div className="carousel-section">
         {/* Text overlay with animation */}
-        <div className="carousel-text-overlay" key={activeIndex}>
+        <div className="carousel-text-overlay" ref={textRef} key={activeIndex}>
           <h3 className="carousel-title">{currentTitle}</h3>
         </div>
 
         {/* Carousel with sliding animation */}
-        <div className="carousel-images-wrapper">
+        <div className="carousel-images-wrapper" ref={carouselRef}>
           {/* Left image */}
           <div className="carousel-image-container carousel-image-left">
             <img 
