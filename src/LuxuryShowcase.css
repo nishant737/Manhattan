@@ -93,31 +93,36 @@
   transition: none;
 }
 
-/* Left image - smaller, dimmed */
+/* Left image - smaller, dimmed - FIXED LAYOUT */
 .carousel-image-left {
   width: auto;
   opacity: 0.5;
+  transform: scale(0.9);
   filter: brightness(0.8) drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
+  transition: none !important;
 }
 
-/* Center image - primary focus */
+/* Center image - primary focus - FIXED LAYOUT */
 .carousel-image-center {
   width: auto;
   opacity: 1;
   transform: scale(1.15);
   filter: drop-shadow(0 40px 100px rgba(0, 0, 0, 0.8));
   z-index: 10;
+  transition: none !important;
 }
 
 .carousel-image-center:hover {
   filter: drop-shadow(0 50px 120px rgba(0, 0, 0, 0.9));
 }
 
-/* Right image - smaller, dimmed */
+/* Right image - smaller, dimmed - FIXED LAYOUT */
 .carousel-image-right {
   width: auto;
   opacity: 0.5;
+  transform: scale(0.9);
   filter: brightness(0.8) drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
+  transition: none !important;
 }
 
 /* Image content */

@@ -40,54 +40,72 @@ export default function LuxuryShowcase() {
       ? (activeIndex + 1) % RESIDENCES.length
       : (activeIndex - 1 + RESIDENCES.length) % RESIDENCES.length
 
-    const containers = wrapperRef.current?.querySelectorAll('.carousel-image-container') || []
+    // Update state first so new images load in background
+    setActiveIndex(newIndex)
 
-    const timeline = gsap.timeline()
+    // Use small setTimeout to ensure React has rendered new images
+    setTimeout(() => {
+      const containers = wrapperRef.current?.querySelectorAll('.carousel-image-container') || []
 
-    // Fade out old text quickly
-    timeline.to(textRef.current, {
-      opacity: 0,
-      y: -8,
-      duration: 0.2,
-      ease: 'power2.in'
+      if (!containers.length) {
+        setIsAnimating(false)
+        return
+      }
+
+      const leftContainer = containers[0]
+      const centerContainer = containers[1]
+      const rightContainer = containers[2]
+
+      // Create timeline for fast, clean image swap (NO SCALING ANIMATIONS)
+      const timeline = gsap.timeline({
+        onComplete: () => {
+          setIsAnimating(false)
+        }
+      })
+
+      // Fade out text quickly
+      timeline.to(textRef.current, {
+        opacity: 0,
+        y: -6,
+        duration: 0.1,
+        ease: 'power2.in'
+      }, 0)
+
+      // Clean crossfade: all images fade smoothly (NO SCALE CHANGES)
+      // Fade all containers down briefly for clean image swap
+      timeline.to(containers, {
+        opacity: 0.7,
+        duration: 0.15,
+        ease: 'power2.inOut'
+      }, 0)
+
+      // Fade back to full opacity - smooth crossfade complete
+      timeline.to(containers, {
+        opacity: 1,
+        duration: 0.15,
+        ease: 'power2.inOut'
+      }, 0.15)
+
+      // Reset any transforms to ensure clean CSS defaults
+      timeline.add(() => {
+        gsap.set([leftContainer, centerContainer, rightContainer], {
+          clearProps: "transform"
+        })
+      }, 0.3)
+
+      // Text pops in after fade completes
+      timeline.fromTo(textRef.current, {
+        opacity: 0,
+        y: 8,
+        scale: 0.96
+      }, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.25,
+        ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+      }, 0.2)
     }, 0)
-
-    // Fade out all images smoothly
-    timeline.to(containers, {
-      opacity: 0,
-      duration: 0.4,
-      ease: 'power2.inOut'
-    }, 0)
-
-    // Update state while images are hidden (show new images)
-    timeline.add(() => {
-      setActiveIndex(newIndex)
-    }, 0.4)
-
-    // Fade in new images smoothly (starting after old images fade out)
-    timeline.to(containers, {
-      opacity: 1,
-      duration: 0.6,
-      ease: 'power2.inOut'
-    }, 0.45)
-
-    // Pop up text after images are in (starts at 0.8s)
-    timeline.fromTo(textRef.current, {
-      opacity: 0,
-      y: 15,
-      scale: 0.92
-    }, {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      duration: 0.55,
-      ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-    }, 0.8)
-
-    // Mark animation complete
-    timeline.add(() => {
-      setIsAnimating(false)
-    }, '-=0')
   }
 
   const { prev, current, next } = getVisibleIndices()
