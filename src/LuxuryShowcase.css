@@ -232,7 +232,8 @@
 /* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
   .luxury-showcase {
-    padding: 80px 0 100px;
+    padding: 60px 0 100px;
+    margin-top: 0;
   }
 
   .showcase-header {

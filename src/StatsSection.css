@@ -13,7 +13,7 @@
   height: 400px;
   padding: 0 40px;
   box-sizing: border-box;
-   transform: translateY(-180px);
+  transform: translateY(-180px);
 }
 
 /* ── 60% — upper right of center ── */
@@ -114,6 +114,7 @@
 @media (max-width: 600px) {
   .stats-section {
     padding: 48px 0 64px;
+    background-color: #0e0e0e;
   }
 
   .stats-box {
@@ -124,6 +125,7 @@
     align-items: center;
     gap: 44px;
     padding: 44px 28px;
+    transform: none;
   }
 
   .stat {

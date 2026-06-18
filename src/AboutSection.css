@@ -71,6 +71,9 @@
 @media (max-width: 768px) {
   .about-section {
     height: auto;
+    margin-top: 0;
+    padding-top: 60px;
+    background-color: #0e0e0e;
   }
 
   .about-sticky {
@@ -78,12 +81,14 @@
     height: auto;
     padding: 72px 28px 80px;
     align-items: center;
+    background-color: #0e0e0e;
   }
 
   .about-inner {
     gap: 20px;
     text-align: center;
     align-items: center;
+    transform: none;
   }
 
   .about-eyebrow {

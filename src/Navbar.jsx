@@ -45,6 +45,20 @@ export default function Navbar({ onNavClick }) {
 
       {/* Mobile drawer */}
       <div className={`mobile-menu ${open ? 'mobile-menu--open' : ''}`}>
+        <div className="mobile-menu-header">
+          <div className="mobile-menu-logo">MANHATTAN</div>
+          <button
+            className="mobile-menu-close"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
         <ul>
           {navItems.map(item => (
             <li key={item.id}>
