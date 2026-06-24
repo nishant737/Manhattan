@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import './ApartmentShowcase.css'
+import LowerDuplexLayout from './assets/lower-duplex-layout.jpeg'
+import UpperDuplexLayout from './assets/upper-duplex-layout.jpeg'
 
 const APARTMENT_DATA = {
   standard: {
@@ -43,7 +45,8 @@ const APARTMENT_DATA = {
     images: [
       '/STREET VIEW_ 02.jpg',
       '/INDOOR GAME.jpg',
-      '/SKY LOUNGE CAFE.jpg'
+      '/SKY LOUNGE CAFE.jpg',
+      LowerDuplexLayout
     ],
     specs: [
       { label: 'Bedroom', value: '3-4' },
@@ -59,7 +62,8 @@ const APARTMENT_DATA = {
     images: [
       '/INDOOR GAME.jpg',
       '/STREET VIEW_ 02.jpg',
-      '/SKY LOUNGE CAFE.jpg'
+      '/SKY LOUNGE CAFE.jpg',
+      UpperDuplexLayout
     ],
     specs: [
       { label: 'Bedroom', value: '4-5' },

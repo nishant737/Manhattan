@@ -1,22 +1,25 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
 import './LuxuryShowcase.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const RESIDENCES = [
   {
     id: 1,
-    image: '/INDOOR GAME.jpg',
-    title: 'INDOOR GAME'
+    image: '/GYM.jpg',
+    title: 'GYM AND SPA'
   },
   {
     id: 2,
     image: '/SKY LOUNGE CAFE.jpg',
-    title: 'SKY LOUNGE CAFE'
+    title: 'INDOOR POOL'
   },
   {
     id: 3,
-    image: '/STREET VIEW_ 02.jpg',
-    title: 'STREET VIEW'
+    image: '/Sky Lounge-Game Room.jpeg',
+    title: 'GAME ROOM'
   }
 ]
 
@@ -25,6 +28,80 @@ export default function LuxuryShowcase() {
   const [isAnimating, setIsAnimating] = useState(false)
   const wrapperRef = useRef(null)
   const textRef = useRef(null)
+  const showcaseRef = useRef(null)
+  const headerRef = useRef(null)
+  const carouselRef = useRef(null)
+
+  // Entrance animations on scroll into view
+  useEffect(() => {
+    const showcase = showcaseRef.current
+    if (!showcase) return
+
+    // Animate header on entrance
+    if (headerRef.current) {
+      gsap.fromTo(
+        headerRef.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: showcase,
+            start: 'top 60%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      )
+    }
+
+    // Animate carousel section with staggered effect
+    if (carouselRef.current) {
+      gsap.fromTo(
+        carouselRef.current,
+        { opacity: 0, y: 60, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 1,
+          ease: 'power2.out',
+          delay: 0.2,
+          scrollTrigger: {
+            trigger: showcase,
+            start: 'top 60%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      )
+    }
+
+    // Parallax effect on images during scroll
+    const images = wrapperRef.current?.querySelectorAll('.carousel-image-container')
+    if (images && images.length > 0) {
+      gsap.to(images, {
+        y: (index) => {
+          return gsap.utils.unitize(index * 10, 'px')
+        },
+        scrollTrigger: {
+          trigger: showcase,
+          start: 'top center',
+          end: 'bottom center',
+          scrub: 1,
+          markers: false
+        }
+      })
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger === showcase || trigger.vars.trigger === headerRef.current || trigger.vars.trigger === carouselRef.current) {
+          trigger.kill()
+        }
+      })
+    }
+  }, [])
 
   const getVisibleIndices = () => {
     const prev = (activeIndex - 1 + RESIDENCES.length) % RESIDENCES.length
@@ -112,12 +189,12 @@ export default function LuxuryShowcase() {
   const currentTitle = RESIDENCES[current].title
 
   return (
-    <section className="luxury-showcase">
-      <div className="showcase-header">
+    <section className="luxury-showcase" ref={showcaseRef}>
+      <div className="showcase-header" ref={headerRef}>
         <h2 className="showcase-main-title">Luxury Residences</h2>
       </div>
 
-      <div className="carousel-section">
+      <div className="carousel-section" ref={carouselRef}>
         {/* Text overlay */}
         <div className="carousel-text-overlay" ref={textRef}>
           <h3 className="carousel-title">{currentTitle}</h3>

@@ -23,7 +23,7 @@
   flex: 0 0 40%;
   display: flex;
   align-items: center;
-  padding: 60px;
+  padding: 60px 100px 60px 60px;
   box-sizing: border-box;
   background-color: #0a0a0a;
 }
@@ -161,7 +161,7 @@
 
   .amenities-content-column {
     flex: 0 0 auto;
-    padding: 60px 40px;
+    padding: 60px 80px 60px 40px;
     min-height: 50vh;
   }
 

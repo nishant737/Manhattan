@@ -79,7 +79,7 @@ export default function AmenitiesSection() {
         trigger: section,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1, // Immediate scrubbing for snappy response
+        scrub: 1,
         markers: false,
         onUpdate: (self) => {
           const newIndex = Math.min(
@@ -100,7 +100,7 @@ export default function AmenitiesSection() {
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 1 },
-          { opacity: 0, duration: 0.6 },
+          { opacity: 0, duration: 0.3 },
           0
         )
       } else if (index === imageSets.length - 1) {
@@ -108,7 +108,7 @@ export default function AmenitiesSection() {
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 0 },
-          { opacity: 1, duration: 0.6 },
+          { opacity: 1, duration: 0.3 },
           index - 0.4
         )
       } else {
@@ -116,12 +116,12 @@ export default function AmenitiesSection() {
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 0 },
-          { opacity: 1, duration: 0.6 },
+          { opacity: 1, duration: 0.3 },
           index - 0.4
         )
         tl.to(
           [imageSet, textItem],
-          { opacity: 0, duration: 0.6 },
+          { opacity: 0, duration: 0.3 },
           index + 0.4
         )
       }

@@ -1,0 +1,628 @@
+.location-connectivity-section {
+  background-color: #0a0a0a;
+  padding: 0 0 120px 0;
+  position: relative;
+}
+
+.location-container {
+  max-width: 1400px;
+  margin: 0 auto;
+ padding: 0 100px 0 60px; 
+}
+
+.location-content-wrapper {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+}
+
+/* ── Left Column: Title & List ── */
+.location-left-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  flex: 0 0 40%;
+  will-change: opacity, transform;
+}
+
+.location-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: fit-content;
+}
+
+.title-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgb(251, 238, 190);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.location-list-item {
+  background: none;
+  border: none;
+  padding: 10px 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.location-list-item:last-child {
+  border-bottom: none;
+}
+
+.location-list-item:hover {
+  padding-left: 12px;
+}
+
+.location-list-item.active {
+  padding-left: 12px;
+}
+
+.location-list-item .time {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgb(251, 238, 190);
+  text-transform: uppercase;
+}
+
+.location-list-item .name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.3s ease;
+}
+
+.location-list-item:hover .name,
+.location-list-item.active .name {
+  color: rgb(251, 238, 190);
+}
+
+/* ── Right Column: Map ── */
+.location-right-column {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 60%;
+  will-change: opacity, transform;
+}
+
+.location-map-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #0a0a0a;
+}
+
+.leaflet-map-container {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 20px;
+  background-color: #0a0a0a;
+}
+
+/* Ensure Leaflet tiles display properly */
+.leaflet-container {
+  background-color: #0a0a0a;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.leaflet-tile-pane {
+  z-index: 1 !important;
+}
+
+/* Fix tile rendering */
+.leaflet-pane {
+  z-index: 2 !important;
+}
+
+/* Hide attribution control */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Main Manhattan Location Marker (Central Pin) */
+.main-location-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-marker-pin {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-marker-outer {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-color: rgba(251, 238, 190, 0.1);
+  border: 2px solid rgb(251, 238, 190);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.main-marker-dot {
+  width: 16px;
+  height: 16px;
+  background-color: rgb(251, 238, 190);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 25px rgba(251, 238, 190, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.main-marker-pulse {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(251, 238, 190, 0.1);
+  border-radius: 50%;
+  animation: mainMarkerPulse 2.5s infinite;
+}
+
+@keyframes mainMarkerPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Custom Leaflet Marker Styles (Nearby Locations) */
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-pin {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-dot {
+  width: 12px;
+  height: 12px;
+  background-color: rgb(251, 238, 190);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(251, 238, 190, 0.6);
+  transition: all 0.3s ease;
+}
+
+.custom-marker.active .marker-dot {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 30px rgba(251, 238, 190, 0.8);
+}
+
+.marker-pulse {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(251, 238, 190, 0.2);
+  border-radius: 50%;
+  animation: markerPulse 2s infinite;
+}
+
+.custom-marker.active .marker-pulse {
+  animation: none;
+  background-color: rgba(251, 238, 190, 0.3);
+}
+
+@keyframes markerPulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Leaflet Popup Customization */
+.location-popup .leaflet-popup-content-wrapper {
+  background-color: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(251, 238, 190, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.location-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 12px;
+}
+
+.popup-content h4 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgb(251, 238, 190);
+  margin: 0 0 4px 0;
+}
+
+.popup-content p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.location-popup .leaflet-popup-tip {
+  border-top-color: rgba(26, 26, 26, 0.95);
+}
+
+
+/* ── Inline Card on Map ── */
+.location-card {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  background-color: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(251, 238, 190, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 320px;
+  backdrop-filter: blur(10px);
+  z-index: 20;
+  will-change: transform, opacity;
+}
+
+.card-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(251, 238, 190, 0.1);
+  border: 1px solid rgba(251, 238, 190, 0.2);
+  color: rgb(251, 238, 190);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 5;
+}
+
+.card-close:hover {
+  background: rgba(251, 238, 190, 0.2);
+  border-color: rgb(251, 238, 190);
+}
+
+.card-image {
+  width: 100%;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgb(251, 238, 190);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.card-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-time {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgb(251, 238, 190);
+  text-transform: uppercase;
+}
+
+.card-category {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.card-description {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.card-cta {
+  background: rgba(251, 238, 190, 0.1);
+  color: rgb(251, 238, 190);
+  border: 1px solid rgba(251, 238, 190, 0.3);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.card-cta:hover {
+  background: rgba(251, 238, 190, 0.2);
+  border-color: rgb(251, 238, 190);
+}
+
+/* ── Responsive: Tablet ── */
+@media (max-width: 1024px) {
+  .location-container {
+    padding: 0 40px;
+  }
+
+  .location-content-wrapper {
+    flex-direction: column;
+    gap: 60px;
+  }
+
+  .location-left-column {
+    flex: 1 1 auto;
+  }
+
+  .location-right-column {
+    flex: 1 1 auto;
+  }
+
+  .location-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 36px;
+    margin-bottom: 30px;
+    height: auto;
+  }
+
+  .location-map-wrapper {
+    aspect-ratio: 16 / 9;
+  }
+
+  .location-card {
+    max-width: 300px;
+  }
+}
+
+/* ── Responsive: Mobile ── */
+@media (max-width: 768px) {
+  .location-connectivity-section {
+    padding: 80px 0;
+  }
+
+  .location-container {
+    padding: 0 24px;
+  }
+
+  .location-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .location-title {
+    font-size: 32px;
+    margin-bottom: 30px;
+  }
+
+  .location-list {
+    gap: 14px;
+  }
+
+  .location-list-item {
+    padding: 12px 0;
+    gap: 4px;
+  }
+
+  .location-list-item .time {
+    font-size: 12px;
+  }
+
+  .location-list-item .name {
+    font-size: 14px;
+  }
+
+  .location-map-wrapper {
+    aspect-ratio: 3 / 2;
+    border-radius: 16px;
+  }
+
+  .location-pin {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pin-marker {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pin-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .location-pin.active .pin-dot {
+    width: 14px;
+    height: 14px;
+  }
+
+  .pin-pulse {
+    width: 32px;
+    height: 32px;
+  }
+
+  .location-card {
+    bottom: 20px;
+    right: 20px;
+    max-width: 280px;
+    padding: 18px;
+  }
+
+  .card-image {
+    height: 130px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 16px;
+  }
+
+  .card-content {
+    gap: 10px;
+  }
+}
+
+/* ── Responsive: Small Mobile ── */
+@media (max-width: 480px) {
+  .location-connectivity-section {
+    padding: 60px 0;
+  }
+
+  .location-container {
+    padding: 0 16px;
+  }
+
+  .location-content-wrapper {
+    gap: 30px;
+  }
+
+  .location-title {
+    font-size: 24px;
+    margin-bottom: 24px;
+  }
+
+  .location-list {
+    gap: 12px;
+  }
+
+  .location-list-item {
+    padding: 10px 0;
+  }
+
+  .location-list-item .time {
+    font-size: 11px;
+  }
+
+  .location-list-item .name {
+    font-size: 13px;
+  }
+
+  .location-map-wrapper {
+    aspect-ratio: 2 / 1.5;
+    border-radius: 12px;
+  }
+
+  .location-card {
+    bottom: 16px;
+    right: 16px;
+    max-width: 260px;
+    padding: 16px;
+  }
+
+  .card-image {
+    height: 110px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+  }
+
+  .card-title {
+    font-size: 15px;
+  }
+
+  .card-description {
+    font-size: 12px;
+  }
+}
+
+/* Leaflet Controls Styling */
+.leaflet-control-zoom {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  background-color: rgba(26, 26, 26, 0.8) !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  color: rgb(251, 238, 190) !important;
+  font-size: 18px !important;
+  border: none !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background-color: rgba(251, 238, 190, 0.1) !important;
+}
+
+.leaflet-control-fullscreen {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  background-color: rgba(26, 26, 26, 0.8) !important;
+}
+
+.leaflet-control-fullscreen a {
+  color: rgb(251, 238, 190) !important;
+}

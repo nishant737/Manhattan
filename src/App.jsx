@@ -6,6 +6,8 @@ import StatsSection from './StatsSection'
 import LuxuryShowcase from './LuxuryShowcase'
 import ApartmentShowcase from './ApartmentShowcase'
 import AmenitiesSection from './AmenitiesSection'
+import TailoredSolutions from './TailoredSolutions'
+import LocationConnectivity from './LocationConnectivity'
 import './App.css'
 
 function App() {
@@ -24,6 +26,8 @@ function App() {
       <StatsSection />
       <LuxuryShowcase />
       <AmenitiesSection />
+      <TailoredSolutions />
+      <LocationConnectivity />
     </>
   )
 }
