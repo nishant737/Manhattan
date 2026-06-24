@@ -214,8 +214,8 @@ export default function LocationConnectivity() {
             <div className="location-map-wrapper">
               <MapContainer
                 center={mapCenter}
-                zoom={13}
-                scrollWheelZoom={true}
+                zoom={11}
+                scrollWheelZoom={false}
                 className="leaflet-map-container"
               >
                 <TileLayer
