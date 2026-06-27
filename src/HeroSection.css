@@ -7,6 +7,18 @@
   z-index: 0;
 }
 
+/* Allow navbar animations to render above hero section */
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
 .hero-video {
   width: 100%;
   height: 100%;

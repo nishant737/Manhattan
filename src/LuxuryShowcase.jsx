@@ -9,17 +9,20 @@ const RESIDENCES = [
   {
     id: 1,
     image: '/GYM.jpg',
-    title: 'GYM AND SPA'
+    title: 'GYM AND SPA',
+    description: 'State-of-the-art fitness facilities with premium equipment, yoga studios, sauna, steam room, and professional spa services.'
   },
   {
     id: 2,
     image: '/SKY LOUNGE CAFE.jpg',
-    title: 'INDOOR POOL'
+    title: 'INDOOR POOL',
+    description: 'Olympic-size heated indoor swimming pool with underwater lighting, jacuzzi facilities, and dedicated lap swimming zones.'
   },
   {
     id: 3,
     image: '/Sky Lounge-Game Room.jpeg',
-    title: 'GAME ROOM'
+    title: 'SKY LOUNGE',
+    description: 'Elegant rooftop lounge with panoramic city views, private dining areas, entertainment facilities, and curated events space.'
   }
 ]
 
@@ -202,8 +205,14 @@ export default function LuxuryShowcase() {
 
         {/* Image carousel with three visible slides */}
         <div className="carousel-images-wrapper" ref={wrapperRef}>
-          {/* Left image */}
-          <div className="carousel-image-container carousel-image-left">
+          {/* Left image - clickable */}
+          <div
+            className="carousel-image-container carousel-image-left carousel-image-clickable"
+            onClick={() => !isAnimating && slideCarousel('prev')}
+            role="button"
+            tabIndex="0"
+            onKeyDown={(e) => e.key === 'Enter' && !isAnimating && slideCarousel('prev')}
+          >
             <img
               src={RESIDENCES[prev].image}
               alt={RESIDENCES[prev].title}
@@ -220,8 +229,14 @@ export default function LuxuryShowcase() {
             />
           </div>
 
-          {/* Right image */}
-          <div className="carousel-image-container carousel-image-right">
+          {/* Right image - clickable */}
+          <div
+            className="carousel-image-container carousel-image-right carousel-image-clickable"
+            onClick={() => !isAnimating && slideCarousel('next')}
+            role="button"
+            tabIndex="0"
+            onKeyDown={(e) => e.key === 'Enter' && !isAnimating && slideCarousel('next')}
+          >
             <img
               src={RESIDENCES[next].image}
               alt={RESIDENCES[next].title}
@@ -230,28 +245,10 @@ export default function LuxuryShowcase() {
           </div>
         </div>
 
-        {/* Navigation arrows */}
-        <button
-          className="carousel-nav-arrow carousel-nav-arrow-prev"
-          onClick={() => slideCarousel('prev')}
-          disabled={isAnimating}
-          aria-label="Previous slide"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
-
-        <button
-          className="carousel-nav-arrow carousel-nav-arrow-next"
-          onClick={() => slideCarousel('next')}
-          disabled={isAnimating}
-          aria-label="Next slide"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
+        {/* Description text below images */}
+        <div className="carousel-description">
+          <p>{RESIDENCES[current].description}</p>
+        </div>
       </div>
     </section>
   )

@@ -459,8 +459,18 @@
   }
 
   .location-content-wrapper {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 40px;
+  }
+
+  .location-left-column {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .location-right-column {
+    flex: 1 1 auto;
+    width: 100%;
   }
 
   .location-title {
@@ -470,6 +480,7 @@
 
   .location-list {
     gap: 14px;
+    width: 100%;
   }
 
   .location-list-item {
@@ -486,8 +497,11 @@
   }
 
   .location-map-wrapper {
+    width: 100%;
+    height: 400px;
     aspect-ratio: 3 / 2;
     border-radius: 16px;
+    min-height: 400px;
   }
 
   .location-pin {
@@ -548,6 +562,17 @@
 
   .location-content-wrapper {
     gap: 30px;
+    flex-direction: column;
+  }
+
+  .location-left-column {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .location-right-column {
+    flex: 1 1 auto;
+    width: 100%;
   }
 
   .location-title {
@@ -557,6 +582,7 @@
 
   .location-list {
     gap: 12px;
+    width: 100%;
   }
 
   .location-list-item {
@@ -572,8 +598,11 @@
   }
 
   .location-map-wrapper {
+    width: 100%;
+    height: 360px;
     aspect-ratio: 2 / 1.5;
     border-radius: 12px;
+    min-height: 360px;
   }
 
   .location-card {

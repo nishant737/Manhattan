@@ -1,93 +1,214 @@
 import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AboutSection.css'
 
-const TEXT =
-  "Manhattan Tower is a landmark collaboration between Allegro and Mohtisham Builders — two names woven from decades of craft, trust, and an unwavering pursuit of the extraordinary. Rising above the Mangaluru skyline, it is not merely a building. It is a statement — of ambition, of artistry, and of what coastal living can truly become."
+gsap.registerPlugin(ScrollTrigger)
 
-const WORDS = TEXT.split(' ')
+const TAGLINE_LINES = [
+  'keep exploring.',
+  'work together.',
+  'grow brilliance.',
+  'shape tomorrow.'
+]
 
 export default function AboutSection() {
   const sectionRef = useRef(null)
-  const contentRef = useRef(null)
-  const spansRef   = useRef([])
+  const headingRef = useRef(null)
+  const imageRef = useRef(null)
+  const weElementRef = useRef(null)
+  const taglineContainerRef = useRef(null)
+  const taglineLinesRef = useRef([])
+  const descriptionRef = useRef(null)
+  const descriptionSecondaryRef = useRef(null)
+  const ctaRef = useRef(null)
 
-  // Build flat list of character refs across all words
-  let charIndex = 0
-  const wordData = WORDS.map(word => {
-    const chars = word.split('').map(char => ({ char, index: charIndex++ }))
-    return chars
-  })
-  const totalChars = charIndex
-
-
-  // Scroll: light each character sequentially
   useEffect(() => {
     const section = sectionRef.current
-    const spans   = spansRef.current
-    if (!section || !spans.length) return
+    const weElement = weElementRef.current
+    const heading = headingRef.current
+    const image = imageRef.current
+    const description = descriptionRef.current
+    const descSecondary = descriptionSecondaryRef.current
+    const cta = ctaRef.current
 
-    let rafId = null
-    let lastLit = -1
+    if (!section || !weElement) return
 
-    function update() {
-      const rect     = section.getBoundingClientRect()
-      const vh       = window.innerHeight
-      const isMobile = window.innerWidth <= 768
+    gsap.registerPlugin(ScrollTrigger)
 
-      // Mobile: spread animation as section travels from bottom to top of viewport
-      // Desktop: spread animation across the full sticky scroll distance
-      const progress = isMobile
-        ? Math.min(1, Math.max(0, (vh - rect.top) / (vh * 0.8)))
-        : Math.min(1, Math.max(0, -rect.top / (rect.height - vh)))
+    // Create single master timeline that pins the section and reveals all content
+    const masterTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: section,
+        start: 'top top',
+        end: '+=2000px',
+        scrub: 2.5,
+        pin: true,
+        markers: false
+      }
+    })
 
-      const lit = Math.floor(progress * totalChars)
+    // Heading and image fade in at start - synced with first line
+    masterTl.fromTo(
+      [heading, image],
+      { opacity: 0 },
+      { opacity: 1, duration: 0.35 },
+      0
+    )
 
-      if (lit === lastLit) return
-      lastLit = lit
+    // Get line height for "We" animation
+    const computedStyle = window.getComputedStyle(weElement)
+    const lineHeightValue = computedStyle.lineHeight
+    const lineHeight = parseFloat(lineHeightValue)
+    const totalDistance = lineHeight * 3
 
-      spans.forEach((span, i) => {
-        if (!span) return
-        span.style.color = i < lit
-          ? 'rgba(249, 238, 228, 1)'
-          : 'rgba(249, 238, 228, 0.15)'
+    // Animate "We" smoothly over first 40% of scroll (0% - 40%)
+    masterTl.fromTo(
+      weElement,
+      { y: 0 },
+      { y: totalDistance, ease: 'power1.inOut', duration: 1.6 },
+      0
+    )
+
+    // Animate line visibility - each line stays visible once revealed
+    const lines = taglineLinesRef.current
+    if (lines.length > 0) {
+      // All lines start hidden
+      lines.forEach(line => {
+        if (line) line.style.opacity = '0'
       })
+
+      // Line 1: becomes visible at start and stays visible
+      if (lines[0]) {
+        masterTl.fromTo(
+          lines[0],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.35 },
+          0
+        )
+      }
+
+      // Line 2: becomes visible when "We" reaches it and stays
+      if (lines[1]) {
+        masterTl.fromTo(
+          lines[1],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.35 },
+          0.4
+        )
+      }
+
+      // Line 3: becomes visible when "We" reaches it and stays
+      if (lines[2]) {
+        masterTl.fromTo(
+          lines[2],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.35 },
+          0.8
+        )
+      }
+
+      // Line 4: becomes visible when "We" reaches it and stays
+      if (lines[3]) {
+        masterTl.fromTo(
+          lines[3],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.35 },
+          1.2
+        )
+      }
     }
 
-    function onScroll() {
-      if (rafId) cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(update)
+    // Description 1 fades in - synced with animation
+    if (description) {
+      masterTl.fromTo(
+        description,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4 },
+        0.85
+      )
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    update()
+    // Description 2 fades in - synced with animation
+    if (descSecondary) {
+      masterTl.fromTo(
+        descSecondary,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4 },
+        1.35
+      )
+    }
+
+    // CTA button fades in - synced with animation
+    if (cta) {
+      masterTl.fromTo(
+        cta,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.4 },
+        1.75
+      )
+    }
+
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      if (rafId) cancelAnimationFrame(rafId)
+      if (masterTl.scrollTrigger) {
+        masterTl.scrollTrigger.kill()
+      }
+      masterTl.kill()
     }
   }, [])
 
   return (
     <section className="about-section" ref={sectionRef}>
-      <div className="about-sticky">
-      <div className="about-inner">
-        <p className="about-eyebrow">The Vision Behind Manhattan</p>
-        <div className="about-divider" />
-        <p className="about-content" ref={contentRef}>
-          {wordData.map((chars, wi) => (
-            <span key={wi} className="about-word">
-              {chars.map(({ char, index }) => (
-                <span
-                  key={index}
-                  ref={el => (spansRef.current[index] = el)}
-                  className="about-letter"
-                >
-                  {char}
-                </span>
-              ))}
-            </span>
-          ))}
-        </p>
-      </div>
+      <div className="about-container">
+        {/* Left Column */}
+        <div className="about-left">
+          <h2 className="about-heading" ref={headingRef}>
+            DESIGN YOU<br />
+            CAN FEEL
+          </h2>
+          <div className="about-image-wrapper" ref={imageRef}>
+            <img
+              src="/STREET VIEW_ 02.jpg"
+              alt="Design vision"
+              className="about-image"
+            />
+          </div>
+        </div>
+
+        {/* Right Column */}
+        <div className="about-right">
+          {/* Tagline with animated "We" */}
+          <div className="about-tagline-wrapper" ref={taglineContainerRef}>
+            <div className="about-tagline-text">
+              <span className="about-we-animated" ref={weElementRef}>We</span>
+              <div className="about-tagline-lines">
+                {TAGLINE_LINES.map((line, index) => (
+                  <div
+                    key={index}
+                    className="tagline-line"
+                    ref={(el) => {
+                      if (el) taglineLinesRef.current[index] = el
+                    }}
+                  >
+                    {line}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <p className="about-description" ref={descriptionRef}>
+            We partner with clients from day one, ensuring clear communication and expert guidance at every stage. Collaborating seamlessly with builders, consultants, and other specialists, we work to keep each project on track and deliver results that exceed our shared ambitions.
+          </p>
+
+          <p className="about-description-secondary" ref={descriptionSecondaryRef}>
+            While our aesthetic remains distinct, every project is shaped by its own unique character—born from our clients' aspirations, the site's potential, and the creative vision of our architectural team.
+          </p>
+
+          <button className="about-cta" ref={ctaRef}>
+            <span>EXPLORE MORE ABOUT US</span>
+          </button>
+        </div>
       </div>
     </section>
   )

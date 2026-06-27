@@ -67,6 +67,71 @@ export default function AmenitiesSection() {
   }, [])
 
   // Setup GSAP ScrollTrigger animations for image transitions
+
+  // Entrance animations when section comes into view
+  useEffect(() => {
+    if (!sectionRef.current || imagesRef.current.length === 0) return
+
+    const section = sectionRef.current
+    const firstImageSet = imagesRef.current[0]
+
+    if (!firstImageSet) return
+
+    const backgroundImg = firstImageSet.querySelector('.amenity-image-background')
+    const foregroundImg = firstImageSet.querySelector('.amenity-image-foreground')
+
+    if (backgroundImg && foregroundImg) {
+      // Animate large image from right to left
+      gsap.fromTo(
+        backgroundImg,
+        {
+          opacity: 0,
+          x: 280
+        },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none none'
+          }
+        }
+      )
+
+      // Animate small image from bottom to top
+      gsap.fromTo(
+        foregroundImg,
+        {
+          opacity: 0,
+          y: 200
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 70%',
+            toggleActions: 'play none none none'
+          }
+        }
+      )
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger === section) {
+          trigger.kill()
+        }
+      })
+    }
+  }, [])
+
+  // Setup GSAP ScrollTrigger animations for image transitions
   useEffect(() => {
     if (!sectionRef.current || imagesRef.current.length === 0) return
 
@@ -91,38 +156,46 @@ export default function AmenitiesSection() {
       }
     })
 
-    // Animate images and text together in perfect sync
+    // Animate images and text with consistent, evenly-spaced transitions
+    const numSlides = imageSets.length
+    const segmentDuration = 1 / numSlides // Equal time per slide
+    const fadeDuration = segmentDuration * 0.25 // Fade duration relative to segment
+
     imageSets.forEach((imageSet, index) => {
       const textItem = itemsRef.current[index]
+      const segmentStart = index * segmentDuration
+      const segmentEnd = (index + 1) * segmentDuration
+      const fadeInStart = segmentStart
+      const fadeOutStart = segmentEnd - fadeDuration
 
       if (index === 0) {
-        // First slide: images and text start visible
+        // First slide: start visible, fade out at end of segment
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 1 },
-          { opacity: 0, duration: 0.3 },
-          0
+          { opacity: 0, duration: fadeDuration },
+          fadeOutStart
         )
-      } else if (index === imageSets.length - 1) {
-        // Last slide: images and text fade in
+      } else if (index === numSlides - 1) {
+        // Last slide: fade in at start of segment, stay visible
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 0 },
-          { opacity: 1, duration: 0.3 },
-          index - 0.4
+          { opacity: 1, duration: fadeDuration },
+          fadeInStart
         )
       } else {
-        // Middle slides: fade in then out
+        // Middle slides: fade in, stay visible, fade out
         tl.fromTo(
           [imageSet, textItem],
           { opacity: 0 },
-          { opacity: 1, duration: 0.3 },
-          index - 0.4
+          { opacity: 1, duration: fadeDuration },
+          fadeInStart
         )
         tl.to(
           [imageSet, textItem],
-          { opacity: 0, duration: 0.3 },
-          index + 0.4
+          { opacity: 0, duration: fadeDuration },
+          fadeOutStart
         )
       }
     })

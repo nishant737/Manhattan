@@ -23,7 +23,7 @@ function App() {
       {activeShowcase && <ApartmentShowcase id={activeShowcase} onClose={() => setActiveShowcase(null)} />}
       <HeroSection />
       <AboutSection />
-        <StatsSection />
+      <StatsSection />
       <LuxuryShowcase />
       <AmenitiesSection />
       <TailoredSolutions />

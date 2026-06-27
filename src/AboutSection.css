@@ -1,108 +1,270 @@
 .about-section {
   position: relative;
-  height: 180vh;
-  background-color: #0e0e0e;
-  margin-top: 0;
-}
-
-.about-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 48px;
-  padding-top: 8vh;
+  background-color: #0a0a0a;
+  padding: 140px 0 200px;
   box-sizing: border-box;
+  width: 100%;
 }
 
-.about-inner {
-  transform: translateY(-180px);
-  width: 100%;
-  max-width: 1100px;
+.about-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 100px;
+  align-items: center;
+}
+
+/* ── Left Column ── */
+.about-left {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 32px;
+  gap: 40px;
 }
 
-.about-eyebrow {
+.about-heading {
   font-family: 'Montserrat', sans-serif;
-  font-size: clamp(9px, 0.7vw, 11px);
-  font-weight: 500;
-  letter-spacing: 0.28em;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: rgb(251, 238, 190);
+  margin: 0;
+  line-height: 1.1;
   text-transform: uppercase;
-  color:  rgb(251, 238, 190);
-  margin: 0;
+  will-change: opacity;
 }
 
-.about-divider {
-  width: 48px;
-  height: 1px;
-  background:rgba(251, 238, 190);
-  margin: 0 auto;
+.about-image-wrapper {
+  position: relative;
+  width: 85%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 0;
+  will-change: opacity;
 }
 
-.about-content {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(16px, 1.8vw, 26px);
-  font-weight: 300;
-  line-height: 1.85;
-  margin: 0;
+.about-image {
   width: 100%;
-  max-width: 1100px;
-  letter-spacing: 0.01em;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.about-word {
+/* ── Right Column ── */
+.about-right {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Tagline with animated "We" ── */
+.about-tagline-wrapper {
+  position: relative;
+  margin-bottom: 0;
+}
+
+.about-tagline-text {
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(24px, 2.5vw, 48px);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.about-we-animated {
   display: inline-block;
+  font-weight: 700;
+  will-change: transform;
+  flex-shrink: 0;
   white-space: nowrap;
-  margin-right: 0.28em;
 }
 
-.about-letter {
-  color: rgba(251, 238, 190);
-  transition: color 0.35s ease;
-  display: inline;
+.about-tagline-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
 }
 
+.tagline-line {
+  font-family: 'Montserrat', sans-serif;
+  font-size: inherit;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: rgb(251, 238, 190);
+  margin: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.about-description {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 300;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  will-change: opacity, transform;
+}
+
+.about-description-secondary {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(14px, 1vw, 16px);
+  font-weight: 300;
+  line-height: 1.8;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  will-change: opacity, transform;
+}
+
+.about-cta {
+  align-self: flex-start;
+  background: #000;
+  color: rgb(251, 238, 190);
+  border: 1px solid rgb(251, 238, 190);
+  padding: 18px 40px;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  will-change: background, border-color, opacity, transform;
+}
+
+.about-cta:hover {
+  background: rgb(251, 238, 190);
+  color: #000;
+  border-color: rgb(251, 238, 190);
+}
+
+/* ── Responsive: Tablet ── */
+@media (max-width: 1024px) {
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 0 48px;
+  }
+
+  .about-heading {
+    font-size: clamp(32px, 6vw, 56px);
+  }
+
+  .about-left {
+    gap: 40px;
+  }
+
+  .about-tagline-text {
+    font-size: clamp(20px, 4vw, 36px);
+  }
+
+  .about-image-wrapper {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
   .about-section {
-    height: auto;
-    margin-top: 0;
-    padding-top: 60px;
-    background-color: #0e0e0e;
+    padding: 100px 0 140px;
   }
 
-  .about-sticky {
-    position: static;
-    height: auto;
-    padding: 72px 28px 80px;
-    align-items: center;
-    background-color: #0e0e0e;
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 0 24px;
   }
 
-  .about-inner {
+  .about-left {
+    gap: 30px;
+  }
+
+  .about-heading {
+    font-size: clamp(28px, 8vw, 48px);
+    letter-spacing: -0.01em;
+  }
+
+  .about-image-wrapper {
+    aspect-ratio: 3 / 4;
+  }
+
+  .about-right {
     gap: 20px;
-    text-align: center;
-    align-items: center;
-    transform: none;
   }
 
-  .about-eyebrow {
-    font-size: clamp(8px, 2.4vw, 10px);
-    letter-spacing: 0.22em;
+  .about-tagline-wrapper {
+    margin-bottom: 0;
   }
 
-  .about-content {
-    font-size: clamp(14px, 4.2vw, 18px);
-    line-height: 1.75;
-    letter-spacing: 0.01em;
+  .about-tagline-text {
+    font-size: clamp(18px, 5vw, 28px);
+    gap: 10px;
   }
 
-  .about-word {
-    white-space: normal;
+  .about-description,
+  .about-description-secondary {
+    font-size: clamp(13px, 3vw, 15px);
+    line-height: 1.7;
+  }
+
+  .about-cta {
+    padding: 16px 32px;
+    font-size: 11px;
+  }
+}
+
+/* ── Responsive: Small Mobile ── */
+@media (max-width: 480px) {
+  .about-section {
+    padding: 80px 0 120px;
+  }
+
+  .about-container {
+    gap: 30px;
+    padding: 0 16px;
+  }
+
+  .about-left {
+    gap: 24px;
+  }
+
+  .about-heading {
+    font-size: clamp(24px, 9vw, 36px);
+  }
+
+  .about-image-wrapper {
+    aspect-ratio: 16 / 9;
+  }
+
+  .about-tagline-wrapper {
+    margin-bottom: 0;
+  }
+
+  .about-tagline-text {
+    font-size: clamp(16px, 5.5vw, 22px);
+    gap: 8px;
+  }
+
+  .about-description,
+  .about-description-secondary {
+    font-size: clamp(12px, 3.2vw, 13px);
+  }
+
+  .about-cta {
+    padding: 14px 28px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
   }
 }

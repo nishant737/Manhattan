@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import './Navbar.css'
 
 export default function Navbar({ onNavClick }) {
   const [open, setOpen] = useState(false)
+  const logoRef = useRef(null)
+  const linksRef = useRef([])
 
   const navItems = [
     { id: 'standard', label: 'Standard Apartments' },
@@ -18,13 +20,19 @@ export default function Navbar({ onNavClick }) {
   return (
     <>
       <nav className="navbar">
-        <div className="navbar-logo">MANHATTAN</div>
+        <div className="navbar-logo navbar-logo-animate" ref={logoRef}>MANHATTAN</div>
 
         {/* Desktop links */}
         <ul className="navbar-links">
-          {navItems.map(item => (
-            <li key={item.id}>
-              <a href="#" onClick={(e) => { e.preventDefault(); handleNavClick(item.id) }}>
+          {navItems.map((item, index) => (
+            <li key={item.id} className="navbar-link-item">
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); handleNavClick(item.id) }}
+                className="navbar-link-animate"
+                ref={(el) => { if (el) linksRef.current[index] = el }}
+                style={{ '--link-index': index }}
+              >
                 {item.label}
               </a>
             </li>
