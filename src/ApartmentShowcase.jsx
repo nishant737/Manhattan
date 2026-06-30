@@ -7,7 +7,7 @@ import UpperDuplexLayout from './assets/upper-duplex-layout.jpeg'
 const APARTMENT_DATA = {
   standard: {
     brand: 'MANHATTAN',
-    title: 'Standard Apartments',
+    title: 'Premium Apartments',
     description: 'Elegant urban residences designed for contemporary living. Featuring premium finishes, open floor plans, and stunning city views.',
     cta: 'BOOK A VISIT',
     images: [

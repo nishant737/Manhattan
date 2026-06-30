@@ -7,7 +7,7 @@ export default function Navbar({ onNavClick }) {
   const linksRef = useRef([])
 
   const navItems = [
-    { id: 'standard', label: 'Standard Apartments' },
+    { id: 'standard', label: 'Premium Apartments' },
     { id: 'refuge', label: 'Refuge Floor Apartments' },
     { id: 'duplex', label: 'Duplex Unit' },
     { id: 'sky-lounge', label: 'Sky Lounge' }

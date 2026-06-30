@@ -4,7 +4,7 @@ import './DynamicShowcase.css'
 
 const SHOWCASE_DATA = {
   standard: {
-    title: 'Standard Apartments',
+    title: 'Premium Apartments',
     description: 'Elegant urban residences designed for contemporary living',
     images: [
       '/INDOOR GAME.jpg',
