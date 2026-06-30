@@ -2,14 +2,15 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AboutSection.css'
+import AboutUsImg from './assets/aboutus.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const TAGLINE_LINES = [
-  'keep exploring.',
-  'work together.',
-  'grow brilliance.',
-  'shape tomorrow.'
+  'reimagine luxury.',
+  'craft exclusivity.',
+  'elevate Mangalore.',
+  'define legacy.'
 ]
 
 export default function AboutSection() {
@@ -26,7 +27,6 @@ export default function AboutSection() {
   useEffect(() => {
     const section = sectionRef.current
     const weElement = weElementRef.current
-    const heading = headingRef.current
     const image = imageRef.current
     const description = descriptionRef.current
     const descSecondary = descriptionSecondaryRef.current
@@ -48,13 +48,15 @@ export default function AboutSection() {
       }
     })
 
-    // Heading and image fade in at start - synced with first line
-    masterTl.fromTo(
-      [heading, image],
-      { opacity: 0 },
-      { opacity: 1, duration: 0.35 },
-      0
-    )
+    // Image fade in at start - synced with first line
+    if (image) {
+      masterTl.fromTo(
+        image,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.35 },
+        0
+      )
+    }
 
     // Get line height for "We" animation
     const computedStyle = window.getComputedStyle(weElement)
@@ -162,13 +164,9 @@ export default function AboutSection() {
       <div className="about-container">
         {/* Left Column */}
         <div className="about-left">
-          <h2 className="about-heading" ref={headingRef}>
-            DESIGN YOU<br />
-            CAN FEEL
-          </h2>
           <div className="about-image-wrapper" ref={imageRef}>
             <img
-              src="/STREET VIEW_ 02.jpg"
+              src={AboutUsImg}
               alt="Design vision"
               className="about-image"
             />
@@ -198,15 +196,15 @@ export default function AboutSection() {
           </div>
 
           <p className="about-description" ref={descriptionRef}>
-            We partner with clients from day one, ensuring clear communication and expert guidance at every stage. Collaborating seamlessly with builders, consultants, and other specialists, we work to keep each project on track and deliver results that exceed our shared ambitions.
+            Manhattan emerges as Mangalore's most coveted luxury residence—a beacon of refined living and architectural excellence. Born from the visionary collaboration between Mothisham and Allergo Group, this exclusive apartment project redefines urban sophistication. Each residence is meticulously designed to capture light, space, and elegance in perfect harmony, creating sanctuaries for those who appreciate the finest nuances of contemporary living.
           </p>
 
           <p className="about-description-secondary" ref={descriptionSecondaryRef}>
-            While our aesthetic remains distinct, every project is shaped by its own unique character—born from our clients' aspirations, the site's potential, and the creative vision of our architectural team.
+            Here, luxury is not merely a concept—it is an experience. From carefully curated finishes to bespoke design details, every element speaks to our unwavering commitment to excellence. Manhattan stands as a testament to what happens when visionary design meets unbridled ambition, transforming Mangalore's skyline and setting a new standard for premium residential architecture.
           </p>
 
           <button className="about-cta" ref={ctaRef}>
-            <span>EXPLORE MORE ABOUT US</span>
+            <span>DISCOVER MANHATTAN</span>
           </button>
         </div>
       </div>

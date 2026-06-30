@@ -9,8 +9,8 @@ export default function Navbar({ onNavClick }) {
   const navItems = [
     { id: 'standard', label: 'Standard Apartments' },
     { id: 'refuge', label: 'Refuge Floor Apartments' },
-    { id: 'lower-duplex', label: 'Lower Duplex Units' },
-    { id: 'upper-duplex', label: 'Upper Duplex Units' }
+    { id: 'duplex', label: 'Duplex Unit' },
+    { id: 'sky-lounge', label: 'Sky Lounge' }
   ]
 
   const handleNavClick = (id) => {

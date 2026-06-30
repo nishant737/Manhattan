@@ -1,5 +1,5 @@
 .stats-section {
-  background-color: #0e0e0e;
+  background-color: #0a0a0a;
   padding: 60px 0 80px;
   box-sizing: border-box;
   width: 100%;
@@ -113,7 +113,7 @@
 @media (max-width: 600px) {
   .stats-section {
     padding: 48px 0 64px;
-    background-color: #0e0e0e;
+    background-color: #0a0a0a;
   }
 
   .stats-box {

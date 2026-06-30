@@ -55,14 +55,16 @@ export default function TailoredSolutions() {
 
     const section = sectionRef.current
 
-    // Create a unified timeline for all animations with scrub for smooth scroll-linked animation
+    // Create a unified timeline for all animations with pinning
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: 'top 70%',
-        end: 'center center',
-        scrub: 1,
-        markers: false
+        start: 'top top',
+        end: '+=1300px',
+        scrub: 1.8,
+        pin: true,
+        markers: false,
+        fastScrollEnd: true
       }
     })
 
@@ -78,44 +80,28 @@ export default function TailoredSolutions() {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 1.2,
-        ease: 'power2.out'
+        duration: 0.5,
+        ease: 'sine.out'
       },
       0
     )
 
-    // Add right column animation
-    tl.fromTo(
-      rightColumnRef.current,
-      {
-        opacity: 0,
-        x: 80
-      },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 1.4,
-        ease: 'power2.out'
-      },
-      0.2
-    )
-
-    // Add accordion items with staggered timing
+    // Add accordion items with smooth staggered animation from right to left
     accordionItemsRef.current.forEach((item, index) => {
       if (item) {
         tl.fromTo(
           item,
           {
             opacity: 0,
-            x: 60
+            x: 120
           },
           {
             opacity: 1,
             x: 0,
-            duration: 0.8,
-            ease: 'power2.out'
+            duration: 0.45,
+            ease: 'sine.inOut'
           },
-          0.3 + index * 0.12
+          index * 0.15
         )
       }
     })
@@ -140,10 +126,6 @@ export default function TailoredSolutions() {
             <br />
             Needs
           </h2>
-          <div className="tailored-solutions-link">
-            <span className="tailored-solutions-dot">•</span>
-            <a href="#explore">Explore More →</a>
-          </div>
         </div>
 
         {/* Right Column */}
@@ -199,7 +181,7 @@ export default function TailoredSolutions() {
       {/* Scrolling Marquee Ticker */}
       <div className="solutions-ticker">
         <div className="ticker-content">
-          <span>LUXURY RESIDENCES · 0% COMMISSION · PREMIUM LAYOUTS · BOOK A VIEWING · LUXURY RESIDENCES · 0% COMMISSION · PREMIUM LAYOUTS · BOOK A VIEWING ·</span>
+          <span>LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · SMART LIVING · PREMIUM FINISHES · CONCIERGE SERVICES · LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · SMART LIVING · PREMIUM FINISHES · CONCIERGE SERVICES ·</span>
         </div>
       </div>
     </section>
