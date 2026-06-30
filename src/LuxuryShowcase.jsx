@@ -136,55 +136,54 @@ export default function LuxuryShowcase() {
       const centerContainer = containers[1]
       const rightContainer = containers[2]
 
-      // Create timeline for fast, clean image swap (NO SCALING ANIMATIONS)
+      // Create timeline for smooth, synchronized image swap and text animation
       const timeline = gsap.timeline({
         onComplete: () => {
           setIsAnimating(false)
         }
       })
 
-      // Fade out text quickly
+      // Fade out text and slide down
       timeline.to(textRef.current, {
         opacity: 0,
-        y: -6,
-        duration: 0.1,
-        ease: 'power2.in'
+        y: -10,
+        duration: 0.2,
+        ease: 'sine.in'
       }, 0)
 
-      // Clean crossfade: all images fade smoothly (NO SCALE CHANGES)
-      // Fade all containers down briefly for clean image swap
+      // Smooth crossfade: fade images with easing
       timeline.to(containers, {
-        opacity: 0.7,
-        duration: 0.15,
-        ease: 'power2.inOut'
+        opacity: 0.5,
+        duration: 0.25,
+        ease: 'sine.inOut'
       }, 0)
 
-      // Fade back to full opacity - smooth crossfade complete
+      // Fade back to full opacity - smooth transition
       timeline.to(containers, {
         opacity: 1,
-        duration: 0.15,
-        ease: 'power2.inOut'
-      }, 0.15)
+        duration: 0.25,
+        ease: 'sine.inOut'
+      }, 0.25)
 
-      // Reset any transforms to ensure clean CSS defaults
+      // Reset transforms for clean state
       timeline.add(() => {
         gsap.set([leftContainer, centerContainer, rightContainer], {
           clearProps: "transform"
         })
-      }, 0.3)
+      }, 0.5)
 
-      // Text pops in after fade completes
+      // Text fades and pops in synchronized with image transition completion
       timeline.fromTo(textRef.current, {
         opacity: 0,
-        y: 8,
-        scale: 0.96
+        y: 12,
+        scale: 0.95
       }, {
         opacity: 1,
         y: 0,
         scale: 1,
-        duration: 0.25,
-        ease: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-      }, 0.2)
+        duration: 0.35,
+        ease: 'sine.out'
+      }, 0.3)
     }, 0)
   }
 
