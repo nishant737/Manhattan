@@ -159,6 +159,16 @@ export default function AboutSection() {
     }
   }, [])
 
+  const handleDownloadBrochure = () => {
+    // Create a link element to trigger download
+    const link = document.createElement('a')
+    link.href = '/Manhattan-Brochure.pdf'
+    link.download = 'Manhattan-Brochure.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   return (
     <section className="about-section" ref={sectionRef}>
       <div className="about-container">
@@ -203,7 +213,7 @@ export default function AboutSection() {
             Here, luxury is not merely a concept—it is an experience. From carefully curated finishes to bespoke design details, every element speaks to our unwavering commitment to excellence. Manhattan stands as a testament to what happens when visionary design meets unbridled ambition, transforming Mangalore's skyline and setting a new standard for premium residential architecture.
           </p>
 
-          <button className="about-cta" ref={ctaRef}>
+          <button className="about-cta" ref={ctaRef} onClick={handleDownloadBrochure}>
             <span>DISCOVER MANHATTAN</span>
           </button>
         </div>
