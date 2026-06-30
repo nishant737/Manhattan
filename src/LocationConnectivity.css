@@ -210,35 +210,35 @@
 
 .marker-pin {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .marker-dot {
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
   background-color: rgb(251, 238, 190);
   border-radius: 50%;
   position: relative;
   z-index: 2;
-  box-shadow: 0 0 20px rgba(251, 238, 190, 0.6);
+  box-shadow: 0 0 16px rgba(251, 238, 190, 0.7);
   transition: all 0.3s ease;
 }
 
 .custom-marker.active .marker-dot {
-  width: 16px;
-  height: 16px;
-  box-shadow: 0 0 30px rgba(251, 238, 190, 0.8);
+  width: 13px;
+  height: 13px;
+  box-shadow: 0 0 24px rgba(251, 238, 190, 0.9);
 }
 
 .marker-pulse {
   position: absolute;
-  width: 40px;
-  height: 40px;
-  background-color: rgba(251, 238, 190, 0.2);
+  width: 32px;
+  height: 32px;
+  background-color: rgba(251, 238, 190, 0.15);
   border-radius: 50%;
   animation: markerPulse 2s infinite;
 }
@@ -254,7 +254,7 @@
     opacity: 1;
   }
   100% {
-    transform: scale(1.8);
+    transform: scale(1.6);
     opacity: 0;
   }
 }
@@ -295,16 +295,17 @@
 /* ── Inline Card on Map ── */
 .location-card {
   position: absolute;
-  bottom: 30px;
-  right: 30px;
   background-color: rgba(26, 26, 26, 0.95);
   border: 1px solid rgba(251, 238, 190, 0.2);
   border-radius: 16px;
   padding: 20px;
   max-width: 320px;
+  width: 320px;
   backdrop-filter: blur(10px);
   z-index: 20;
   will-change: transform, opacity;
+  pointer-events: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
 .card-close {
@@ -392,25 +393,6 @@
   margin: 0;
 }
 
-.card-cta {
-  background: rgba(251, 238, 190, 0.1);
-  color: rgb(251, 238, 190);
-  border: 1px solid rgba(251, 238, 190, 0.3);
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: all 0.3s ease;
-}
-
-.card-cta:hover {
-  background: rgba(251, 238, 190, 0.2);
-  border-color: rgb(251, 238, 190);
-}
 
 /* ── Responsive: Tablet ── */
 @media (max-width: 1024px) {
@@ -445,6 +427,7 @@
 
   .location-card {
     max-width: 300px;
+    width: 300px;
   }
 }
 
@@ -530,9 +513,8 @@
   }
 
   .location-card {
-    bottom: 20px;
-    right: 20px;
     max-width: 280px;
+    width: 280px;
     padding: 18px;
   }
 
@@ -606,9 +588,8 @@
   }
 
   .location-card {
-    bottom: 16px;
-    right: 16px;
     max-width: 260px;
+    width: 260px;
     padding: 16px;
   }
 
@@ -631,7 +612,7 @@
 .leaflet-control-zoom {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 8px !important;
-  background-color: rgba(26, 26, 26, 0.8) !important;
+  background-color: #0a0a0a !important;
 }
 
 .leaflet-control-zoom-in,
@@ -639,6 +620,7 @@
   color: rgb(251, 238, 190) !important;
   font-size: 18px !important;
   border: none !important;
+  background-color: #0a0a0a !important;
 }
 
 .leaflet-control-zoom-in:hover,
@@ -649,9 +631,10 @@
 .leaflet-control-fullscreen {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 8px !important;
-  background-color: rgba(26, 26, 26, 0.8) !important;
+  background-color: #0a0a0a !important;
 }
 
 .leaflet-control-fullscreen a {
   color: rgb(251, 238, 190) !important;
+  background-color: #0a0a0a !important;
 }

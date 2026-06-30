@@ -1,12 +1,38 @@
 import { useState, useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './LocationConnectivity.css'
 
 gsap.registerPlugin(ScrollTrigger)
+
+// Component to handle map bounds fitting
+function MapBoundsFitter({ locations, mainLocation }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (!map || !locations.length) return
+
+    // Create bounds that includes all markers
+    const bounds = L.latLngBounds([
+      [mainLocation.coordinates.lat, mainLocation.coordinates.lng],
+      ...locations.map(loc => [loc.coordinates.lat, loc.coordinates.lng])
+    ])
+
+    // Fit map to bounds with padding
+    setTimeout(() => {
+      map.fitBounds(bounds, {
+        padding: [60, 60],
+        maxZoom: 12,
+        duration: 0
+      })
+    }, 100)
+  }, [map, locations, mainLocation])
+
+  return null
+}
 
 // Custom luxury marker icon
 const createLuxuryMarker = (isActive) => {
@@ -18,9 +44,9 @@ const createLuxuryMarker = (isActive) => {
         <div class="marker-pulse"></div>
       </div>
     `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40]
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
   })
 }
 
@@ -31,7 +57,7 @@ const MANHATTAN_LOCATION = {
   time: 'Your Location',
   category: 'Residential',
   description: 'Premium luxury residential development in Mangalore',
-  coordinates: { lat: 12.9352, lng: 74.8597 },
+  coordinates: { lat: 12.8700, lng: 74.8450 },
   images: ['/STREET VIEW_ 02.jpg'],
   highlights: ['Luxury Living', 'Prime Location', 'World-class Amenities']
 }
@@ -43,8 +69,8 @@ const LOCATIONS = [
     time: '03 Minutes',
     category: 'Transportation',
     description: 'Major railway hub connecting to all major cities',
-    coordinates: { lat: 12.9320, lng: 74.8555 },
-    images: ['/STREET VIEW_ 02.jpg'],
+    coordinates: { lat: 12.863691, lng: 74.843261 },
+    images: ['/location/CentralRailwayStation.jpeg'],
     highlights: ['Express trains', '24/7 Operations', 'Premium Lounge']
   },
   {
@@ -53,8 +79,8 @@ const LOCATIONS = [
     time: '30 Minutes',
     category: 'Transportation',
     description: 'International airport with direct flights worldwide',
-    coordinates: { lat: 12.7673, lng: 74.9219 },
-    images: ['/STREET VIEW_ 02.jpg'],
+    coordinates: { lat: 12.953666, lng: 74.885411 },
+    images: ['/location/MangaloreInternationalAirport.jpeg'],
     highlights: ['International Flights', 'Premium Services', 'Fast-track']
   },
   {
@@ -63,8 +89,8 @@ const LOCATIONS = [
     time: '04 Minutes',
     category: 'Shopping',
     description: 'Premier shopping destination with luxury brands',
-    coordinates: { lat: 12.9356, lng: 74.8485 },
-    images: ['/INDOOR GAME.jpg'],
+    coordinates: { lat: 12.871256, lng: 74.842768 },
+    images: ['/location/CityCentreMall.jpg'],
     highlights: ['200+ Stores', 'Fine Dining', 'Entertainment']
   },
   {
@@ -73,8 +99,8 @@ const LOCATIONS = [
     time: '03 Minutes',
     category: 'Education',
     description: 'Premier educational institution with excellent reputation',
-    coordinates: { lat: 12.9408, lng: 74.8464 },
-    images: ['/SKY LOUNGE CAFE.jpg'],
+    coordinates: { lat: 12.873119, lng: 74.845923 },
+    images: ['/location/St.AloysiusCollege.png'],
     highlights: ['Top Rankings', 'Modern Campus', 'World-class Faculty']
   },
   {
@@ -83,8 +109,8 @@ const LOCATIONS = [
     time: '08 Minutes',
     category: 'Healthcare',
     description: 'State-of-the-art healthcare facility',
-    coordinates: { lat: 12.9348, lng: 74.8510 },
-    images: ['/STREET VIEW_ 02.jpg'],
+    coordinates: { lat: 12.866668, lng: 74.858700 },
+    images: ['/location/FatherMullerHospital.jpeg'],
     highlights: ['24/7 Emergency', 'Advanced Equipment', 'Expert Doctors']
   },
   {
@@ -93,8 +119,8 @@ const LOCATIONS = [
     time: '14 Minutes',
     category: 'Recreation',
     description: 'World-class sports and entertainment venue',
-    coordinates: { lat: 12.9280, lng: 74.8590 },
-    images: ['/INDOOR GAME.jpg'],
+    coordinates: { lat: 12.886125, lng: 74.835349 },
+    images: ['/location/MangalaStadium.avif'],
     highlights: ['Stadium Events', 'Concerts', 'Sports']
   },
   {
@@ -103,28 +129,30 @@ const LOCATIONS = [
     time: '01 Minutes',
     category: 'Religious',
     description: 'Historic and architecturally stunning church',
-    coordinates: { lat: 12.9380, lng: 74.8540 },
-    images: ['/SKY LOUNGE CAFE.jpg'],
+    coordinates: { lat: 12.867448, lng: 74.844455 },
+    images: ['/location/MilagresChurch.jpeg'],
     highlights: ['Heritage Site', 'Spiritual Center', 'Beautiful Architecture']
   },
   {
     id: 8,
-    name: 'Tanur Bavi Beach',
+    name: 'Tannirbhavi Beach',
     time: '26 Minutes',
     category: 'Recreation',
     description: 'Pristine coastal destination with scenic beauty',
-    coordinates: { lat: 13.0169, lng: 74.5630 },
-    images: ['/STREET VIEW_ 02.jpg'],
+    coordinates: { lat: 12.891302, lng: 74.813874 },
+    images: ['/location/TannirbhaviBeach.jpeg'],
     highlights: ['Scenic Views', 'Water Sports', 'Restaurants']
   }
 ]
 
 export default function LocationConnectivity() {
   const [selectedLocation, setSelectedLocation] = useState(null)
+  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 })
   const sectionRef = useRef(null)
   const leftColumnRef = useRef(null)
   const mapRef = useRef(null)
   const cardRef = useRef(null)
+  const mapInstanceRef = useRef(null)
 
   // Entrance animation
   useEffect(() => {
@@ -178,11 +206,38 @@ export default function LocationConnectivity() {
     }
   }, [selectedLocation])
 
-  const handleLocationClick = (location) => {
+  const handleLocationClick = (location, event) => {
     setSelectedLocation(location)
+
+    // Calculate card position relative to marker on map
+    if (mapInstanceRef.current && event) {
+      const mapContainer = mapInstanceRef.current.getContainer()
+      const mapRect = mapContainer.getBoundingClientRect()
+      const mapWidth = mapRect.width
+      const mapHeight = mapRect.height
+
+      // Get marker position in pixels
+      const markerLatLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
+      const markerPoint = mapInstanceRef.current.latLngToContainerPoint(markerLatLng)
+
+      // Card dimensions
+      const cardWidth = 320
+      const cardHeight = 280
+
+      // Calculate initial card position (centered above marker)
+      let cardX = markerPoint.x - cardWidth / 2
+      let cardY = markerPoint.y - cardHeight - 20
+
+      // Check boundaries and adjust
+      if (cardX < 10) cardX = 10 // Left boundary
+      if (cardX + cardWidth > mapWidth - 10) cardX = mapWidth - cardWidth - 10 // Right boundary
+      if (cardY < 10) cardY = markerPoint.y + 40 // If too high, position below marker instead
+
+      setCardPosition({ x: cardX, y: cardY })
+    }
   }
 
-  const mapCenter = [12.9352, 74.8597]
+  const mapCenter = [12.8700, 74.8450]
 
   return (
     <section className="location-connectivity-section" ref={sectionRef}>
@@ -213,11 +268,14 @@ export default function LocationConnectivity() {
           <div className="location-right-column" ref={mapRef}>
             <div className="location-map-wrapper">
               <MapContainer
+                ref={mapInstanceRef}
                 center={mapCenter}
-                zoom={11}
+                zoom={12}
                 scrollWheelZoom={false}
                 className="leaflet-map-container"
               >
+                <MapBoundsFitter locations={LOCATIONS} mainLocation={MANHATTAN_LOCATION} />
+
                 <TileLayer
                   attribution={false}
                   url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
@@ -226,34 +284,6 @@ export default function LocationConnectivity() {
                   crossOrigin="anonymous"
                 />
 
-                {/* Main Manhattan Location - Central Marker */}
-                <Marker
-                  position={[MANHATTAN_LOCATION.coordinates.lat, MANHATTAN_LOCATION.coordinates.lng]}
-                  icon={L.divIcon({
-                    className: 'main-location-marker',
-                    html: `
-                      <div class="main-marker-pin">
-                        <div class="main-marker-outer"></div>
-                        <div class="main-marker-dot"></div>
-                        <div class="main-marker-pulse"></div>
-                      </div>
-                    `,
-                    iconSize: [50, 50],
-                    iconAnchor: [25, 50],
-                    popupAnchor: [0, -50]
-                  })}
-                  eventHandlers={{
-                    click: () => handleLocationClick(MANHATTAN_LOCATION)
-                  }}
-                >
-                  <Popup className="location-popup">
-                    <div className="popup-content">
-                      <h4>{MANHATTAN_LOCATION.name}</h4>
-                      <p>{MANHATTAN_LOCATION.category}</p>
-                    </div>
-                  </Popup>
-                </Marker>
-
                 {/* Markers for all nearby locations */}
                 {LOCATIONS.map((location) => (
                   <Marker
@@ -261,22 +291,22 @@ export default function LocationConnectivity() {
                     position={[location.coordinates.lat, location.coordinates.lng]}
                     icon={createLuxuryMarker(selectedLocation?.id === location.id)}
                     eventHandlers={{
-                      click: () => handleLocationClick(location)
+                      click: (e) => handleLocationClick(location, e)
                     }}
-                  >
-                    <Popup className="location-popup">
-                      <div className="popup-content">
-                        <h4>{location.name}</h4>
-                        <p>{location.time}</p>
-                      </div>
-                    </Popup>
-                  </Marker>
+                  />
                 ))}
               </MapContainer>
 
               {/* Inline Card on Map */}
               {selectedLocation && (
-                <div className="location-card" ref={cardRef}>
+                <div
+                  className="location-card"
+                  ref={cardRef}
+                  style={{
+                    left: `${cardPosition.x}px`,
+                    top: `${cardPosition.y}px`
+                  }}
+                >
                   <button className="card-close" onClick={() => setSelectedLocation(null)}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -297,8 +327,6 @@ export default function LocationConnectivity() {
                     </div>
 
                     <p className="card-description">{selectedLocation.description}</p>
-
-                    <button className="card-cta">Get Directions →</button>
                   </div>
                 </div>
               )}
