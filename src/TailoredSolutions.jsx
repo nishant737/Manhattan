@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
+import LeadCaptureModal from './LeadCaptureModal'
 import './TailoredSolutions.css'
 
 // Import placeholder images for floor plans
@@ -39,16 +40,48 @@ const SOLUTIONS = [
   }
 ]
 
+const LEAD_SUBMITTED_KEY = 'manhattan_lead_submitted'
+
 export default function TailoredSolutions() {
   const [expandedId, setExpandedId] = useState(null)
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
+  const [pendingSolutionId, setPendingSolutionId] = useState(null)
+  const [hasSubmittedLead, setHasSubmittedLead] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem(LEAD_SUBMITTED_KEY) === 'true'
+  })
   const sectionRef = useRef(null)
   const pinRef = useRef(null)
   const leftColumnRef = useRef(null)
   const rightColumnRef = useRef(null)
   const accordionItemsRef = useRef([])
 
+  // First attempt to open any layout is gated behind a short lead-capture
+  // form. Once the visitor has submitted it once, every accordion behaves
+  // like a normal toggle for the rest of the session.
   const toggleAccordion = (id) => {
+    if (!hasSubmittedLead) {
+      setPendingSolutionId(id)
+      setIsLeadModalOpen(true)
+      return
+    }
     setExpandedId(expandedId === id ? null : id)
+  }
+
+  const handleLeadModalClose = () => {
+    setIsLeadModalOpen(false)
+    setPendingSolutionId(null)
+  }
+
+  const handleLeadSubmit = (formData) => {
+    // TODO: wire this up to the real CRM/lead-capture endpoint once available.
+    console.log('Lead captured from TailoredSolutions:', formData)
+
+    window.localStorage.setItem(LEAD_SUBMITTED_KEY, 'true')
+    setHasSubmittedLead(true)
+    setIsLeadModalOpen(false)
+    setExpandedId(pendingSolutionId)
+    setPendingSolutionId(null)
   }
 
   // Setup scroll-triggered entrance animations with unified timeline.
@@ -202,6 +235,12 @@ export default function TailoredSolutions() {
           <span>LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · SMART LIVING · PREMIUM FINISHES · CONCIERGE SERVICES · LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · SMART LIVING · PREMIUM FINISHES · CONCIERGE SERVICES ·</span>
         </div>
       </div>
+
+      <LeadCaptureModal
+        isOpen={isLeadModalOpen}
+        onClose={handleLeadModalClose}
+        onSubmit={handleLeadSubmit}
+      />
     </section>
   )
 }

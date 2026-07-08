@@ -1,0 +1,167 @@
+.lead-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.lead-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background-color: rgba(20, 20, 20, 0.98);
+  border: 1px solid rgba(251, 238, 190, 0.2);
+  border-radius: 18px;
+  padding: 36px 32px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+.lead-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(251, 238, 190, 0.1);
+  border: 1px solid rgba(251, 238, 190, 0.2);
+  color: rgb(251, 238, 190);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.lead-modal-close:hover {
+  background: rgba(251, 238, 190, 0.2);
+  border-color: rgb(251, 238, 190);
+}
+
+.lead-modal-eyebrow {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.6);
+  margin-bottom: 10px;
+}
+
+.lead-modal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: rgb(251, 238, 190);
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.lead-modal-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 24px 0;
+}
+
+.lead-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lead-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lead-modal-field label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.lead-modal-field input,
+.lead-modal-field textarea {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: rgb(251, 238, 190);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+  resize: none;
+}
+
+.lead-modal-field input::placeholder,
+.lead-modal-field textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.lead-modal-field input:focus,
+.lead-modal-field textarea:focus {
+  border-color: rgba(251, 238, 190, 0.6);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.lead-modal-field input.has-error {
+  border-color: rgba(255, 99, 99, 0.7);
+}
+
+.lead-modal-error {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11.5px;
+  color: rgb(255, 130, 130);
+}
+
+.lead-modal-submit {
+  margin-top: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #0a0a0a;
+  background-color: rgb(251, 238, 190);
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.25s ease;
+}
+
+.lead-modal-submit:hover {
+  background-color: rgb(255, 246, 209);
+  transform: translateY(-1px);
+}
+
+.lead-modal-submit:active {
+  transform: translateY(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .lead-modal-card {
+    padding: 28px 22px 22px;
+    border-radius: 14px;
+  }
+
+  .lead-modal-title {
+    font-size: 22px;
+  }
+}
