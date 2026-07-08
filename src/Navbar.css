@@ -1,53 +1,55 @@
 .navbar {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 0px;
   left: 0;
   width: 100%;
   z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 32px;
+  padding: 10px 32px;
   box-sizing: border-box;
-  background-color: transparent !important;
-  background: none !important;
+  background-color: transparent;
   gap: 50px;
   line-height: 1;
   overflow: visible;
-  will-change: transform;
+  will-change: transform, background-color;
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              backdrop-filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animated line below navbar */
+.navbar--scrolled {
+  background-color: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  padding: 8px 32px;
+}
+
+/* Animated line below navbar - REMOVED */
 .navbar::after {
-  content: '';
-  position: absolute;
-  bottom: -12px;
-  left: 50%;
-  width: 100%;
-  height: 1px;
-  background-color: rgb(251, 238, 190);
-  transform: translateX(-50%) scaleX(0);
-  transform-origin: center;
-  animation: navbarLineExtend 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  animation-delay: 0.8s;
+  display: none;
 }
 
 .navbar-logo {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(10px, 0.8vw, 13px);
-  font-weight: 500;
-  letter-spacing: 0.3em;
-  color: rgb(251, 238, 190);
-  text-transform: uppercase;
   position: absolute;
   left: 32px;
+  top: 20%;
+  transform: translateY(-50%);
+  height: 60px;
+  width: auto;
+   max-width: 1800px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Navbar logo entrance animation */
 .navbar-logo-animate {
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-40px);
   animation: navbarEntranceSlide 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   animation-delay: 0.5s;
   will-change: opacity, transform;
@@ -57,10 +59,15 @@
   display: flex;
   gap: 28px;
   list-style: none;
-  margin: 0;
+ margin: 5px 0 0 0;  /* Adds 10px top margin */
   padding: 0;
   overflow: visible;
   align-items: center;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navbar-link-item {
@@ -105,6 +112,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
   gap: 4px;
   width: 28px;
   height: 28px;
@@ -113,9 +121,44 @@
   cursor: pointer;
   padding: 0;
   flex-shrink: 0;
-  /* always visible, no animation glitch */
-  opacity: 1 !important;
-  visibility: visible !important;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Desktop: swap full nav links for hamburger once scrolled past hero ── */
+@media (min-width: 769px) {
+  .navbar-links {
+    position: relative;
+  }
+
+  .navbar--scrolled .navbar-links {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px);
+    position: absolute;
+  }
+
+  .hamburger {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    position: absolute;
+    right: 32px;
+    top: 200%;
+    transform: translateY(-50%) scale(0.85);
+  }
+
+  .navbar--scrolled .hamburger {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transform: translateY(-50%) scale(1);
+  }
 }
 
 .hamburger span {
@@ -148,7 +191,7 @@
   width: 100%;
   height: 100vh;
   background: #0a0a0a;
-  z-index: 998;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -160,6 +203,7 @@
   padding: 0;
   box-sizing: border-box;
   padding-top: 20px;
+  overflow: hidden;
 }
 
 .mobile-menu-header {
@@ -168,19 +212,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 8px 32px;
   box-sizing: border-box;
-  margin: 0 auto 40px;
+  margin: 0 auto 50px;
   flex-shrink: 0;
+  gap: 20px;
+  overflow: hidden;
 }
 
 .mobile-menu-logo {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(10px, 2vw, 12px);
-  font-weight: 500;
-  letter-spacing: 0.3em;
-  color: rgb(251, 238, 190);
-  text-transform: uppercase;
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  cursor: pointer;
 }
 
 .mobile-menu--open {
@@ -201,7 +245,7 @@
   align-items: center;
   justify-content: center;
   padding: 0;
-  margin-right: -4px;
+  margin: 0;
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
   opacity: 0.65;
   flex-shrink: 0;
@@ -226,21 +270,28 @@
 .mobile-menu ul {
   list-style: none;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
+  gap: 40px;
   width: 100%;
-  max-width: 500px;
+  max-width: 100%;
   flex: 1;
   box-sizing: border-box;
+  text-align: center;
+  overflow: hidden;
 }
 
 .mobile-menu li {
-  width: 100%;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: auto;
+  min-width: fit-content;
 }
 
 .mobile-menu a {
@@ -254,6 +305,7 @@
   opacity: 0.85;
   transition: opacity 0.2s ease;
   display: inline-block;
+  white-space: nowrap;
 }
 
 .mobile-menu a:hover {
@@ -289,13 +341,25 @@
 /* ── Responsive: Tablet & Mobile ── */
 @media (max-width: 768px) {
   .navbar {
-    padding: 12px 20px;
+    padding: 6px 12px;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .navbar::after {
+    bottom: -6px;
   }
 
   .navbar-logo {
-    font-size: clamp(10px, 2vw, 12px);
-    left: 20px;
-    display: none;
+    left: 0;
+    position: relative;
+    display: block;
+    height: 32px;
+    width: auto;
+    opacity: 0;
+    animation: navbarEntranceSlide 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.5s;
+    margin-left: 0;
   }
 
   .navbar-links {
@@ -307,6 +371,7 @@
     width: 28px;
     height: 28px;
     margin-left: auto;
+    margin-right: 0;
   }
 
   .hamburger span {
@@ -318,19 +383,23 @@
     display: none;
   }
 
+
   .mobile-menu {
     padding-top: 16px;
     align-items: center;
   }
 
   .mobile-menu-header {
-    max-width: 450px;
-    padding: 0 28px;
-    margin: 0 auto 40px;
+    padding: 6px 12px;
+    margin: 0;
+    gap: 0;
+    justify-content: space-between;
+    max-width: 100%;
   }
 
   .mobile-menu-logo {
-    font-size: clamp(10px, 2vw, 12px);
+    height: 28px;
+    width: auto;
   }
 
   .mobile-menu-close {
@@ -345,9 +414,9 @@
   }
 
   .mobile-menu ul {
-    gap: 28px;
-    padding: 0 28px;
-    max-width: 450px;
+    gap: 40px;
+    padding: 60px 20px;
+    max-width: 100%;
   }
 
   .mobile-menu a {
@@ -358,18 +427,32 @@
 /* ── Responsive: Small Mobile (320px - 480px) ── */
 @media (max-width: 480px) {
   .navbar {
-    padding: 10px 16px;
+    padding: 6px 12px;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .navbar::after {
+    bottom: -6px;
   }
 
   .navbar-logo {
-    font-size: clamp(9px, 2.5vw, 11px);
-    left: 16px;
+    left: 0;
+    position: relative;
+    display: block;
+    height: 28px;
+    width: auto;
+    opacity: 0;
+    animation: navbarEntranceSlide 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.5s;
+    margin-left: 0;
   }
 
   .hamburger {
     width: 26px;
     height: 26px;
     margin-left: auto;
+    margin-right: 0;
   }
 
   .hamburger span {
@@ -377,25 +460,30 @@
     height: 1.5px;
   }
 
+
   .mobile-menu {
-    padding-top: 12px;
-    align-items: center;
+    padding-top: 0;
+    align-items: flex-start;
   }
 
   .mobile-menu-header {
-    max-width: 380px;
-    padding: 0 24px;
-    margin: 0 auto 30px;
+    width: 100%;
+    max-width: 100%;
+    padding: 6px 12px;
+    margin: 0;
+    gap: 0;
+    justify-content: space-between;
   }
 
   .mobile-menu-logo {
-    font-size: clamp(9px, 2.5vw, 11px);
+    height: 24px;
+    width: auto;
   }
 
   .mobile-menu-close {
     width: 28px;
     height: 28px;
-    margin-right: 0;
+    margin: 0;
   }
 
   .mobile-menu-close svg {
@@ -404,9 +492,9 @@
   }
 
   .mobile-menu ul {
-    gap: 24px;
-    padding: 0 24px;
-    max-width: 380px;
+    gap: 35px;
+    padding: 50px 16px;
+    max-width: 100%;
   }
 
   .mobile-menu a {

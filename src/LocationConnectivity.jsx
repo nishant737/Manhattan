@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css'
 import './LocationConnectivity.css'
 
 gsap.registerPlugin(ScrollTrigger)
+ScrollTrigger.config({ ignoreMobileResize: true })
 
 // Component to handle map bounds fitting
 function MapBoundsFitter({ locations, mainLocation }) {
@@ -34,10 +35,26 @@ function MapBoundsFitter({ locations, mainLocation }) {
   return null
 }
 
-// Custom luxury marker icon
+// Custom luxury marker icon for nearby locations
 const createLuxuryMarker = (isActive) => {
   return L.divIcon({
     className: `custom-marker ${isActive ? 'active' : ''}`,
+    html: `
+      <div class="marker-pin">
+        <div class="marker-dot"></div>
+        <div class="marker-pulse"></div>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  })
+}
+
+// Custom Manhattan checkpoint marker (same style as other locations but slightly larger)
+const createManhattanMarker = () => {
+  return L.divIcon({
+    className: 'custom-marker manhattan-checkpoint',
     html: `
       <div class="marker-pin">
         <div class="marker-dot"></div>
@@ -63,16 +80,6 @@ const MANHATTAN_LOCATION = {
 }
 
 const LOCATIONS = [
-  {
-    id: 1,
-    name: 'Central Railway Station',
-    time: '03 Minutes',
-    category: 'Transportation',
-    description: 'Major railway hub connecting to all major cities',
-    coordinates: { lat: 12.863691, lng: 74.843261 },
-    images: ['/location/CentralRailwayStation.jpeg'],
-    highlights: ['Express trains', '24/7 Operations', 'Premium Lounge']
-  },
   {
     id: 2,
     name: 'Mangalore International Airport',
@@ -149,42 +156,49 @@ export default function LocationConnectivity() {
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 })
   const sectionRef = useRef(null)
+  const contentWrapperRef = useRef(null)
   const leftColumnRef = useRef(null)
   const mapRef = useRef(null)
   const cardRef = useRef(null)
   const mapInstanceRef = useRef(null)
 
-  // Entrance animation
+  // Entrance animation: the section can only ever start entering the
+  // viewport once TailoredSolutions' pin has released (they are adjacent
+  // siblings, so this is structurally guaranteed, not just timed). Starting
+  // the reveal at "top bottom" — the exact instant it first appears — and
+  // driving it off the whole content wrapper produces a single, cohesive
+  // rise-and-settle motion instead of a delayed pop-in.
   useEffect(() => {
-    if (!sectionRef.current) return
+    if (!sectionRef.current || !contentWrapperRef.current) return
 
     const section = sectionRef.current
+
+    gsap.set(contentWrapperRef.current, { opacity: 0, y: 90 })
+    if (leftColumnRef.current) gsap.set(leftColumnRef.current, { x: -30 })
+    if (mapRef.current) gsap.set(mapRef.current, { x: 30 })
+
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: 'top 70%',
-        end: 'center center',
-        scrub: 1,
+        start: 'top bottom',
+        end: 'top 40%',
+        scrub: 1.2,
         markers: false
       }
     })
 
+    tl.to(
+      contentWrapperRef.current,
+      { opacity: 1, y: 0, duration: 1, ease: 'power2.out' },
+      0
+    )
+
     if (leftColumnRef.current) {
-      tl.fromTo(
-        leftColumnRef.current,
-        { opacity: 0, x: -60 },
-        { opacity: 1, x: 0, duration: 1, ease: 'power2.out' },
-        0
-      )
+      tl.to(leftColumnRef.current, { x: 0, duration: 1, ease: 'power2.out' }, 0)
     }
 
     if (mapRef.current) {
-      tl.fromTo(
-        mapRef.current,
-        { opacity: 0, x: 60 },
-        { opacity: 1, x: 0, duration: 1.2, ease: 'power2.out' },
-        0.2
-      )
+      tl.to(mapRef.current, { x: 0, duration: 1, ease: 'power2.out' }, 0.08)
     }
 
     return () => {
@@ -242,7 +256,7 @@ export default function LocationConnectivity() {
   return (
     <section className="location-connectivity-section" ref={sectionRef}>
       <div className="location-container">
-        <div className="location-content-wrapper">
+        <div className="location-content-wrapper" ref={contentWrapperRef}>
           {/* Left Column: Text List */}
           <div className="location-left-column" ref={leftColumnRef}>
             <div className="location-title">
@@ -283,6 +297,19 @@ export default function LocationConnectivity() {
                   minZoom={1}
                   crossOrigin="anonymous"
                 />
+
+                {/* Main Manhattan Location Marker */}
+                <Marker
+                  position={[MANHATTAN_LOCATION.coordinates.lat, MANHATTAN_LOCATION.coordinates.lng]}
+                  icon={createManhattanMarker()}
+                >
+                  <Popup>
+                    <div className="popup-content">
+                      <strong>{MANHATTAN_LOCATION.name}</strong>
+                      <p>{MANHATTAN_LOCATION.category}</p>
+                    </div>
+                  </Popup>
+                </Marker>
 
                 {/* Markers for all nearby locations */}
                 {LOCATIONS.map((location) => (

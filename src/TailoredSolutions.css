@@ -1,7 +1,21 @@
 .tailored-solutions-section {
   background-color: #0a0a0a;
-  padding: 100px 0 100px 0;
+  padding: 0 0 100px 0;
   position: relative;
+}
+
+/* Pinned viewport wrapper: fixed to exactly one screen tall on desktop so
+   the pinned content (heading + accordion) can never be clipped while the
+   section is pinned in place. On compact/stacked layouts it collapses back
+   to natural flow (see media query below) since it is no longer pinned. */
+.tailored-solutions-pin {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0a0a;
+  overflow: hidden;
 }
 
 .tailored-solutions-container {
@@ -11,7 +25,7 @@
   display: flex;
   gap: 100px;
   align-items: center;
-  min-height: 80vh;
+  width: 100%;
 }
 
 /* ── Left Column ── */
@@ -114,6 +128,10 @@
   padding: 0 30px 30px 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   animation: slideDown 0.3s ease forwards;
+  /* Clamped to viewport height so an expanded row can never push the
+     section taller than the pinned 100vh viewport on desktop. */
+  max-height: min(30vh, 380px);
+  overflow: hidden;
 }
 
 @keyframes slideDown {
@@ -123,7 +141,7 @@
   }
   to {
     opacity: 1;
-    max-height: 600px;
+    max-height: min(30vh, 380px);
   }
 }
 
@@ -131,7 +149,7 @@
   width: 100%;
   border-radius: 12px;
   object-fit: contain;
-  max-height: 500px;
+  max-height: min(26vh, 340px);
   display: block;
 }
 
@@ -169,8 +187,40 @@
   padding-right: 100px;
 }
 
+/* Short desktop viewports (e.g. 1366x768 laptops): tighten up spacing so
+   the collapsed heading + full accordion list still comfortably fits
+   within the pinned 100vh viewport with room to spare for an expanded row. */
+@media (min-width: 1025px) and (max-height: 750px) {
+  .tailored-solutions-heading {
+    font-size: 42px;
+    margin-bottom: 24px;
+  }
+
+  .solutions-accordion {
+    gap: 12px;
+  }
+
+  .accordion-trigger {
+    padding: 18px 40px 18px 26px;
+    gap: 18px;
+  }
+
+  .accordion-thumbnail {
+    width: 52px;
+    height: 52px;
+  }
+}
+
 /* ── Responsive: Tablet ── */
 @media (max-width: 1024px) {
+  /* Not pinned at this breakpoint (see TailoredSolutions.jsx matchMedia) —
+     let the section size itself naturally so stacked content is never clipped. */
+  .tailored-solutions-pin {
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
   .tailored-solutions-container {
     flex-direction: column;
     align-items: stretch;

@@ -3,11 +3,8 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AmenitiesSection.css'
 import ConciergeServicesImg from './assets/ConciergeServices.jpeg'
-import ConciergeServicesSmallImg from './assets/ConciergeServicessmall.jpeg'
 import PremiumFinishesImg from './assets/PremiumFinishes.jpeg'
-import PremiumFinishesSmallImg from './assets/PremiumFinishessmall.jpeg'
 import SmartLivingImg from './assets/SmartLiving.jpeg'
-import SmartLivingSmallImg from './assets/SmartLivingsmall.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -17,30 +14,28 @@ const AMENITIES = [
     index: '01',
     title: 'Premium Finishes',
     description: 'Every surface, fixture, and fitting has been curated with intention — imported stone, bespoke millwork, and materials selected for both beauty and longevity.',
-    backgroundImage: PremiumFinishesImg,
-    foregroundImage: PremiumFinishesSmallImg
+    backgroundImage: PremiumFinishesImg
   },
   {
     id: 3,
     index: '02',
     title: 'Smart Living',
     description: 'Integrated home automation, climate control, and high-speed connectivity — engineered to make every moment effortless and every space responsive to you.',
-    backgroundImage: SmartLivingImg,
-    foregroundImage: SmartLivingSmallImg
+    backgroundImage: SmartLivingImg
   },
   {
     id: 1,
     index: '03',
     title: 'Concierge Services',
     description: 'From restaurant reservations to private event curation, our dedicated concierge team is available around the clock to anticipate your every need.',
-    backgroundImage: ConciergeServicesImg,
-    foregroundImage: ConciergeServicesSmallImg
+    backgroundImage: ConciergeServicesImg
   }
 ]
 
 export default function AmenitiesSection() {
   const sectionRef = useRef(null)
   const contentRef = useRef(null)
+  const imagesContainerRef = useRef(null)
   const itemsRef = useRef([])
   const imagesRef = useRef([])
   const [isInView, setIsInView] = useState(false)
@@ -66,87 +61,76 @@ export default function AmenitiesSection() {
     }
   }, [])
 
-  // Setup GSAP ScrollTrigger animations for image transitions
-
-  // Entrance animations when section comes into view
+  // One-time entrance reveal: the left content block and right image
+  // cluster converge in from opposite edges as the section first scrolls
+  // into view. This fires before the section reaches the pin point below
+  // and plays once (real-time tween, not scroll-scrubbed) so it never
+  // replays or fights with the pinned crossfade storytelling timeline.
   useEffect(() => {
-    if (!sectionRef.current || imagesRef.current.length === 0) return
+    if (!sectionRef.current || !contentRef.current || !imagesContainerRef.current) return
 
     const section = sectionRef.current
-    const firstImageSet = imagesRef.current[0]
 
-    if (!firstImageSet) return
+    const tl = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      scrollTrigger: {
+        trigger: section,
+        start: 'top 78%',
+        once: true,
+        markers: false
+      }
+    })
 
-    const backgroundImg = firstImageSet.querySelector('.amenity-image-background')
-    const foregroundImg = firstImageSet.querySelector('.amenity-image-foreground')
+    tl.fromTo(
+      contentRef.current,
+      { x: -80, opacity: 0 },
+      { x: 0, opacity: 1, duration: 1.1 },
+      0
+    )
 
-    if (backgroundImg && foregroundImg) {
-      // Animate large image from right to left
-      gsap.fromTo(
-        backgroundImg,
-        {
-          opacity: 0,
-          x: 280
-        },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 1.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 70%',
-            toggleActions: 'play none none none'
-          }
-        }
-      )
-
-      // Animate small image from bottom to top
-      gsap.fromTo(
-        foregroundImg,
-        {
-          opacity: 0,
-          y: 200
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top 70%',
-            toggleActions: 'play none none none'
-          }
-        }
-      )
-    }
+    tl.fromTo(
+      imagesContainerRef.current,
+      { x: 80, opacity: 0 },
+      { x: 0, opacity: 1, duration: 1.1 },
+      0.12
+    )
 
     return () => {
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.vars.trigger === section) {
-          trigger.kill()
-        }
-      })
+      if (tl.scrollTrigger) tl.scrollTrigger.kill()
+      tl.kill()
     }
   }, [])
 
-  // Setup GSAP ScrollTrigger animations for image transitions
+  // Setup comprehensive GSAP ScrollTrigger pinned scroll animations
   useEffect(() => {
-    if (!sectionRef.current || imagesRef.current.length === 0) return
+    if (!sectionRef.current || imagesRef.current.length === 0 || itemsRef.current.length === 0) return
 
     const section = sectionRef.current
     const imageSets = imagesRef.current
+    const textItems = itemsRef.current
+    const numSlides = imageSets.length
 
-    // Create timeline for fast image crossfades
+    // Calculate scroll range: generous time for reading + transitions
+    // Provide ample scroll distance for smooth transitions (400px per slide)
+    const scrollRangePerSlide = 400
+    const totalScrollRange = numSlides * scrollRangePerSlide
+
+    // Create master timeline for comprehensive pinned scroll storytelling
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1,
+        end: `+=${totalScrollRange}px`,
+        pin: true,
+        pinSpacing: true, // Reserve real scroll room for the pin duration so the
+        // crossfade storytelling fully plays out before the next section begins —
+        // without this, the following section starts consuming scroll space
+        // before this one's sequence finishes, producing a blank transition frame.
+        scrub: 1, // Responsive scrubbing for smooth feel
         markers: false,
+        fastScrollEnd: false, // Allow smooth momentum scrolling
         onUpdate: (self) => {
+          // Update active index based on scroll progress
           const newIndex = Math.min(
             AMENITIES.length - 1,
             Math.floor(self.progress * AMENITIES.length)
@@ -156,47 +140,110 @@ export default function AmenitiesSection() {
       }
     })
 
-    // Animate images and text with consistent, evenly-spaced transitions
-    const numSlides = imageSets.length
-    const segmentDuration = 1 / numSlides // Equal time per slide
-    const fadeDuration = segmentDuration * 0.25 // Fade duration relative to segment
-
+    // Initialize all slides as invisible except first
     imageSets.forEach((imageSet, index) => {
-      const textItem = itemsRef.current[index]
-      const segmentStart = index * segmentDuration
-      const segmentEnd = (index + 1) * segmentDuration
-      const fadeInStart = segmentStart
-      const fadeOutStart = segmentEnd - fadeDuration
+      gsap.set(imageSet, {
+        opacity: index === 0 ? 1 : 0,
+        pointerEvents: index === 0 ? 'auto' : 'none',
+        x: 0,
+        y: 0
+      })
+    })
+
+    textItems.forEach((textItem, index) => {
+      gsap.set(textItem, {
+        opacity: index === 0 ? 1 : 0,
+        pointerEvents: index === 0 ? 'auto' : 'none'
+      })
+    })
+
+    // Simple, predictable animation timing
+    // Each slide segment in the 0-1 timeline
+    const segmentDuration = 1 / numSlides // Each slide gets 1/3 of timeline
+    const transitionTime = 0.15 // 15% for crossfade
+    const displayTime = 0.85 // 85% for reading
+
+    // Create synchronized animations for each amenity
+    imageSets.forEach((imageSet, index) => {
+      const textItem = textItems[index]
+      const backgroundImg = imageSet.querySelector('.amenity-image-background')
+
+      // Absolute timeline position for this slide
+      const slideStart = index * segmentDuration
+      const transitionStart = slideStart + (displayTime * segmentDuration) // Fade out near end of display
+      const nextSlideStart = slideStart + segmentDuration
 
       if (index === 0) {
-        // First slide: start visible, fade out at end of segment
-        tl.fromTo(
-          [imageSet, textItem],
-          { opacity: 1 },
-          { opacity: 0, duration: fadeDuration },
-          fadeOutStart
+        // Premium Finishes: visible from start, fade out as Smart Living comes in
+        tl.to([imageSet, textItem],
+          {
+            opacity: 0,
+            pointerEvents: 'none',
+            duration: transitionTime * segmentDuration,
+            ease: 'sine.inOut'
+          },
+          transitionStart
         )
+        if (backgroundImg) {
+          tl.to(backgroundImg,
+            { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+            transitionStart
+          )
+        }
       } else if (index === numSlides - 1) {
-        // Last slide: fade in at start of segment, stay visible
-        tl.fromTo(
-          [imageSet, textItem],
-          { opacity: 0 },
-          { opacity: 1, duration: fadeDuration },
-          fadeInStart
+        // Concierge Services: fade in and stay visible until end
+        tl.fromTo([imageSet, textItem],
+          { opacity: 0, pointerEvents: 'none' },
+          {
+            opacity: 1,
+            pointerEvents: 'auto',
+            duration: transitionTime * segmentDuration,
+            ease: 'sine.inOut'
+          },
+          slideStart
         )
+        if (backgroundImg) {
+          tl.fromTo(backgroundImg,
+            { x: 30 },
+            { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+            slideStart
+          )
+        }
       } else {
-        // Middle slides: fade in, stay visible, fade out
-        tl.fromTo(
-          [imageSet, textItem],
-          { opacity: 0 },
-          { opacity: 1, duration: fadeDuration },
-          fadeInStart
+        // Smart Living: fade in, stay visible, fade out
+        tl.fromTo([imageSet, textItem],
+          { opacity: 0, pointerEvents: 'none' },
+          {
+            opacity: 1,
+            pointerEvents: 'auto',
+            duration: transitionTime * segmentDuration,
+            ease: 'sine.inOut'
+          },
+          slideStart
         )
-        tl.to(
-          [imageSet, textItem],
-          { opacity: 0, duration: fadeDuration },
-          fadeOutStart
+        if (backgroundImg) {
+          tl.fromTo(backgroundImg,
+            { x: 30 },
+            { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+            slideStart
+          )
+        }
+        // Fade out
+        tl.to([imageSet, textItem],
+          {
+            opacity: 0,
+            pointerEvents: 'none',
+            duration: transitionTime * segmentDuration,
+            ease: 'sine.inOut'
+          },
+          transitionStart
         )
+        if (backgroundImg) {
+          tl.to(backgroundImg,
+            { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+            transitionStart
+          )
+        }
       }
     })
 
@@ -233,7 +280,7 @@ export default function AmenitiesSection() {
 
         {/* Right Image Column */}
         <div className="amenities-image-column">
-          <div className="amenities-images-container">
+          <div className="amenities-images-container" ref={imagesContainerRef}>
             {AMENITIES.map((amenity, index) => (
               <div
                 key={amenity.id}
@@ -243,10 +290,7 @@ export default function AmenitiesSection() {
                 className={`amenity-image-set ${index === 0 ? 'active' : ''}`}
               >
                 <div className="amenity-image-background">
-                  <img src={amenity.backgroundImage} alt={`${amenity.title} background`} />
-                </div>
-                <div className="amenity-image-foreground">
-                  <img src={amenity.foregroundImage} alt={`${amenity.title} foreground`} />
+                  <img src={amenity.backgroundImage} alt={amenity.title} />
                 </div>
               </div>
             ))}

@@ -1,0 +1,122 @@
+.path-to-ownership-section {
+  background-color: #0a0a0a;
+  padding: 100px 0;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.path-to-ownership-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+.path-to-ownership-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+}
+
+.path-to-ownership-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: rgb(251, 238, 190);
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.path-to-ownership-video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.path-to-ownership-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background-color: #0a0a0a;
+}
+
+/* ── Responsive: Tablet ── */
+@media (max-width: 1024px) {
+  .path-to-ownership-section {
+    padding: 80px 0;
+  }
+
+  .path-to-ownership-container {
+    padding: 0 40px;
+  }
+
+  .path-to-ownership-content {
+    gap: 50px;
+  }
+
+  .path-to-ownership-title {
+    font-size: 36px;
+  }
+
+  .path-to-ownership-video-wrapper {
+    max-width: 100%;
+  }
+}
+
+/* ── Responsive: Mobile ── */
+@media (max-width: 768px) {
+  .path-to-ownership-section {
+    padding: 60px 0;
+  }
+
+  .path-to-ownership-container {
+    padding: 0 24px;
+  }
+
+  .path-to-ownership-content {
+    gap: 40px;
+  }
+
+  .path-to-ownership-title {
+    font-size: 28px;
+  }
+
+  .path-to-ownership-video-wrapper {
+    max-width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ── Responsive: Small Mobile ── */
+@media (max-width: 480px) {
+  .path-to-ownership-section {
+    padding: 50px 0;
+  }
+
+  .path-to-ownership-container {
+    padding: 0 16px;
+  }
+
+  .path-to-ownership-content {
+    gap: 30px;
+  }
+
+  .path-to-ownership-title {
+    font-size: 24px;
+  }
+
+  .path-to-ownership-video-wrapper {
+    max-width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+}

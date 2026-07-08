@@ -2,20 +2,23 @@
 
 .amenities-section {
   background-color: #0a0a0a;
-  padding: 80px 0 0 0;
+  padding: 0;
+  margin: 0;
   position: relative;
-  contain: layout style paint;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* ── Sticky Wrapper (pins during scroll) ── */
+/* ── Sticky Wrapper (pinned via GSAP ScrollTrigger) ── */
 .amenities-sticky-wrapper {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: relative;
+  height: 80vh;
   display: flex;
   align-items: stretch;
   background-color: #0a0a0a;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Left Content Column (40%) ── */
@@ -33,6 +36,7 @@
   max-width: 380px;
   position: relative;
   min-height: 400px;
+  will-change: opacity, transform;
 }
 
 .amenity-item {
@@ -79,13 +83,16 @@
   position: relative;
   overflow: visible;
   background-color: #0A0A0A;
-  padding-top: 20px;
 }
 
 .amenities-images-container {
   position: relative;
   width: 100%;
-  height: 90vh;
+  /* Match the column's own (stretched) height exactly, so the image's
+     top:50%/translateY(-50%) centering lines up with the left column's
+     centered content instead of centering against a taller, mismatched box. */
+  height: 100%;
+  will-change: opacity, transform;
 }
 
 /* Image Set Container */
@@ -102,16 +109,18 @@
   opacity: 1;
 }
 
-/* Background Image - Portrait orientation */
+/* Background Image - Landscape orientation, single focal image */
 .amenity-image-background {
   position: absolute;
   top: 50%;
-  right: 150px;
-  width: 450px;
-  height: 80vh;
+  right: 60px;
+  width: 700px;
+  max-width: calc(100% - 60px);
+  aspect-ratio: 16 / 10;
+  height: auto;
   overflow: hidden;
   transform: translateY(-50%);
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .amenity-image-background img {
@@ -121,32 +130,12 @@
   display: block;
 }
 
-/* Foreground Image - Overlapping into content area */
-.amenity-image-foreground {
-  position: absolute;
-  top: 55%;
-  left: auto;
-  right:500px;
-  transform: translateY(-50%);
-  width: 240px;
-  height: 400px;
-  overflow: hidden;
-  z-index: 10;
-  will-change: transform;
-}
-
-.amenity-image-foreground img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-/* ── Spacer for scroll range ── */
+/* ── Spacer for scroll range (minimal - scroll range handled by GSAP pin) ── */
 .amenities-spacer {
-  height: 300vh;
+  height: 0;
   background-color: #0a0a0a;
+  width: 100%;
+  display: none;
 }
 
 /* ── Responsive: Tablet ── */
@@ -168,7 +157,6 @@
   .amenities-image-column {
     flex: 0 0 auto;
     min-height: 50vh;
-    padding-top: 0;
     overflow: hidden;
   }
 
@@ -177,19 +165,13 @@
   }
 
   .amenity-image-background {
-    width: 350px;
-    height: 800px;
+    width: 560px;
+    max-width: calc(100% - 40px);
+    aspect-ratio: 16 / 10;
+    height: auto;
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
-  }
-
-  .amenity-image-foreground {
-    width: 200px;
-    height: 300px;
-    left: auto;
-    right: 240px;
-    top: 18%;
   }
 
   .amenity-title {
@@ -286,7 +268,6 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 0;
-    gap: 16px;
     padding: 0 24px 40px;
   }
 
@@ -297,22 +278,12 @@
   .amenity-image-background {
     position: static !important;
     width: 100%;
-    height: 280px;
+    aspect-ratio: 16 / 10;
+    height: auto;
     max-width: 100%;
     transform: none !important;
     overflow: hidden;
     border-radius: 8px;
-  }
-
-  .amenity-image-foreground {
-    position: static !important;
-    width: 100%;
-    height: 220px;
-    max-width: 100%;
-    transform: none !important;
-    overflow: hidden;
-    z-index: 1;
-    border-radius: 6px;
   }
 
   .amenity-index {
@@ -356,17 +327,10 @@
 
   .amenity-image-set {
     padding: 0 16px 30px;
-    gap: 12px;
   }
 
   .amenity-image-background {
-    height: 240px;
     border-radius: 6px;
-  }
-
-  .amenity-image-foreground {
-    height: 180px;
-    border-radius: 4px;
   }
 
   .amenity-index {

@@ -2,12 +2,12 @@ import { useState } from 'react'
 import Navbar from './Navbar'
 import HeroSection from './HeroSection'
 import AboutSection from './AboutSection'
-import StatsSection from './StatsSection'
 import LuxuryShowcase from './LuxuryShowcase'
 import ApartmentShowcase from './ApartmentShowcase'
 import AmenitiesSection from './AmenitiesSection'
 import TailoredSolutions from './TailoredSolutions'
 import LocationConnectivity from './LocationConnectivity'
+import PathToOwnership from './PathToOwnership'
 import './App.css'
 
 function App() {
@@ -23,12 +23,11 @@ function App() {
       {activeShowcase && <ApartmentShowcase id={activeShowcase} onClose={() => setActiveShowcase(null)} />}
       <HeroSection />
       <AboutSection />
-      <StatsSection />
       <LuxuryShowcase />
       <AmenitiesSection />
       <TailoredSolutions />
       <LocationConnectivity />
-    
+      <PathToOwnership />
     </>
   )
 }

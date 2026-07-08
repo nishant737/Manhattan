@@ -50,13 +50,19 @@
   }
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
   min-height: 100svh;
+  overflow-x: hidden;
 }
 
 h1,

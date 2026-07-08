@@ -41,7 +41,7 @@ function HeroSection() {
       <div className="hero-content">
         <p className="hero-subheading">A PROJECT BY ALLEGRO &amp; MOHTISHAM</p>
         <h1 className="hero-heading">MANHATTAN</h1>
-        <p className="hero-tagline">Luxury Redefined. Coastal Living Elevated.</p>
+        <p className="hero-tagline">Luxury Elevated in the Heart of Mangalore.</p>
       </div>
     </section>
   )

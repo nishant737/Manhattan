@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AboutSection.css'
-import AboutUsImg from './assets/aboutus.jpeg'
+import Entrance01 from './assets/ENTRANCE/ENTRANCE01.jpeg'
+import Entrance02 from './assets/ENTRANCE/ENTRANCE_02.jpeg'
+import Entrance03 from './assets/ENTRANCE/ENTRANCE_03.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -22,7 +24,18 @@ export default function AboutSection() {
   const taglineLinesRef = useRef([])
   const descriptionRef = useRef(null)
   const descriptionSecondaryRef = useRef(null)
-  const ctaRef = useRef(null)
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const images = [Entrance01, Entrance02, Entrance03]
+
+  // Slideshow effect - changes image every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % images.length)
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [images.length])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -30,7 +43,6 @@ export default function AboutSection() {
     const image = imageRef.current
     const description = descriptionRef.current
     const descSecondary = descriptionSecondaryRef.current
-    const cta = ctaRef.current
 
     if (!section || !weElement) return
 
@@ -141,16 +153,6 @@ export default function AboutSection() {
       )
     }
 
-    // CTA button fades in - synced with animation
-    if (cta) {
-      masterTl.fromTo(
-        cta,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4 },
-        1.75
-      )
-    }
-
     return () => {
       if (masterTl.scrollTrigger) {
         masterTl.scrollTrigger.kill()
@@ -159,27 +161,24 @@ export default function AboutSection() {
     }
   }, [])
 
-  const handleDownloadBrochure = () => {
-    // Create a link element to trigger download
-    const link = document.createElement('a')
-    link.href = '/Manhattan-Brochure.pdf'
-    link.download = 'Manhattan-Brochure.pdf'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  }
-
   return (
     <section className="about-section" ref={sectionRef}>
       <div className="about-container">
         {/* Left Column */}
         <div className="about-left">
           <div className="about-image-wrapper" ref={imageRef}>
-            <img
-              src={AboutUsImg}
-              alt="Design vision"
-              className="about-image"
-            />
+            {images.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Design vision ${index + 1}`}
+                className="about-image"
+                style={{
+                  opacity: currentImageIndex === index ? 1 : 0,
+                  pointerEvents: currentImageIndex === index ? 'auto' : 'none'
+                }}
+              />
+            ))}
           </div>
         </div>
 
@@ -212,10 +211,6 @@ export default function AboutSection() {
           <p className="about-description-secondary" ref={descriptionSecondaryRef}>
             Here, luxury is not merely a concept—it is an experience. From carefully curated finishes to bespoke design details, every element speaks to our unwavering commitment to excellence. Manhattan stands as a testament to what happens when visionary design meets unbridled ambition, transforming Mangalore's skyline and setting a new standard for premium residential architecture.
           </p>
-
-          <button className="about-cta" ref={ctaRef} onClick={handleDownloadBrochure}>
-            <span>DISCOVER MANHATTAN</span>
-          </button>
         </div>
       </div>
     </section>
