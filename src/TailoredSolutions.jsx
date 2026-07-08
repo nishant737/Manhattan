@@ -139,11 +139,9 @@ export default function TailoredSolutions() {
           {/* Left Column */}
           <div className="tailored-solutions-left" ref={leftColumnRef}>
             <h2 className="tailored-solutions-heading">
-              Tailored Solutions
+              Luxury Residences
               <br />
-              for Your Real Estate
-              <br />
-              Needs
+              Designed for You
             </h2>
           </div>
 

@@ -1,39 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './LocationConnectivity.css'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
-
-// Component to handle map bounds fitting
-function MapBoundsFitter({ locations, mainLocation }) {
-  const map = useMap()
-
-  useEffect(() => {
-    if (!map || !locations.length) return
-
-    // Create bounds that includes all markers
-    const bounds = L.latLngBounds([
-      [mainLocation.coordinates.lat, mainLocation.coordinates.lng],
-      ...locations.map(loc => [loc.coordinates.lat, loc.coordinates.lng])
-    ])
-
-    // Fit map to bounds with padding
-    setTimeout(() => {
-      map.fitBounds(bounds, {
-        padding: [60, 60],
-        maxZoom: 12,
-        duration: 0
-      })
-    }, 100)
-  }, [map, locations, mainLocation])
-
-  return null
-}
 
 // Custom luxury marker icon for nearby locations
 const createLuxuryMarker = (isActive) => {
@@ -52,9 +26,9 @@ const createLuxuryMarker = (isActive) => {
 }
 
 // Custom Manhattan checkpoint marker (same style as other locations but slightly larger)
-const createManhattanMarker = () => {
+const createManhattanMarker = (isActive) => {
   return L.divIcon({
-    className: 'custom-marker manhattan-checkpoint',
+    className: `custom-marker manhattan-checkpoint ${isActive ? 'active' : ''}`,
     html: `
       <div class="marker-pin">
         <div class="marker-dot"></div>
@@ -88,7 +62,13 @@ const LOCATIONS = [
     description: 'International airport with direct flights worldwide',
     coordinates: { lat: 12.953666, lng: 74.885411 },
     images: ['/location/MangaloreInternationalAirport.jpeg'],
-    highlights: ['International Flights', 'Premium Services', 'Fast-track']
+    highlights: ['International Flights', 'Premium Services', 'Fast-track'],
+    // ~4x farther from Manhattan than any other point on this list. Including
+    // it in the default fitted view forces the whole map to zoom out so far
+    // that the immediate neighborhood (and its markers) becomes illegible.
+    // Its marker still renders and its list entry still works — it's just
+    // excluded from the bounds the map fits to by default.
+    includeInMapBounds: false
   },
   {
     id: 3,
@@ -151,6 +131,20 @@ const LOCATIONS = [
     highlights: ['Scenic Views', 'Water Sports', 'Restaurants']
   }
 ]
+
+// Computed once at module scope and passed straight to MapContainer's
+// `bounds` prop so the map fits from its very first frame — fitting bounds
+// via a post-mount effect instead causes a visible flash of the wrong
+// default zoom/center before it snaps to the correct view. Locations flagged
+// `includeInMapBounds: false` (currently just the airport) are left out of
+// this calculation so the default view stays tightly zoomed on the walkable
+// neighborhood instead of zooming out to fit a single distant outlier.
+const MAP_BOUNDS = L.latLngBounds([
+  [MANHATTAN_LOCATION.coordinates.lat, MANHATTAN_LOCATION.coordinates.lng],
+  ...LOCATIONS
+    .filter((loc) => loc.includeInMapBounds !== false)
+    .map((loc) => [loc.coordinates.lat, loc.coordinates.lng])
+])
 
 export default function LocationConnectivity() {
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -220,23 +214,51 @@ export default function LocationConnectivity() {
     }
   }, [selectedLocation])
 
+  // Close the card on any click outside it. Marker and list-item clicks are
+  // excluded so opening a (new) card in the same click doesn't immediately
+  // close it — those are handled by handleLocationClick itself instead.
+  useEffect(() => {
+    if (!selectedLocation) return
+
+    const handleOutsideClick = (event) => {
+      const clickedInsideCard = cardRef.current && cardRef.current.contains(event.target)
+      const clickedTrigger = event.target.closest('.custom-marker') || event.target.closest('.location-list-item')
+
+      if (!clickedInsideCard && !clickedTrigger) {
+        setSelectedLocation(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [selectedLocation])
+
   const handleLocationClick = (location, event) => {
     setSelectedLocation(location)
 
     // Calculate card position relative to marker on map
     if (mapInstanceRef.current && event) {
-      const mapContainer = mapInstanceRef.current.getContainer()
+      const map = mapInstanceRef.current
+      const markerLatLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
+
+      // Locations excluded from the default fitted bounds (currently just
+      // the airport) can sit outside the current view — pan it into view
+      // first (instantly) so the card doesn't get positioned off-screen.
+      if (!map.getBounds().contains(markerLatLng)) {
+        map.panTo(markerLatLng, { animate: false })
+      }
+
+      const mapContainer = map.getContainer()
       const mapRect = mapContainer.getBoundingClientRect()
       const mapWidth = mapRect.width
       const mapHeight = mapRect.height
 
       // Get marker position in pixels
-      const markerLatLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
-      const markerPoint = mapInstanceRef.current.latLngToContainerPoint(markerLatLng)
+      const markerPoint = map.latLngToContainerPoint(markerLatLng)
 
-      // Card dimensions
-      const cardWidth = 320
-      const cardHeight = 280
+      // Card dimensions (kept in sync with the reduced .location-card CSS size)
+      const cardWidth = 240
+      const cardHeight = 220
 
       // Calculate initial card position (centered above marker)
       let cardX = markerPoint.x - cardWidth / 2
@@ -250,8 +272,6 @@ export default function LocationConnectivity() {
       setCardPosition({ x: cardX, y: cardY })
     }
   }
-
-  const mapCenter = [12.8700, 74.8450]
 
   return (
     <section className="location-connectivity-section" ref={sectionRef}>
@@ -283,13 +303,11 @@ export default function LocationConnectivity() {
             <div className="location-map-wrapper">
               <MapContainer
                 ref={mapInstanceRef}
-                center={mapCenter}
-                zoom={12}
+                bounds={MAP_BOUNDS}
+                boundsOptions={{ padding: [24, 24], maxZoom: 16 }}
                 scrollWheelZoom={false}
                 className="leaflet-map-container"
               >
-                <MapBoundsFitter locations={LOCATIONS} mainLocation={MANHATTAN_LOCATION} />
-
                 <TileLayer
                   attribution={false}
                   url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
@@ -298,18 +316,14 @@ export default function LocationConnectivity() {
                   crossOrigin="anonymous"
                 />
 
-                {/* Main Manhattan Location Marker */}
+                {/* Main Manhattan Location Marker (checkpoint) */}
                 <Marker
                   position={[MANHATTAN_LOCATION.coordinates.lat, MANHATTAN_LOCATION.coordinates.lng]}
-                  icon={createManhattanMarker()}
-                >
-                  <Popup>
-                    <div className="popup-content">
-                      <strong>{MANHATTAN_LOCATION.name}</strong>
-                      <p>{MANHATTAN_LOCATION.category}</p>
-                    </div>
-                  </Popup>
-                </Marker>
+                  icon={createManhattanMarker(selectedLocation?.id === MANHATTAN_LOCATION.id)}
+                  eventHandlers={{
+                    click: (e) => handleLocationClick(MANHATTAN_LOCATION, e)
+                  }}
+                />
 
                 {/* Markers for all nearby locations */}
                 {LOCATIONS.map((location) => (

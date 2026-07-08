@@ -101,158 +101,184 @@ export default function AmenitiesSection() {
     }
   }, [])
 
-  // Setup comprehensive GSAP ScrollTrigger pinned scroll animations
+  // Setup comprehensive GSAP ScrollTrigger pinned scroll animations.
+  // Restricted to desktop widths: below 1025px the CSS switches the layout to
+  // a vertically stacked column (all panels rendered in normal flow with
+  // opacity:1 !important), which is often taller than one screen. Pinning
+  // that stacked layout would fix it at a height greater than the viewport,
+  // permanently clipping the lower panels — so on narrower screens we skip
+  // the pin/crossfade entirely and let the stacked layout scroll naturally.
   useEffect(() => {
     if (!sectionRef.current || imagesRef.current.length === 0 || itemsRef.current.length === 0) return
 
-    const section = sectionRef.current
-    const imageSets = imagesRef.current
-    const textItems = itemsRef.current
-    const numSlides = imageSets.length
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia()
 
-    // Calculate scroll range: generous time for reading + transitions
-    // Provide ample scroll distance for smooth transitions (400px per slide)
-    const scrollRangePerSlide = 400
-    const totalScrollRange = numSlides * scrollRangePerSlide
+      mm.add('(min-width: 1025px)', () => {
+        const section = sectionRef.current
+        const imageSets = imagesRef.current
+        const textItems = itemsRef.current
+        const numSlides = imageSets.length
 
-    // Create master timeline for comprehensive pinned scroll storytelling
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: `+=${totalScrollRange}px`,
-        pin: true,
-        pinSpacing: true, // Reserve real scroll room for the pin duration so the
-        // crossfade storytelling fully plays out before the next section begins —
-        // without this, the following section starts consuming scroll space
-        // before this one's sequence finishes, producing a blank transition frame.
-        scrub: 1, // Responsive scrubbing for smooth feel
-        markers: false,
-        fastScrollEnd: false, // Allow smooth momentum scrolling
-        onUpdate: (self) => {
-          // Update active index based on scroll progress
-          const newIndex = Math.min(
-            AMENITIES.length - 1,
-            Math.floor(self.progress * AMENITIES.length)
-          )
-          setActiveIndex(newIndex)
+        // Give each slide a full viewport-height of scroll (e.g. 3 slides = "+=300%"
+        // of the viewport) so the reveal feels slow and deliberate rather than rushed.
+        // Computed via a function so ScrollTrigger re-measures correctly on resize.
+        const getEnd = () => `+=${window.innerHeight * numSlides}`
+
+        // Create master timeline for comprehensive pinned scroll storytelling
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: getEnd,
+            pin: true,
+            pinSpacing: true, // Reserve real scroll room for the pin duration so the
+            // crossfade storytelling fully plays out before the next section begins —
+            // without this, the following section starts consuming scroll space
+            // before this one's sequence finishes, producing a blank transition frame.
+            scrub: 1, // Responsive scrubbing for smooth feel
+            markers: false,
+            fastScrollEnd: false, // Allow smooth momentum scrolling
+            onUpdate: (self) => {
+              // Update active index based on scroll progress
+              const newIndex = Math.min(
+                AMENITIES.length - 1,
+                Math.floor(self.progress * AMENITIES.length)
+              )
+              setActiveIndex(newIndex)
+            }
+          }
+        })
+
+        // Initialize all slides as invisible except first
+        imageSets.forEach((imageSet, index) => {
+          gsap.set(imageSet, {
+            opacity: index === 0 ? 1 : 0,
+            pointerEvents: index === 0 ? 'auto' : 'none',
+            x: 0,
+            y: 0
+          })
+        })
+
+        textItems.forEach((textItem, index) => {
+          gsap.set(textItem, {
+            opacity: index === 0 ? 1 : 0,
+            pointerEvents: index === 0 ? 'auto' : 'none'
+          })
+        })
+
+        // Simple, predictable animation timing
+        // Each slide segment in the 0-1 timeline
+        const segmentDuration = 1 / numSlides // Each slide gets 1/3 of timeline
+        const transitionTime = 0.15 // 15% for crossfade
+        const displayTime = 0.85 // 85% for reading
+
+        // Create synchronized animations for each amenity
+        imageSets.forEach((imageSet, index) => {
+          const textItem = textItems[index]
+          const backgroundImg = imageSet.querySelector('.amenity-image-background')
+
+          // Absolute timeline position for this slide
+          const slideStart = index * segmentDuration
+          const transitionStart = slideStart + (displayTime * segmentDuration) // Fade out near end of display
+
+          if (index === 0) {
+            // Premium Finishes: visible from start, fade out as Smart Living comes in
+            tl.to([imageSet, textItem],
+              {
+                opacity: 0,
+                pointerEvents: 'none',
+                duration: transitionTime * segmentDuration,
+                ease: 'sine.inOut'
+              },
+              transitionStart
+            )
+            if (backgroundImg) {
+              tl.to(backgroundImg,
+                { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                transitionStart
+              )
+            }
+          } else if (index === numSlides - 1) {
+            // Concierge Services: fade in and stay visible until end
+            tl.fromTo([imageSet, textItem],
+              { opacity: 0, pointerEvents: 'none' },
+              {
+                opacity: 1,
+                pointerEvents: 'auto',
+                duration: transitionTime * segmentDuration,
+                ease: 'sine.inOut'
+              },
+              slideStart
+            )
+            if (backgroundImg) {
+              tl.fromTo(backgroundImg,
+                { x: 30 },
+                { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                slideStart
+              )
+            }
+          } else {
+            // Smart Living: fade in, stay visible, fade out
+            tl.fromTo([imageSet, textItem],
+              { opacity: 0, pointerEvents: 'none' },
+              {
+                opacity: 1,
+                pointerEvents: 'auto',
+                duration: transitionTime * segmentDuration,
+                ease: 'sine.inOut'
+              },
+              slideStart
+            )
+            if (backgroundImg) {
+              tl.fromTo(backgroundImg,
+                { x: 30 },
+                { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                slideStart
+              )
+            }
+            // Fade out
+            tl.to([imageSet, textItem],
+              {
+                opacity: 0,
+                pointerEvents: 'none',
+                duration: transitionTime * segmentDuration,
+                ease: 'sine.inOut'
+              },
+              transitionStart
+            )
+            if (backgroundImg) {
+              tl.to(backgroundImg,
+                { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                transitionStart
+              )
+            }
+          }
+        })
+
+        // The last tween above ends well before timeline time 1 (it only needs to
+        // reach ~0.72 of the way through). Since ScrollTrigger's scrub maps the FULL
+        // scroll range onto the timeline's OWN duration, leaving it unpadded squeezes
+        // every transition — especially the final one — into a rushed sliver at the
+        // very end of the scroll, instead of each slide getting its equal third. Pad
+        // the timeline out to exactly 1 so scroll progress maps 1:1 to timeline time.
+        const finalDuration = tl.duration()
+        if (finalDuration < 1) {
+          tl.to({}, { duration: 1 - finalDuration })
         }
-      }
-    })
 
-    // Initialize all slides as invisible except first
-    imageSets.forEach((imageSet, index) => {
-      gsap.set(imageSet, {
-        opacity: index === 0 ? 1 : 0,
-        pointerEvents: index === 0 ? 'auto' : 'none',
-        x: 0,
-        y: 0
+        return () => {
+          if (tl.scrollTrigger) {
+            tl.scrollTrigger.kill()
+          }
+          tl.kill()
+        }
       })
-    })
 
-    textItems.forEach((textItem, index) => {
-      gsap.set(textItem, {
-        opacity: index === 0 ? 1 : 0,
-        pointerEvents: index === 0 ? 'auto' : 'none'
-      })
-    })
+      return () => mm.revert()
+    }, sectionRef)
 
-    // Simple, predictable animation timing
-    // Each slide segment in the 0-1 timeline
-    const segmentDuration = 1 / numSlides // Each slide gets 1/3 of timeline
-    const transitionTime = 0.15 // 15% for crossfade
-    const displayTime = 0.85 // 85% for reading
-
-    // Create synchronized animations for each amenity
-    imageSets.forEach((imageSet, index) => {
-      const textItem = textItems[index]
-      const backgroundImg = imageSet.querySelector('.amenity-image-background')
-
-      // Absolute timeline position for this slide
-      const slideStart = index * segmentDuration
-      const transitionStart = slideStart + (displayTime * segmentDuration) // Fade out near end of display
-      const nextSlideStart = slideStart + segmentDuration
-
-      if (index === 0) {
-        // Premium Finishes: visible from start, fade out as Smart Living comes in
-        tl.to([imageSet, textItem],
-          {
-            opacity: 0,
-            pointerEvents: 'none',
-            duration: transitionTime * segmentDuration,
-            ease: 'sine.inOut'
-          },
-          transitionStart
-        )
-        if (backgroundImg) {
-          tl.to(backgroundImg,
-            { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
-            transitionStart
-          )
-        }
-      } else if (index === numSlides - 1) {
-        // Concierge Services: fade in and stay visible until end
-        tl.fromTo([imageSet, textItem],
-          { opacity: 0, pointerEvents: 'none' },
-          {
-            opacity: 1,
-            pointerEvents: 'auto',
-            duration: transitionTime * segmentDuration,
-            ease: 'sine.inOut'
-          },
-          slideStart
-        )
-        if (backgroundImg) {
-          tl.fromTo(backgroundImg,
-            { x: 30 },
-            { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
-            slideStart
-          )
-        }
-      } else {
-        // Smart Living: fade in, stay visible, fade out
-        tl.fromTo([imageSet, textItem],
-          { opacity: 0, pointerEvents: 'none' },
-          {
-            opacity: 1,
-            pointerEvents: 'auto',
-            duration: transitionTime * segmentDuration,
-            ease: 'sine.inOut'
-          },
-          slideStart
-        )
-        if (backgroundImg) {
-          tl.fromTo(backgroundImg,
-            { x: 30 },
-            { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
-            slideStart
-          )
-        }
-        // Fade out
-        tl.to([imageSet, textItem],
-          {
-            opacity: 0,
-            pointerEvents: 'none',
-            duration: transitionTime * segmentDuration,
-            ease: 'sine.inOut'
-          },
-          transitionStart
-        )
-        if (backgroundImg) {
-          tl.to(backgroundImg,
-            { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
-            transitionStart
-          )
-        }
-      }
-    })
-
-    return () => {
-      if (tl.scrollTrigger) {
-        tl.scrollTrigger.kill()
-      }
-      tl.kill()
-    }
+    return () => ctx.revert()
   }, [])
 
   return (
