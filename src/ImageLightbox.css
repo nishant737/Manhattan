@@ -1,0 +1,76 @@
+.image-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  padding: 40px;
+  box-sizing: border-box;
+  animation: imageLightboxFadeIn 0.25s ease;
+}
+
+.image-lightbox-image {
+  max-width: min(90vw, 1100px);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  animation: imageLightboxScaleIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.image-lightbox-close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(251, 238, 190, 0.1);
+  border: 1px solid rgba(251, 238, 190, 0.3);
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5001;
+  transition: all 0.3s ease;
+}
+
+.image-lightbox-close:hover {
+  background: rgba(251, 238, 190, 0.2);
+  border-color: rgb(251, 238, 190);
+  transform: scale(1.08);
+}
+
+.image-lightbox-close:active {
+  transform: scale(0.96);
+}
+
+@keyframes imageLightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes imageLightboxScaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  .image-lightbox-overlay {
+    padding: 20px;
+  }
+
+  .image-lightbox-close {
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+  }
+}

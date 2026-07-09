@@ -145,12 +145,45 @@
   }
 }
 
+.accordion-detail-image-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .accordion-detail-image {
   width: 100%;
   border-radius: 12px;
   object-fit: contain;
   max-height: min(26vh, 340px);
   display: block;
+}
+
+.accordion-zoom-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.75);
+  border: 1px solid rgba(251, 238, 190, 0.4);
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.accordion-zoom-button:hover {
+  background-color: rgba(251, 238, 190, 0.2);
+  border-color: rgb(251, 238, 190);
+  transform: scale(1.08);
+}
+
+.accordion-zoom-button:active {
+  transform: scale(0.96);
 }
 
 /* ── Scrolling Ticker ── */
