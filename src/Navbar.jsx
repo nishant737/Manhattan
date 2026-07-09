@@ -34,7 +34,8 @@ export default function Navbar({ onNavClick }) {
     { id: 'amenities', label: 'Amenities' },
     { id: 'about', label: 'About' },
     { id: 'brochure', label: 'Brochure' },
-    { id: 'vr-walkthrough', label: '3D Walkthrough / VR' }
+    { id: '3d-walkthrough', label: '3D Walkthrough' },
+    { id: 'vr-experience', label: 'VR Experience' }
   ]
 
   const handleNavClick = (id) => {
@@ -90,7 +91,8 @@ export default function Navbar({ onNavClick }) {
         </button>
       </nav>
 
-      {/* Mobile drawer */}
+      {/* Full-screen nav overlay (hamburger on desktop-once-scrolled, and
+          always on mobile — same overlay, same component, both breakpoints) */}
       <div className={`mobile-menu ${open ? 'mobile-menu--open' : ''}`}>
         <div className="mobile-menu-header">
           <img
@@ -99,6 +101,7 @@ export default function Navbar({ onNavClick }) {
             className="mobile-menu-logo"
             onClick={() => { setOpen(false); handleLogoClick() }}
           />
+
           <button
             className="mobile-menu-close"
             onClick={() => setOpen(false)}
@@ -111,22 +114,24 @@ export default function Navbar({ onNavClick }) {
           </button>
         </div>
 
-        <ul>
-          {navItems.map(item => (
-            <li key={item.id}>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavClick(item.id)
-                  setOpen(false)
-                }}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+        <nav className="mobile-menu-primary">
+          <ul>
+            {navItems.map((item, index) => (
+              <li key={item.id} style={{ '--item-index': index }}>
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavClick(item.id)
+                    setOpen(false)
+                  }}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </>
   )

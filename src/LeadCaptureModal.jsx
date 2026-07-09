@@ -1,11 +1,47 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
+import { Country, State, City } from 'country-state-city'
+import SearchableSelect from './SearchableSelect'
 import './LeadCaptureModal.css'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const PHONE_PATTERN = /^[0-9+\-\s()]{7,}$/
 
-const EMPTY_FORM = { name: '', email: '', phone: '', location: '', requirement: '' }
+// A handful of countries (mostly Caribbean/UK-dependency territories) store
+// their dial code with a leading "+" and a dash-suffixed area code, e.g.
+// "+358-18" (Åland) or "+1-242" (Bahamas), unlike the plain "91"/"1" the rest
+// use. Left as-is, `+${phonecode}` produces garbage like "++358-18" and
+// Number(phonecode) is NaN, breaking any numeric sort. Normalize to just the
+// leading digits so every country has a clean, comparable dial code.
+const normalizeDialCode = (phonecode) => phonecode.replace(/^\+/, '').match(/^\d+/)?.[0] ?? ''
+
+const ALL_COUNTRIES = Country.getAllCountries()
+  .map((c) => ({ ...c, dialCode: normalizeDialCode(c.phonecode || '') }))
+  .sort((a, b) => a.name.localeCompare(b.name))
+
+// Shared by both the Country select and the Phone Country Code select (they
+// read/write the exact same form.country value, see handleCountryChange).
+const COUNTRY_OPTIONS = ALL_COUNTRIES.map((c) => ({
+  value: c.isoCode,
+  label: <>{c.flag} {c.name}</>,
+  searchText: `${c.name} ${c.isoCode} +${c.dialCode}`
+}))
+
+const PHONE_CODE_OPTIONS = ALL_COUNTRIES.map((c) => ({
+  value: c.isoCode,
+  triggerLabel: <>{c.flag} +{c.dialCode}</>,
+  label: <>{c.flag} +{c.dialCode} <span className="searchable-select-option-sub">{c.name}</span></>,
+  searchText: `${c.name} ${c.isoCode} +${c.dialCode} ${c.dialCode}`
+}))
+
+const EMPTY_FORM = {
+  name: '',
+  email: '',
+  phone: '',
+  country: 'IN',
+  state: '',
+  city: '',
+  requirement: ''
+}
 
 export default function LeadCaptureModal({ isOpen, onClose, onSubmit }) {
   const [form, setForm] = useState(EMPTY_FORM)
@@ -36,26 +72,84 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit }) {
     )
   }, [isOpen])
 
+  // States for the selected country; cities for the selected state (or,
+  // for countries with no state subdivisions in the dataset, straight off
+  // the country). Both recompute whenever their parent selection changes.
+  const states = useMemo(() => State.getStatesOfCountry(form.country) || [], [form.country])
+
+  const cities = useMemo(() => {
+    if (states.length > 0) {
+      if (!form.state) return []
+      return City.getCitiesOfState(form.country, form.state) || []
+    }
+    return City.getCitiesOfCountry(form.country) || []
+  }, [form.country, form.state, states])
+
+  const stateOptions = useMemo(
+    () => states.map((s) => ({ value: s.isoCode, label: s.name, searchText: s.name })),
+    [states]
+  )
+
+  const cityOptions = useMemo(
+    () => cities.map((c) => ({
+      value: c.name,
+      label: c.name,
+      searchText: c.name
+    })),
+    [cities]
+  )
+
   if (!isOpen) return null
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
   }
 
+  // The Country select and the Phone Country Code select both call this SAME
+  // handler and read/write the SAME form.country value — there's no separate
+  // "phone country" field to fall out of sync, so selecting either one always
+  // updates the other by construction. State/City only get cleared when the
+  // country actually changes (not on a redundant re-select), so an existing
+  // valid State/City selection is never wiped out unnecessarily.
+  const handleCountryChange = (nextCountry) => {
+    setForm((prev) => {
+      if (prev.country === nextCountry) return prev
+      return { ...prev, country: nextCountry, state: '', city: '' }
+    })
+  }
+
+  const handleStateChange = (nextState) => {
+    setForm((prev) => {
+      if (prev.state === nextState) return prev
+      return { ...prev, state: nextState, city: '' }
+    })
+  }
+
+  const handleCityChange = (nextCity) => {
+    setForm((prev) => ({ ...prev, city: nextCity }))
+  }
+
   const validate = () => {
     const nextErrors = {}
     if (!form.name.trim()) nextErrors.name = 'Please enter your name.'
+
     if (!form.email.trim()) {
       nextErrors.email = 'Please enter your email.'
     } else if (!EMAIL_PATTERN.test(form.email.trim())) {
       nextErrors.email = 'Please enter a valid email.'
     }
+
+    const phoneDigits = form.phone.replace(/[^0-9]/g, '')
     if (!form.phone.trim()) {
       nextErrors.phone = 'Please enter your phone number.'
-    } else if (!PHONE_PATTERN.test(form.phone.trim())) {
+    } else if (phoneDigits.length < 6 || phoneDigits.length > 14) {
       nextErrors.phone = 'Please enter a valid phone number.'
     }
-    if (!form.location.trim()) nextErrors.location = 'Please enter your location.'
+
+    if (!form.country) nextErrors.country = 'Please select your country.'
+    if (states.length > 0 && !form.state) nextErrors.state = 'Please select your state.'
+    if (cities.length > 0 && !form.city) nextErrors.city = 'Please select your city.'
+
     return nextErrors
   }
 
@@ -64,12 +158,28 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit }) {
     const nextErrors = validate()
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
-    onSubmit({ ...form, name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim(), location: form.location.trim() })
+
+    const countryObj = ALL_COUNTRIES.find((c) => c.isoCode === form.country)
+    const stateObj = states.find((s) => s.isoCode === form.state)
+
+    onSubmit({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      phone: `+${countryObj?.dialCode ?? ''} ${form.phone.trim()}`,
+      country: countryObj?.name ?? form.country,
+      state: stateObj?.name ?? '',
+      city: form.city,
+      requirement: form.requirement.trim()
+    })
   }
 
   const handleOverlayMouseDown = (e) => {
     if (e.target === overlayRef.current) onClose()
   }
+
+  const cityPlaceholder = cities.length > 0
+    ? 'Select city'
+    : (states.length > 0 && !form.state ? 'Select a state first' : 'No cities available')
 
   return (
     <div className="lead-modal-overlay" ref={overlayRef} onMouseDown={handleOverlayMouseDown}>
@@ -116,28 +226,77 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit }) {
 
           <div className="lead-modal-field">
             <label htmlFor="lead-phone">Phone Number *</label>
-            <input
-              id="lead-phone"
-              type="tel"
-              value={form.phone}
-              onChange={handleChange('phone')}
-              className={errors.phone ? 'has-error' : ''}
-              placeholder="+91 98765 43210"
-            />
+            <div className="lead-modal-phone-row">
+              <SearchableSelect
+                id="lead-phone-country"
+                value={form.country}
+                options={PHONE_CODE_OPTIONS}
+                onChange={handleCountryChange}
+                triggerClassName="lead-modal-phone-code"
+                panelWidth={260}
+                ariaLabel="Phone country code (synced with Country below)"
+                searchPlaceholder="Search country or code…"
+              />
+              <input
+                id="lead-phone"
+                type="tel"
+                value={form.phone}
+                onChange={handleChange('phone')}
+                className={errors.phone ? 'has-error' : ''}
+                placeholder="98765 43210"
+              />
+            </div>
             {errors.phone && <span className="lead-modal-error">{errors.phone}</span>}
           </div>
 
           <div className="lead-modal-field">
-            <label htmlFor="lead-location">Your Location *</label>
-            <input
-              id="lead-location"
-              type="text"
-              value={form.location}
-              onChange={handleChange('location')}
-              className={errors.location ? 'has-error' : ''}
-              placeholder="City you're writing from"
+            <label htmlFor="lead-country">Country *</label>
+            <SearchableSelect
+              id="lead-country"
+              value={form.country}
+              options={COUNTRY_OPTIONS}
+              onChange={handleCountryChange}
+              hasError={!!errors.country}
+              placeholder="Select country"
+              searchPlaceholder="Search country…"
             />
-            {errors.location && <span className="lead-modal-error">{errors.location}</span>}
+            {errors.country && <span className="lead-modal-error">{errors.country}</span>}
+          </div>
+
+          <div className="lead-modal-field-row">
+            {states.length > 0 && (
+              <div className="lead-modal-field">
+                <label htmlFor="lead-state">State *</label>
+                <SearchableSelect
+                  id="lead-state"
+                  value={form.state}
+                  options={stateOptions}
+                  onChange={handleStateChange}
+                  hasError={!!errors.state}
+                  placeholder="Select state"
+                  panelWidth={260}
+                  searchPlaceholder="Search state…"
+                />
+                {errors.state && <span className="lead-modal-error">{errors.state}</span>}
+              </div>
+            )}
+
+            <div className="lead-modal-field">
+              <label htmlFor="lead-city">City {cities.length > 0 ? '*' : ''}</label>
+              <SearchableSelect
+                id="lead-city"
+                value={form.city}
+                options={cityOptions}
+                onChange={handleCityChange}
+                hasError={!!errors.city}
+                placeholder={cityPlaceholder}
+                panelWidth={260}
+                disabled={cities.length === 0}
+                searchPlaceholder="Search city…"
+                emptyMessage="No matching cities"
+              />
+              {errors.city && <span className="lead-modal-error">{errors.city}</span>}
+            </div>
           </div>
 
           <div className="lead-modal-field">

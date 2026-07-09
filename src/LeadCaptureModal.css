@@ -11,16 +11,27 @@
 }
 
 .lead-modal-card {
+  /* Without border-box, max-height only bounds the content box and the
+     padding/border get added on top, pushing the rendered card past the
+     viewport at both the top and bottom instead of scrolling internally. */
+  box-sizing: border-box;
   position: relative;
   width: 100%;
   max-width: 440px;
   max-height: calc(100vh - 48px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   background-color: rgba(20, 20, 20, 0.98);
   border: 1px solid rgba(251, 238, 190, 0.2);
   border-radius: 18px;
   padding: 36px 32px 28px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+}
+
+.lead-modal-card *,
+.lead-modal-card *::before,
+.lead-modal-card *::after {
+  box-sizing: border-box;
 }
 
 .lead-modal-close {
@@ -84,6 +95,19 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+}
+
+/* State + City share a row on wider screens to keep the form compact;
+   wraps to stacked full-width fields once there isn't room for both. */
+.lead-modal-field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.lead-modal-field-row .lead-modal-field {
+  flex: 1 1 160px;
 }
 
 .lead-modal-field label {
@@ -106,6 +130,26 @@
   outline: none;
   transition: border-color 0.25s ease, background-color 0.25s ease;
   resize: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lead-modal-phone-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* Country/Phone-code selects are now the SearchableSelect component (see
+   SearchableSelect.css for the trigger's base look); this just constrains
+   the phone-code trigger's width within the phone row. */
+.lead-modal-phone-code {
+  flex: 0 0 108px;
+  min-width: 0;
+}
+
+.lead-modal-phone-row input {
+  flex: 1;
+  min-width: 0;
 }
 
 .lead-modal-field input::placeholder,
@@ -132,7 +176,7 @@
 .lead-modal-submit {
   margin-top: 8px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -140,7 +184,8 @@
   background-color: rgb(251, 238, 190);
   border: none;
   border-radius: 10px;
-  padding: 14px;
+  padding: 11px 14px;
+  line-height: 1.2;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.25s ease;
 }

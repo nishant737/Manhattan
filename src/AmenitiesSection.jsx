@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AmenitiesSection.css'
@@ -38,28 +38,6 @@ export default function AmenitiesSection() {
   const imagesContainerRef = useRef(null)
   const itemsRef = useRef([])
   const imagesRef = useRef([])
-  const [isInView, setIsInView] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(0)
-
-  // Detect when section enters viewport for content animation
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting)
-      },
-      { threshold: 0.3 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current)
-      }
-    }
-  }, [])
 
   // One-time entrance reveal: the left content block and right image
   // cluster converge in from opposite edges as the section first scrolls
@@ -136,17 +114,17 @@ export default function AmenitiesSection() {
             // crossfade storytelling fully plays out before the next section begins —
             // without this, the following section starts consuming scroll space
             // before this one's sequence finishes, producing a blank transition frame.
-            scrub: 1, // Responsive scrubbing for smooth feel
+            scrub: true, // True 1:1 scrub — the timeline tracks the scrollbar position
+            // directly with zero smoothing lag. A numeric scrub (e.g. 1) introduces up
+            // to a full second of "catch up" easing, which is exactly what reads as
+            // laggy/disconnected motion on fast flicks; scrub:true removes that entirely.
+            anticipatePin: 1, // Pre-compensates the pin engagement so there's no
+            // one-frame jump/flash the instant the section reaches the pin point.
+            invalidateOnRefresh: true, // Recompute the (viewport-height-based) end
+            // value and all tween positions cleanly on resize instead of reusing stale
+            // cached numbers, so the pin boundary never feels like it jumps.
             markers: false,
-            fastScrollEnd: false, // Allow smooth momentum scrolling
-            onUpdate: (self) => {
-              // Update active index based on scroll progress
-              const newIndex = Math.min(
-                AMENITIES.length - 1,
-                Math.floor(self.progress * AMENITIES.length)
-              )
-              setActiveIndex(newIndex)
-            }
+            fastScrollEnd: false // Allow smooth momentum scrolling
           }
         })
 
@@ -170,8 +148,15 @@ export default function AmenitiesSection() {
         // Simple, predictable animation timing
         // Each slide segment in the 0-1 timeline
         const segmentDuration = 1 / numSlides // Each slide gets 1/3 of timeline
-        const transitionTime = 0.15 // 15% for crossfade
-        const displayTime = 0.85 // 85% for reading
+        // At the previous 0.15/0.85 split, each crossfade only spanned ~5% of the
+        // total scroll distance (roughly 135px at a 900px viewport) — with true
+        // 1:1 scrub that's covered in an instant, reading as an abrupt snap rather
+        // than a dissolve. Widening the transition to 40% of each slide's own
+        // scroll budget (~360px) gives the fade real distance to play out
+        // gradually, while still summing to 1 with displayTime so the handoff
+        // stays perfectly sequential (no two headings visible at once).
+        const transitionTime = 0.4 // 40% of each segment for the crossfade
+        const displayTime = 0.6 // 60% for reading
 
         // Create synchronized animations for each amenity
         imageSets.forEach((imageSet, index) => {
@@ -195,7 +180,7 @@ export default function AmenitiesSection() {
             )
             if (backgroundImg) {
               tl.to(backgroundImg,
-                { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                { x: -60, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
                 transitionStart
               )
             }
@@ -213,7 +198,7 @@ export default function AmenitiesSection() {
             )
             if (backgroundImg) {
               tl.fromTo(backgroundImg,
-                { x: 30 },
+                { x: 60 },
                 { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
                 slideStart
               )
@@ -232,7 +217,7 @@ export default function AmenitiesSection() {
             )
             if (backgroundImg) {
               tl.fromTo(backgroundImg,
-                { x: 30 },
+                { x: 60 },
                 { x: 0, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
                 slideStart
               )
@@ -249,7 +234,7 @@ export default function AmenitiesSection() {
             )
             if (backgroundImg) {
               tl.to(backgroundImg,
-                { x: -30, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
+                { x: -60, duration: transitionTime * segmentDuration, ease: 'sine.inOut' },
                 transitionStart
               )
             }

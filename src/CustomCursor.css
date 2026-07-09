@@ -1,0 +1,30 @@
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgb(251, 238, 190);
+  mix-blend-mode: difference;
+  z-index: 9999;
+  pointer-events: none;
+  will-change: transform, width, height;
+  transition: width 0.25s ease, height 0.25s ease;
+}
+
+.custom-cursor.cursor-hover {
+  width: 70px;
+  height: 70px;
+}
+
+/* Hide the native cursor everywhere while the custom one is active — plain
+   `cursor: none` on body alone wouldn't win against elements that set their
+   own explicit `cursor: pointer` (nav links, buttons, etc.), which is most
+   of what this effect is meant to appear over. Only ever applied on
+   hover-capable, fine-pointer devices (see the (hover:hover) check in
+   CustomCursor.jsx) — touch devices are completely untouched. */
+body.custom-cursor-active,
+body.custom-cursor-active * {
+  cursor: none !important;
+}

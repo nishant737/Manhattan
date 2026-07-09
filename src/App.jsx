@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import CustomCursor from './CustomCursor'
 import Navbar from './Navbar'
 import HeroSection from './HeroSection'
 import AboutSection from './AboutSection'
@@ -19,6 +20,7 @@ function App() {
 
   return (
     <>
+      <CustomCursor />
       <Navbar onNavClick={handleNavClick} />
       {activeShowcase && <ApartmentShowcase id={activeShowcase} onClose={() => setActiveShowcase(null)} />}
       <HeroSection />
