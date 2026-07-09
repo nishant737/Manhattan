@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { Country, State, City } from 'country-state-city'
+import { isValidPhoneNumber } from 'libphonenumber-js'
 import SearchableSelect from './SearchableSelect'
 import './LeadCaptureModal.css'
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// A stricter, practical email pattern (close to the WHATWG HTML5 spec used
+// for <input type="email">, plus a mandatory 2+ letter TLD). The previous
+// pattern (`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`) let a bare "no whitespace/no @"
+// domain segment absorb dots freely, so nonsensical addresses like
+// "user@example..com" or "user@example.com." (trailing dot) passed.
+const EMAIL_PATTERN =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/
 
 // A handful of countries (mostly Caribbean/UK-dependency territories) store
 // their dial code with a leading "+" and a dash-suffixed area code, e.g.
@@ -136,14 +143,20 @@ export default function LeadCaptureModal({ isOpen, onClose, onSubmit }) {
     if (!form.email.trim()) {
       nextErrors.email = 'Please enter your email.'
     } else if (!EMAIL_PATTERN.test(form.email.trim())) {
-      nextErrors.email = 'Please enter a valid email.'
+      nextErrors.email = 'Please enter a valid email address.'
     }
 
+    // Validated against the actual numbering-plan rules for the selected
+    // country (via libphonenumber-js), not a fixed digit range — e.g. India
+    // requires exactly 10 digits, the US requires exactly 10, other
+    // countries allow different lengths/prefixes. This is what makes the
+    // check "dynamic based on the selected country code" rather than a
+    // one-size-fits-all min/max.
     const phoneDigits = form.phone.replace(/[^0-9]/g, '')
     if (!form.phone.trim()) {
       nextErrors.phone = 'Please enter your phone number.'
-    } else if (phoneDigits.length < 6 || phoneDigits.length > 14) {
-      nextErrors.phone = 'Please enter a valid phone number.'
+    } else if (!isValidPhoneNumber(phoneDigits, form.country)) {
+      nextErrors.phone = 'Please enter a valid phone number with the required number of digits for the selected country.'
     }
 
     if (!form.country) nextErrors.country = 'Please select your country.'
