@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import CustomCursor from './CustomCursor'
+import WhatsAppButton from './WhatsAppButton'
 import Navbar from './Navbar'
 import HeroSection from './HeroSection'
 import AboutSection from './AboutSection'
@@ -21,6 +22,7 @@ function App() {
   return (
     <>
       <CustomCursor />
+      <WhatsAppButton />
       <Navbar onNavClick={handleNavClick} />
       {activeShowcase && <ApartmentShowcase id={activeShowcase} onClose={() => setActiveShowcase(null)} />}
       <HeroSection />

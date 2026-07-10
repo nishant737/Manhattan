@@ -1,0 +1,50 @@
+.whatsapp-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: #0a0a0a;
+  border: 1px solid rgba(251, 238, 190, 0.3);
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  /* Below the navbar/modals (999-1000+) so it never floats on top of an
+     open modal, but above ordinary page content. */
+  z-index: 950;
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.whatsapp-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.08);
+  border-color: rgb(251, 238, 190);
+  background-color: #131313;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+}
+
+.whatsapp-button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 480px) {
+  .whatsapp-button {
+    width: 42px;
+    height: 42px;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .whatsapp-button svg {
+    width: 20px;
+    height: 20px;
+  }
+}

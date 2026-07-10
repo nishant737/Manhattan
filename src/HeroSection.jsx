@@ -1,5 +1,7 @@
 import { useRef, useEffect } from 'react'
 import './HeroSection.css'
+import AllegroLogo from './assets/Allegro-Logo-2-cream.png'
+import MohtishamLogo from './assets/mohtisham-logo-cream.png'
 
 function HeroSection() {
   const videoRef = useRef(null)
@@ -42,6 +44,12 @@ function HeroSection() {
         <p className="hero-subheading">A PROJECT BY ALLEGRO &amp; MOHTISHAM</p>
         <h1 className="hero-heading">MANHATTAN</h1>
         <p className="hero-tagline">Luxury Elevated in the Heart of Mangalore.</p>
+
+        <div className="hero-logos">
+          <img src={AllegroLogo} alt="Allegro" className="hero-logo" />
+          <span className="hero-logo-divider" />
+          <img src={MohtishamLogo} alt="Mohtisham" className="hero-logo" />
+        </div>
       </div>
     </section>
   )
