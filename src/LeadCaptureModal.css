@@ -173,6 +173,12 @@
   color: rgb(255, 130, 130);
 }
 
+.lead-modal-hint {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .lead-modal-submit {
   margin-top: 8px;
   font-family: 'Montserrat', sans-serif;

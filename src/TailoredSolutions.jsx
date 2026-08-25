@@ -2,50 +2,29 @@ import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import LeadCaptureModal from './LeadCaptureModal'
-import ImageLightbox from './ImageLightbox'
+import { LAYOUT_TYPES } from './apartmentLayouts'
 import './TailoredSolutions.css'
-
-// Import placeholder images for floor plans
-import FloorPlan1 from './assets/lower-duplex-layout.jpeg'
-import FloorPlan2 from './assets/upper-duplex-layout.jpeg'
-import InteriorPhoto1 from './assets/premiumone.jpeg'
-import InteriorPhoto2 from './assets/premiumtwo.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
-const SOLUTIONS = [
-  {
-    id: 1,
-    label: 'Floor Plan',
-    image: FloorPlan1,
-    thumbnail: InteriorPhoto1
-  },
-  {
-    id: 2,
-    label: 'Unit Layout',
-    image: FloorPlan2,
-    thumbnail: InteriorPhoto2
-  },
-  {
-    id: 3,
-    label: 'Master Bedroom',
-    image: FloorPlan1,
-    thumbnail: InteriorPhoto1
-  },
-  {
-    id: 4,
-    label: 'Living Area',
-    image: FloorPlan2,
-    thumbnail: InteriorPhoto2
-  }
-]
+// Same 4 apartment types offered in the Layout modal, reused here so this
+// row and that modal never drift out of sync with each other — picking a
+// type here and submitting the lead form opens straight into that same
+// modal, already showing this exact type's detail view. Each type's
+// images[0] is its distinct hero image there (floor-plan drawings for the
+// two duplex types, a distinct lifestyle photo for the other two — see
+// apartmentLayouts.js), so reusing it here guarantees every thumbnail in
+// this row is visually distinct too, with no accidental image reuse.
+const SOLUTIONS = LAYOUT_TYPES.map((type) => ({
+  id: type.id,
+  label: type.title,
+  thumbnail: type.images[0]
+}))
 
 const LEAD_SUBMITTED_KEY = 'manhattan_lead_submitted'
 
-export default function TailoredSolutions() {
-  const [expandedId, setExpandedId] = useState(null)
-  const [lightboxSolution, setLightboxSolution] = useState(null)
+export default function TailoredSolutions({ onSelectLayout }) {
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
   const [pendingSolutionId, setPendingSolutionId] = useState(null)
   const [hasSubmittedLead, setHasSubmittedLead] = useState(() => {
@@ -58,16 +37,16 @@ export default function TailoredSolutions() {
   const rightColumnRef = useRef(null)
   const accordionItemsRef = useRef([])
 
-  // First attempt to open any layout is gated behind a short lead-capture
-  // form. Once the visitor has submitted it once, every accordion behaves
-  // like a normal toggle for the rest of the session.
-  const toggleAccordion = (id) => {
+  // First attempt to view any layout is gated behind a short lead-capture
+  // form; once the visitor has submitted it once, picking a type opens the
+  // shared Layout modal straight away for the rest of the session.
+  const handleSelectSolution = (id) => {
     if (!hasSubmittedLead) {
       setPendingSolutionId(id)
       setIsLeadModalOpen(true)
       return
     }
-    setExpandedId(expandedId === id ? null : id)
+    onSelectLayout?.(id)
   }
 
   const handleLeadModalClose = () => {
@@ -77,12 +56,13 @@ export default function TailoredSolutions() {
 
   const handleLeadSubmit = (formData) => {
     // TODO: wire this up to the real CRM/lead-capture endpoint once available.
-    console.log('Lead captured from TailoredSolutions:', formData)
+    const pendingSolution = SOLUTIONS.find((s) => s.id === pendingSolutionId)
+    console.log('Lead captured from TailoredSolutions:', { ...formData, apartmentType: pendingSolution?.label })
 
     window.localStorage.setItem(LEAD_SUBMITTED_KEY, 'true')
     setHasSubmittedLead(true)
     setIsLeadModalOpen(false)
-    setExpandedId(pendingSolutionId)
+    onSelectLayout?.(pendingSolutionId)
     setPendingSolutionId(null)
   }
 
@@ -189,12 +169,12 @@ export default function TailoredSolutions() {
                   ref={(el) => {
                     if (el) accordionItemsRef.current[index] = el
                   }}
-                  className={`accordion-row ${expandedId === solution.id ? 'expanded' : ''}`}
+                  className="accordion-row"
                 >
                   <button
                     className="accordion-trigger"
-                    onClick={() => toggleAccordion(solution.id)}
-                    aria-expanded={expandedId === solution.id}
+                    onClick={() => handleSelectSolution(solution.id)}
+                    aria-label={`View ${solution.label} layout`}
                   >
                     <img
                       src={solution.thumbnail}
@@ -211,34 +191,9 @@ export default function TailoredSolutions() {
                       stroke="currentColor"
                       strokeWidth="2"
                     >
-                      <polyline points="6 9 12 15 18 9"></polyline>
+                      <polyline points="9 6 15 12 9 18"></polyline>
                     </svg>
                   </button>
-
-                  {expandedId === solution.id && (
-                    <div className="accordion-content">
-                      <div className="accordion-detail-image-wrapper">
-                        <img
-                          src={solution.image}
-                          alt={`${solution.label} detail`}
-                          className="accordion-detail-image"
-                        />
-                        <button
-                          type="button"
-                          className="accordion-zoom-button"
-                          onClick={() => setLightboxSolution(solution)}
-                          aria-label={`View ${solution.label} full size`}
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <circle cx="11" cy="11" r="7"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            <line x1="11" y1="8" x2="11" y2="14"></line>
-                            <line x1="8" y1="11" x2="14" y2="11"></line>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -258,14 +213,6 @@ export default function TailoredSolutions() {
         onClose={handleLeadModalClose}
         onSubmit={handleLeadSubmit}
       />
-
-      {lightboxSolution && (
-        <ImageLightbox
-          src={lightboxSolution.image}
-          alt={`${lightboxSolution.label} detail`}
-          onClose={() => setLightboxSolution(null)}
-        />
-      )}
     </section>
   )
 }

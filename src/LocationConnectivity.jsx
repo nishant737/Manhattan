@@ -280,7 +280,7 @@ export default function LocationConnectivity() {
           {/* Left Column: Text List */}
           <div className="location-left-column" ref={leftColumnRef}>
             <div className="location-title">
-              <span className="title-line">Peacefully Secluded &</span>
+              <span className="title-line">In the Heart of the City &</span>
               <span className="title-line">Ideally Connected</span>
             </div>
 

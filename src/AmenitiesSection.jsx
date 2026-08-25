@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './AmenitiesSection.css'
-import ConciergeServicesImg from './assets/ConciergeServices.jpeg'
-import PremiumFinishesImg from './assets/PremiumFinishes.jpeg'
-import SmartLivingImg from './assets/SmartLiving.jpeg'
+import IconicArchitectureImg from './assets/more.jpeg'
+import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
+import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -12,23 +12,29 @@ const AMENITIES = [
   {
     id: 2,
     index: '01',
-    title: 'Premium Finishes',
-    description: 'Every surface, fixture, and fitting has been curated with intention — imported stone, bespoke millwork, and materials selected for both beauty and longevity.',
-    backgroundImage: PremiumFinishesImg
+    title: 'Iconic Architecture',
+    description: 'A striking silhouette that redefines Mangalore’s skyline — sculpted balconies and a facade designed to be as unforgettable by night as it is by day.',
+    backgroundImage: IconicArchitectureImg,
+    // This shot is portrait (a full tower elevation), unlike the other two
+    // panels' landscape photography — forcing it into the shared 16:10
+    // landscape box crops most of the building away. See the
+    // `--portrait` modifier in AmenitiesSection.css for the per-breakpoint
+    // sizing that replaces it.
+    imageBoxClassName: 'amenity-image-background--portrait'
   },
   {
     id: 3,
     index: '02',
-    title: 'Smart Living',
-    description: 'Integrated home automation, climate control, and high-speed connectivity — engineered to make every moment effortless and every space responsive to you.',
-    backgroundImage: SmartLivingImg
+    title: 'Spacious Living',
+    description: 'Soaring double-height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing — designed for those who live without compromise on space.',
+    backgroundImage: SpaciousLivingImg
   },
   {
     id: 1,
     index: '03',
-    title: 'Concierge Services',
-    description: 'From restaurant reservations to private event curation, our dedicated concierge team is available around the clock to anticipate your every need.',
-    backgroundImage: ConciergeServicesImg
+    title: 'Elevated Living',
+    description: 'Rooftop lounges and sky terraces that place panoramic city views, curated greenery, and refined leisure just an elevator ride from home.',
+    backgroundImage: ElevatedLivingImg
   }
 ]
 
@@ -168,7 +174,7 @@ export default function AmenitiesSection() {
           const transitionStart = slideStart + (displayTime * segmentDuration) // Fade out near end of display
 
           if (index === 0) {
-            // Premium Finishes: visible from start, fade out as Smart Living comes in
+            // Iconic Architecture: visible from start, fade out as Spacious Living comes in
             tl.to([imageSet, textItem],
               {
                 opacity: 0,
@@ -185,7 +191,7 @@ export default function AmenitiesSection() {
               )
             }
           } else if (index === numSlides - 1) {
-            // Concierge Services: fade in and stay visible until end
+            // Elevated Living: fade in and stay visible until end
             tl.fromTo([imageSet, textItem],
               { opacity: 0, pointerEvents: 'none' },
               {
@@ -204,7 +210,7 @@ export default function AmenitiesSection() {
               )
             }
           } else {
-            // Smart Living: fade in, stay visible, fade out
+            // Spacious Living: fade in, stay visible, fade out
             tl.fromTo([imageSet, textItem],
               { opacity: 0, pointerEvents: 'none' },
               {
@@ -300,7 +306,7 @@ export default function AmenitiesSection() {
                 }}
                 className={`amenity-image-set ${index === 0 ? 'active' : ''}`}
               >
-                <div className="amenity-image-background">
+                <div className={`amenity-image-background ${amenity.imageBoxClassName || ''}`}>
                   <img src={amenity.backgroundImage} alt={amenity.title} />
                 </div>
               </div>

@@ -5,6 +5,24 @@
   width: 100%;
 }
 
+.stats-heading {
+  max-width: 1200px;
+  margin: 0 auto 20px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.stats-heading h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  color: rgb(251, 238, 190);
+  margin: 0;
+  text-transform: uppercase;
+}
+
 .stats-box {
   position: relative;
   width: 100%;
@@ -13,6 +31,36 @@
   height: 400px;
   padding: 0 40px;
   box-sizing: border-box;
+}
+
+.stats-cta-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.stats-cta-btn {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #0a0a0a;
+  background: rgb(251, 238, 190);
+  border: none;
+  border-radius: 50px;
+  padding: 16px 40px;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s ease;
+}
+
+.stats-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(251, 238, 190, 0.3);
+}
+
+.stats-cta-btn:active {
+  transform: translateY(0);
 }
 
 /* ── 60% — upper right of center ── */
@@ -99,6 +147,10 @@
 }
 
 @media (max-width: 900px) {
+  .stats-heading {
+    padding: 0 28px;
+  }
+
   .stats-box {
     height: 480px;
     padding: 0 28px;

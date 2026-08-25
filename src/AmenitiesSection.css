@@ -132,6 +132,16 @@
   display: block;
 }
 
+/* Portrait override (the "Iconic Architecture" full tower elevation) — the
+   shared box above is landscape (16:10), which would crop most of a
+   portrait shot away under object-fit:cover. Narrower + taller instead, so
+   the whole facade fits without cropping. */
+.amenity-image-background--portrait {
+  width: 460px;
+  max-width: calc(100% - 60px);
+  aspect-ratio: 3 / 4;
+}
+
 /* ── Spacer for scroll range (minimal - scroll range handled by GSAP pin) ── */
 .amenities-spacer {
   height: 0;
@@ -286,6 +296,13 @@
     transform: none !important;
     overflow: hidden;
     border-radius: 8px;
+  }
+
+  /* Stays full-width like the other two cards here (the stacked mobile/
+     tablet layout scrolls naturally, so there's no pinned-viewport height
+     to worry about) — just taller, to match the source photo's shape. */
+  .amenity-image-background--portrait {
+    aspect-ratio: 3 / 4;
   }
 
   .amenity-index {

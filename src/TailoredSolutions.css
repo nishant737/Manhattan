@@ -71,7 +71,7 @@
   will-change: opacity, transform;
 }
 
-.accordion-row.expanded {
+.accordion-row:hover {
   background-color: #222;
   border-color: rgba(251, 238, 190, 0.3);
 }
@@ -119,71 +119,8 @@
   margin-left: auto;
 }
 
-.accordion-row.expanded .accordion-arrow {
-  transform: rotate(180deg);
-}
-
-/* Accordion Content */
-.accordion-content {
-  padding: 0 30px 30px 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  animation: slideDown 0.3s ease forwards;
-  /* Clamped to viewport height so an expanded row can never push the
-     section taller than the pinned 100vh viewport on desktop. */
-  max-height: min(30vh, 380px);
-  overflow: hidden;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: min(30vh, 380px);
-  }
-}
-
-.accordion-detail-image-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.accordion-detail-image {
-  width: 100%;
-  border-radius: 12px;
-  object-fit: contain;
-  max-height: min(26vh, 340px);
-  display: block;
-}
-
-.accordion-zoom-button {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(10, 10, 10, 0.75);
-  border: 1px solid rgba(251, 238, 190, 0.4);
-  color: rgb(251, 238, 190);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
-}
-
-.accordion-zoom-button:hover {
-  background-color: rgba(251, 238, 190, 0.2);
-  border-color: rgb(251, 238, 190);
-  transform: scale(1.08);
-}
-
-.accordion-zoom-button:active {
-  transform: scale(0.96);
+.accordion-row:hover .accordion-arrow {
+  transform: translateX(4px);
 }
 
 /* ── Scrolling Ticker ── */
@@ -283,14 +220,6 @@
     height: 56px;
   }
 
-  .accordion-detail-image {
-    max-height: 450px;
-  }
-
-  .accordion-content {
-    padding: 0 24px 24px 24px;
-  }
-
   .solutions-ticker {
     margin-top: 60px;
   }
@@ -338,14 +267,6 @@
   .accordion-thumbnail {
     width: 52px;
     height: 52px;
-  }
-
-  .accordion-content {
-    padding: 0 20px 20px 20px;
-  }
-
-  .accordion-detail-image {
-    max-height: 350px;
   }
 
   .solutions-ticker {
@@ -400,14 +321,6 @@
 
   .accordion-label {
     font-size: 13px;
-  }
-
-  .accordion-content {
-    padding: 0 16px 16px 16px;
-  }
-
-  .accordion-detail-image {
-    max-height: 280px;
   }
 
   .solutions-ticker {

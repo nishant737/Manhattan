@@ -58,6 +58,145 @@
   transform: scale(0.96);
 }
 
+/* ── Layout Selection Screen ── */
+.apartment-selection-screen {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 60px;
+  box-sizing: border-box;
+}
+
+.apartment-selection-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.apartment-selection-header .apartment-brand {
+  margin-bottom: 12px;
+}
+
+.apartment-selection-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+}
+
+.apartment-selection-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: rgba(251, 238, 190, 0.6);
+  margin: 0;
+}
+
+.apartment-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 1360px;
+  width: 100%;
+}
+
+.apartment-selection-card {
+  position: relative;
+  aspect-ratio: 3 / 4.6;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(251, 238, 190, 0.15);
+  background: #000;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.apartment-selection-card:hover {
+  border-color: rgb(251, 238, 190);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.apartment-selection-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.apartment-selection-card:hover .apartment-selection-image {
+  transform: scale(1.06);
+}
+
+.apartment-selection-card-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 28px 12px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgb(251, 238, 190);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ── Back to selection button (inside a specific layout's info panel) ── */
+.apartment-back-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(251, 238, 190, 0.6);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.apartment-back-btn:hover {
+  color: rgb(251, 238, 190);
+}
+
+@media (max-width: 1024px) {
+  .apartment-selection-screen {
+    padding: 60px 32px;
+  }
+
+  .apartment-selection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .apartment-selection-screen {
+    padding: 48px 20px;
+  }
+
+  .apartment-selection-header {
+    margin-bottom: 32px;
+  }
+
+  .apartment-selection-grid {
+    gap: 16px;
+  }
+}
+
 /* ── Left Section - Image ── */
 .apartment-image-section {
   flex: 1;
@@ -205,8 +344,8 @@
 .apartment-spec {
   margin-bottom: 16px;
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .apartment-spec:last-child {
@@ -228,6 +367,7 @@
   font-weight: 400;
   letter-spacing: 0.01em;
   color: rgba(255, 255, 255, 0.9);
+  line-height: 1.3;
 }
 
 /* CTA Button */

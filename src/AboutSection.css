@@ -77,24 +77,12 @@
   line-height: 1.4;
   letter-spacing: -0.01em;
   color: rgb(251, 238, 190);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.about-we-animated {
-  display: inline-block;
-  font-weight: 700;
-  will-change: transform;
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
 .about-tagline-lines {
   display: flex;
   flex-direction: column;
   gap: 0;
-  flex: 1;
 }
 
 .tagline-line {
@@ -106,7 +94,15 @@
   color: rgb(251, 238, 190);
   margin: 0;
   opacity: 0;
-  will-change: opacity;
+  will-change: opacity, transform, text-shadow;
+}
+
+/* Each line's own "We " prefix — pops in together with the rest of that
+   line as the scroll reaches it (see AboutSection.jsx). */
+.tagline-we {
+  display: inline-block;
+  font-weight: 700;
+  will-change: opacity, transform;
 }
 
 .about-description {

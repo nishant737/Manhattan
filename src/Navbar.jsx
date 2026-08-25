@@ -30,12 +30,12 @@ export default function Navbar({ onNavClick }) {
   }, [])
 
   const navItems = [
-    { id: 'apartments', label: 'Apartments' },
+    { id: 'layout', label: 'Layout' },
     { id: 'amenities', label: 'Amenities' },
-    { id: 'about', label: 'About' },
     { id: 'brochure', label: 'Brochure' },
     { id: '3d-walkthrough', label: '3D Walkthrough' },
-    { id: 'vr-experience', label: 'VR Experience' }
+    { id: 'vr-experience', label: 'VR Experience' },
+    { id: 'contact', label: 'Contact Us' }
   ]
 
   const handleNavClick = (id) => {

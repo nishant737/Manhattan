@@ -115,23 +115,82 @@
 .carousel-wrapper {
   position: relative;
   width: 100%;
-  overflow: hidden;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 60px;
+  box-sizing: border-box;
 }
 
-/* ── Carousel Track (Continuous Scroll) ── */
+/* ── Carousel Track — natively scrollable so visitors can drag/swipe/scroll
+   through the images themselves (trackpad, touch, scrollbar, or the arrow
+   buttons), instead of only ever auto-playing on a fixed loop. ── */
 .carousel-track {
   display: flex;
-  gap: 0;
-  padding: 0;
-  will-change: transform;
-  /* Animation handled by GSAP */
+  gap: 20px;
+  padding: 4px 4px 16px;
+  overflow-x: auto;
+  /* Deliberately no `scroll-snap-type` or `scroll-behavior: smooth` here —
+     the continuous auto-slide writes `scrollLeft` directly every animation
+     frame, and both of those CSS behaviors fight that: snap keeps
+     correcting each tiny sub-pixel nudge straight back to the nearest card
+     (since every nudge lands well within "proximity" of it, net movement
+     is permanently zero), and smooth-scroll restarts its own eased
+     animation on every write before the last one can progress. The arrow
+     buttons still animate smoothly by passing `behavior: 'smooth'` to
+     `scrollBy()` directly in JS, which is unaffected by either. */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 238, 190, 0.4) transparent;
 }
 
-/* ── Carousel Item ── */
+.carousel-track::-webkit-scrollbar {
+  height: 6px;
+}
+
+.carousel-track::-webkit-scrollbar-thumb {
+  background: rgba(251, 238, 190, 0.3);
+  border-radius: 3px;
+}
+
+/* ── Carousel Item — sized larger than before so images read as the
+   cinematic centerpiece rather than small thumbnails. ── */
 .carousel-item {
   flex: 0 0 auto;
-  width: 550px;
-  height: 400px;
+  width: 640px;
+  height: 460px;
+}
+
+/* ── Prev/Next scroll buttons ── */
+.carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.75);
+  border: 1.5px solid rgba(251, 238, 190, 0.4);
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-nav-btn:hover {
+  background: rgba(10, 10, 10, 0.95);
+  border-color: rgb(251, 238, 190);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.carousel-nav-prev {
+  left: 4px;
+}
+
+.carousel-nav-next {
+  right: 4px;
 }
 
 .amenity-card {
@@ -192,7 +251,7 @@
 
 .amenity-label h3 {
   font-family: 'Montserrat', sans-serif;
-  font-size: 13px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.08em;
   color: rgb(251, 238, 190);
@@ -212,7 +271,7 @@
 
 .amenity-description {
   font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 300;
   line-height: 1.7;
   letter-spacing: 0.02em;
@@ -421,14 +480,18 @@
     font-size: 11px;
   }
 
-  .carousel-item {
-    width: 480px;
-    height: 360px;
+  .carousel-wrapper {
+    padding: 0 48px;
   }
 
-  .carousel-track {
-    gap: 0;
-    padding: 0;
+  .carousel-item {
+    width: 520px;
+    height: 380px;
+  }
+
+  .carousel-nav-btn {
+    width: 42px;
+    height: 42px;
   }
 
   .amenities-grid-top,
@@ -481,18 +544,39 @@
     padding: 40px 0;
   }
 
-  .carousel-item {
-    width: 360px;
-    height: 280px;
+  .carousel-wrapper {
+    padding: 0 16px;
   }
 
-  .carousel-track {
-    gap: 0;
-    padding: 0;
+  .carousel-item {
+    width: 340px;
+    height: 260px;
+  }
+
+  .carousel-nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .carousel-nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .carousel-nav-prev {
+    left: 4px;
+  }
+
+  .carousel-nav-next {
+    right: 4px;
   }
 
   .amenity-label h3 {
-    font-size: 12px;
+    font-size: 17px;
+  }
+
+  .amenity-description {
+    font-size: 13px;
   }
 
   .amenities-grid-top,
@@ -550,19 +634,26 @@
     padding: 30px 0;
   }
 
-  .carousel-item {
-    width: 300px;
-    height: 230px;
+  .carousel-wrapper {
+    padding: 0 12px;
   }
 
-  .carousel-track {
-    gap: 0;
-    padding: 0;
+  .carousel-item {
+    width: 260px;
+    height: 200px;
+  }
+
+  .carousel-nav-btn {
+    display: none;
   }
 
   .amenity-label h3 {
-    font-size: 11px;
+    font-size: 15px;
     letter-spacing: 0.06em;
+  }
+
+  .amenity-description {
+    font-size: 12px;
   }
 
   .amenities-grid-top,

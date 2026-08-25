@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './StatsSection.css'
 
-export default function StatsSection() {
+export default function StatsSection({ onCtaClick }) {
   const sectionRef = useRef(null)
   const [counts, setCounts] = useState({ c2: 0, c30: 0, c7035: 0, c24: 0 })
 
@@ -35,6 +35,10 @@ export default function StatsSection() {
 
   return (
     <section className="stats-section" ref={sectionRef}>
+      <div className="stats-heading">
+        <h2>Manhattan, At a Glance</h2>
+      </div>
+
       <div className="stats-box">
 
         {/* 2 — upper center */}
@@ -69,6 +73,12 @@ export default function StatsSection() {
           <p className="stat-sublabel">every need effortlessly.</p>
         </div>
 
+      </div>
+
+      <div className="stats-cta-wrapper">
+        <button type="button" className="stats-cta-btn" onClick={onCtaClick}>
+          Download Brochure
+        </button>
       </div>
     </section>
   )

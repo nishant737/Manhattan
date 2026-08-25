@@ -2,20 +2,28 @@ import { useRef, useEffect, useState } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './LuxuryShowcase.css'
+import LuxuryAmenitiesImg from './LuxuryAmenities.jpeg'
+import CloseUpImg from './assets/close-up.jpeg'
+import IndoorPoolImg from './assets/Indoor Pool.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Each entry below now points at a distinct, real Manhattan render — the
+// previous data reused just 3 images across all 7 categories (e.g. Community
+// Hall and Gym shared the identical GYM.jpg), which meant several "different"
+// amenities showed the exact same photo. Sourced from the project's own
+// cinematic renders rather than generic stock imagery.
 const AMENITIES = [
   {
     id: 1,
     title: 'Community Hall',
-    image: '/GYM.jpg',
+    image: LuxuryAmenitiesImg,
     description: 'Elegant multi-purpose space for gatherings, events, and celebrations with state-of-the-art facilities and customizable ambiance.'
   },
   {
     id: 2,
     title: 'Game Room',
-    image: '/Sky Lounge-Game Room.jpeg',
+    image: '/INDOOR GAME.jpg',
     description: 'Premium entertainment space featuring billiards, gaming stations, and recreational facilities for leisure and social gatherings.'
   },
   {
@@ -27,38 +35,49 @@ const AMENITIES = [
   {
     id: 4,
     title: 'Lobby',
-    image: '/SKY LOUNGE CAFE.jpg',
+    image: '/STREET VIEW_ 02.jpg',
     description: 'Grand entrance with sophisticated design, concierge services, and a welcoming atmosphere for residents and guests.'
   },
   {
     id: 5,
     title: 'Pool',
-    image: '/SKY LOUNGE CAFE.jpg',
-    description: 'Olympic-size heated swimming pool with underwater lighting, jacuzzi facilities, and dedicated lap swimming zones.'
+    image: IndoorPoolImg,
+    description: 'Heated indoor swimming pool with panoramic glazing, loungers, and dedicated relaxation zones.'
   },
   {
     id: 6,
     title: 'Cinema Lounge',
-    image: '/Sky Lounge-Game Room.jpeg',
+    image: CloseUpImg,
     description: 'Private screening room with premium audio-visual systems, comfortable seating, and curated entertainment experiences.'
   },
   {
     id: 7,
     title: 'Sky Lounge',
-    image: '/Sky Lounge-Game Room.jpeg',
+    image: '/SKY LOUNGE CAFE.jpg',
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
   }
 ]
 
+// The track renders the amenity list twice back-to-back so the continuous
+// auto-slide below can jump from the end of the first copy back to the start
+// of the second — identical content either side of the seam — without any
+// visible pop.
+const LOOPED_AMENITIES = [
+  ...AMENITIES.map((a) => ({ ...a, key: `${a.id}-a` })),
+  ...AMENITIES.map((a) => ({ ...a, key: `${a.id}-b` }))
+]
+
 export default function LuxuryShowcase() {
   const carouselRef = useRef(null)
+  const trackRef = useRef(null)
   const headerRef = useRef(null)
   const showcaseRef = useRef(null)
-  const carouselAnimationRef = useRef(null)
+  const pauseAutoScrollRef = useRef(() => {})
+  const scheduleResumeAutoScrollRef = useRef(() => {})
   const [hoveredId, setHoveredId] = useState(null)
   const [isGridView, setIsGridView] = useState(false)
 
-  // Entrance animations and continuous carousel scroll
+  // Entrance animations
   useEffect(() => {
     const showcase = showcaseRef.current
     if (!showcase) return
@@ -82,43 +101,8 @@ export default function LuxuryShowcase() {
       )
     }
 
-    // Setup continuous carousel scroll animation
+    // Fade in carousel
     if (carouselRef.current) {
-      const carousel = carouselRef.current.querySelector('.carousel-track')
-      if (carousel) {
-        // Clone items for seamless loop
-        const items = carousel.querySelectorAll('.carousel-item')
-        items.forEach(item => {
-          const clone = item.cloneNode(true)
-          carousel.appendChild(clone)
-        })
-
-        // Animate continuous scroll - ALWAYS RUNNING
-        const totalWidth = carousel.scrollWidth / 2
-        const scrollAnimation = gsap.to(carousel, {
-          x: -totalWidth,
-          duration: 40,
-          ease: 'none',
-          repeat: -1,
-          onRepeat: () => {
-            gsap.set(carousel, { x: 0 })
-          }
-        })
-        carouselAnimationRef.current = scrollAnimation
-
-        // Add hover listeners to pause/resume only
-        const carouselItems = carousel.querySelectorAll('.carousel-item')
-        carouselItems.forEach((item) => {
-          item.addEventListener('mouseenter', () => {
-            scrollAnimation.pause()
-          })
-          item.addEventListener('mouseleave', () => {
-            scrollAnimation.play()
-          })
-        })
-      }
-
-      // Fade in carousel
       gsap.fromTo(
         carouselRef.current,
         { opacity: 0, y: 60 },
@@ -145,6 +129,85 @@ export default function LuxuryShowcase() {
       })
     }
   }, [])
+
+  // Continuous, gentle auto-slide — pauses the instant a visitor takes over
+  // (drag, swipe, wheel, or an arrow click) and quietly resumes a couple of
+  // seconds after they let go, so manual scrolling always wins in the moment
+  // without permanently stopping the ambient motion.
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track || isGridView) return
+
+    const SPEED_PX_PER_SEC = 32
+    const RESUME_DELAY_MS = 2200
+    let rafId
+    let lastTime = null
+    let paused = false
+    let resumeTimer = null
+
+    const pause = () => {
+      paused = true
+      if (resumeTimer) clearTimeout(resumeTimer)
+    }
+    const scheduleResume = (delay = RESUME_DELAY_MS) => {
+      if (resumeTimer) clearTimeout(resumeTimer)
+      resumeTimer = setTimeout(() => {
+        paused = false
+        lastTime = null
+      }, delay)
+    }
+    pauseAutoScrollRef.current = pause
+    scheduleResumeAutoScrollRef.current = scheduleResume
+
+    const step = (time) => {
+      if (lastTime == null) lastTime = time
+      const dt = (time - lastTime) / 1000
+      lastTime = time
+
+      if (!paused) {
+        const halfWidth = track.scrollWidth / 2
+        track.scrollLeft += SPEED_PX_PER_SEC * dt
+        if (track.scrollLeft >= halfWidth) {
+          track.scrollLeft -= halfWidth
+        }
+      }
+      rafId = requestAnimationFrame(step)
+    }
+    rafId = requestAnimationFrame(step)
+
+    const handleInteractionStart = () => pause()
+    const handleInteractionEnd = () => scheduleResume()
+
+    track.addEventListener('pointerdown', handleInteractionStart)
+    track.addEventListener('pointerup', handleInteractionEnd)
+    track.addEventListener('pointercancel', handleInteractionEnd)
+    track.addEventListener('touchstart', handleInteractionStart, { passive: true })
+    track.addEventListener('touchend', handleInteractionEnd, { passive: true })
+    track.addEventListener('wheel', () => { pause(); scheduleResume() }, { passive: true })
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      if (resumeTimer) clearTimeout(resumeTimer)
+      track.removeEventListener('pointerdown', handleInteractionStart)
+      track.removeEventListener('pointerup', handleInteractionEnd)
+      track.removeEventListener('pointercancel', handleInteractionEnd)
+      track.removeEventListener('touchstart', handleInteractionStart)
+      track.removeEventListener('touchend', handleInteractionEnd)
+    }
+  }, [isGridView])
+
+  // The carousel track is a natively scrollable element (drag/swipe/trackpad/
+  // scrollbar all work out of the box) on top of the continuous auto-slide —
+  // these buttons are just a discoverable shortcut that nudges it by roughly
+  // one card at a time, pausing the auto-slide the same way manual input does.
+  const scrollCarousel = (direction) => {
+    const track = trackRef.current
+    if (!track) return
+    pauseAutoScrollRef.current()
+    const amount = track.clientWidth * 0.8 * (direction === 'next' ? 1 : -1)
+    track.scrollBy({ left: amount, behavior: 'smooth' })
+    scheduleResumeAutoScrollRef.current()
+  }
 
   return (
     <section className="luxury-showcase" ref={showcaseRef}>
@@ -182,10 +245,21 @@ export default function LuxuryShowcase() {
 
       <div className={`carousel-section ${isGridView ? 'hidden' : 'visible'}`} ref={carouselRef}>
         <div className="carousel-wrapper">
-          <div className="carousel-track">
-            {AMENITIES.map((amenity) => (
+          <button
+            type="button"
+            className="carousel-nav-btn carousel-nav-prev"
+            onClick={() => scrollCarousel('prev')}
+            aria-label="Scroll to previous"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div className="carousel-track" ref={trackRef}>
+            {LOOPED_AMENITIES.map((amenity) => (
               <div
-                key={amenity.id}
+                key={amenity.key}
                 className="carousel-item"
                 onMouseEnter={() => setHoveredId(amenity.id)}
                 onMouseLeave={() => setHoveredId(null)}
@@ -202,6 +276,17 @@ export default function LuxuryShowcase() {
               </div>
             ))}
           </div>
+
+          <button
+            type="button"
+            className="carousel-nav-btn carousel-nav-next"
+            onClick={() => scrollCarousel('next')}
+            aria-label="Scroll to next"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
 

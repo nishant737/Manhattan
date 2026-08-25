@@ -15,13 +15,18 @@ const TAGLINE_LINES = [
   'define legacy.'
 ]
 
+// Opacity each tagline line (and "We") sits at once individually revealed —
+// full opacity is reserved for the closing emphasis once "We" reaches the
+// final line, so freshly-revealed text reads as "light" rather than final.
+const LIGHT_OPACITY = 0.45
+
 export default function AboutSection() {
   const sectionRef = useRef(null)
   const headingRef = useRef(null)
   const imageRef = useRef(null)
-  const weElementRef = useRef(null)
   const taglineContainerRef = useRef(null)
   const taglineLinesRef = useRef([])
+  const taglineWeRefs = useRef([])
   const descriptionRef = useRef(null)
   const descriptionSecondaryRef = useRef(null)
 
@@ -39,12 +44,11 @@ export default function AboutSection() {
 
   useEffect(() => {
     const section = sectionRef.current
-    const weElement = weElementRef.current
     const image = imageRef.current
     const description = descriptionRef.current
     const descSecondary = descriptionSecondaryRef.current
 
-    if (!section || !weElement) return
+    if (!section) return
 
     gsap.registerPlugin(ScrollTrigger)
 
@@ -70,67 +74,73 @@ export default function AboutSection() {
       )
     }
 
-    // Get line height for "We" animation
-    const computedStyle = window.getComputedStyle(weElement)
-    const lineHeightValue = computedStyle.lineHeight
-    const lineHeight = parseFloat(lineHeightValue)
-    const totalDistance = lineHeight * 3
+    const FINAL_EMPHASIS_TIME = 1.6
 
-    // Animate "We" smoothly over first 40% of scroll (0% - 40%)
-    masterTl.fromTo(
-      weElement,
-      { y: 0 },
-      { y: totalDistance, ease: 'power1.inOut', duration: 1.6 },
-      0
-    )
+    // Each line's sentence text is on screen from the very start ("We
+    // reimagine luxury. / craft exclusivity. / elevate Mangalore. / define
+    // legacy.") — only the "We" is what animates: already showing on the
+    // first line, then fading in on each line in turn as the scroll reaches
+    // it, so it reads as "We" itself moving down through the sentences one
+    // at a time rather than the sentences appearing from nothing.
+    const weSpans = taglineWeRefs.current
+    gsap.set(weSpans.filter(Boolean), { opacity: 0, scale: 0.8, transformOrigin: 'left center' })
+    if (weSpans[0]) {
+      gsap.set(weSpans[0], { opacity: LIGHT_OPACITY, scale: 1 })
+    }
 
     // Animate line visibility - each line stays visible once revealed
     const lines = taglineLinesRef.current
     if (lines.length > 0) {
-      // All lines start hidden
-      lines.forEach(line => {
-        if (line) line.style.opacity = '0'
+      gsap.set(lines.filter(Boolean), { opacity: LIGHT_OPACITY, y: 0, scale: 1, transformOrigin: 'left center' })
+      gsap.set(lines.filter(Boolean), {
+        textShadow: '0 0 18px rgba(251, 238, 190, 0), 0 0 36px rgba(251, 238, 190, 0)'
       })
 
-      // Line 1: becomes visible at start and stays visible
-      if (lines[0]) {
+      // Each line's own "We" pops in as the scroll reaches it (the first
+      // line's is already visible from the start, so it has nothing to
+      // animate here). Full emphasis (brighter + glow) is still reserved for
+      // the closing moment below, so nothing reads as "final" until the
+      // sequence actually reaches the last line.
+      const lineRevealTimes = [0, 0.4, 0.8, 1.2]
+      weSpans.forEach((weSpan, index) => {
+        if (!weSpan || index === 0) return
         masterTl.fromTo(
-          lines[0],
-          { opacity: 0 },
-          { opacity: 1, duration: 0.35 },
-          0
+          weSpan,
+          { opacity: 0, scale: 0.8 },
+          { opacity: LIGHT_OPACITY, scale: 1, duration: 0.45, ease: 'back.out(1.6)' },
+          lineRevealTimes[index]
         )
-      }
+      })
 
-      // Line 2: becomes visible when "We" reaches it and stays
-      if (lines[1]) {
-        masterTl.fromTo(
-          lines[1],
-          { opacity: 0 },
-          { opacity: 1, duration: 0.35 },
-          0.4
-        )
-      }
+      // Closing emphasis: once the sequence reaches the final line, every
+      // line and every "We" brighten to full opacity AND pick up a soft gold
+      // glow together in one beat — a cohesive "arrival" moment instead of
+      // the last line just being one more fade-in among equals.
+      const emphasisTargets = [...lines.filter(Boolean), ...weSpans.filter(Boolean)]
+      masterTl.to(
+        emphasisTargets,
+        {
+          opacity: 1,
+          textShadow: '0 0 18px rgba(251, 238, 190, 0.55), 0 0 36px rgba(251, 238, 190, 0.25)',
+          duration: 0.4,
+          ease: 'power1.out'
+        },
+        FINAL_EMPHASIS_TIME
+      )
 
-      // Line 3: becomes visible when "We" reaches it and stays
-      if (lines[2]) {
-        masterTl.fromTo(
-          lines[2],
-          { opacity: 0 },
-          { opacity: 1, duration: 0.35 },
-          0.8
-        )
-      }
-
-      // Line 4: becomes visible when "We" reaches it and stays
-      if (lines[3]) {
-        masterTl.fromTo(
-          lines[3],
-          { opacity: 0 },
-          { opacity: 1, duration: 0.35 },
-          1.2
-        )
-      }
+      // At this same closing beat the lines themselves get a small pop (a
+      // gentle lift-and-settle) so the arrival visibly lifts the whole group
+      // together, on top of the brightening above. Only the lines are
+      // bounced here, not the nested "We" spans — they're carried along by
+      // their parent line's own transform, so bouncing both would double
+      // the motion and throw "We" out of alignment with the rest of its
+      // own line.
+      masterTl.fromTo(
+        lines.filter(Boolean),
+        { y: 6, scale: 0.975 },
+        { y: 0, scale: 1, duration: 0.45, ease: 'back.out(1.6)' },
+        FINAL_EMPHASIS_TIME
+      )
     }
 
     // Description 1 fades in - synced with animation
@@ -184,10 +194,12 @@ export default function AboutSection() {
 
         {/* Right Column */}
         <div className="about-right">
-          {/* Tagline with animated "We" */}
+          {/* Tagline — every sentence is on screen from the start; only each
+              line's own "We" animates, appearing on the first line
+              immediately and popping in on each line below it in turn as
+              the scroll reaches it. */}
           <div className="about-tagline-wrapper" ref={taglineContainerRef}>
             <div className="about-tagline-text">
-              <span className="about-we-animated" ref={weElementRef}>We</span>
               <div className="about-tagline-lines">
                 {TAGLINE_LINES.map((line, index) => (
                   <div
@@ -197,6 +209,14 @@ export default function AboutSection() {
                       if (el) taglineLinesRef.current[index] = el
                     }}
                   >
+                    <span
+                      className="tagline-we"
+                      ref={(el) => {
+                        if (el) taglineWeRefs.current[index] = el
+                      }}
+                    >
+                      We
+                    </span>{' '}
                     {line}
                   </div>
                 ))}

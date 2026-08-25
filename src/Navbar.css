@@ -36,11 +36,11 @@
 .navbar-logo {
   position: absolute;
   left: 32px;
-  top: 20%;
+  top: 50%;
   transform: translateY(-50%);
   height: 60px;
   width: auto;
-   max-width: 1800px;
+  max-width: 1800px;
   object-fit: contain;
   cursor: pointer;
   transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1);
