@@ -15,10 +15,6 @@ const TAGLINE_LINES = [
   'define legacy.'
 ]
 
-// Opacity each tagline line (and "We") sits at once individually revealed —
-// full opacity is reserved for the closing emphasis once "We" reaches the
-// final line, so freshly-revealed text reads as "light" rather than final.
-const LIGHT_OPACITY = 0.45
 
 export default function AboutSection() {
   const sectionRef = useRef(null)
@@ -75,70 +71,81 @@ export default function AboutSection() {
     }
 
     const FINAL_EMPHASIS_TIME = 1.6
+    const TRANSITION_DURATION = 0.4
 
-    // Each line's sentence text is on screen from the very start ("We
-    // reimagine luxury. / craft exclusivity. / elevate Mangalore. / define
-    // legacy.") — only the "We" is what animates: already showing on the
-    // first line, then fading in on each line in turn as the scroll reaches
-    // it, so it reads as "We" itself moving down through the sentences one
-    // at a time rather than the sentences appearing from nothing.
+    // Per-line states the timeline below moves each line through — real
+    // position + scale changes, not just an opacity fade, so the block
+    // reads as physically travelling rather than four static lines quietly
+    // lighting up in place:
+    //   BELOW   — not reached yet: small, dim, sitting slightly lower.
+    //   ACTIVE  — the current line: full size, full brightness, centered.
+    //   PASSED  — already moved through: small, dim, sitting slightly
+    //             higher (drifted up and out, mirroring BELOW).
+    //   FINAL   — the closing convergence: every line (arriving from
+    //             whichever of the above states it was last in) settles
+    //             back to center together, at full brightness, with a
+    //             glow and a slight scale-pop.
+    const RECEDED = { opacity: 0.35, scale: 0.9 }
+    const ACTIVE = { opacity: 1, scale: 1.06 }
+    const NO_GLOW = '0 0 18px rgba(251, 238, 190, 0), 0 0 36px rgba(251, 238, 190, 0)'
+    const FULL_GLOW = '0 0 18px rgba(251, 238, 190, 0.55), 0 0 36px rgba(251, 238, 190, 0.25)'
+
     const weSpans = taglineWeRefs.current
-    gsap.set(weSpans.filter(Boolean), { opacity: 0, scale: 0.8, transformOrigin: 'left center' })
-    if (weSpans[0]) {
-      gsap.set(weSpans[0], { opacity: LIGHT_OPACITY, scale: 1 })
-    }
-
-    // Animate line visibility - each line stays visible once revealed
     const lines = taglineLinesRef.current
+
     if (lines.length > 0) {
-      gsap.set(lines.filter(Boolean), { opacity: LIGHT_OPACITY, y: 0, scale: 1, transformOrigin: 'left center' })
-      gsap.set(lines.filter(Boolean), {
-        textShadow: '0 0 18px rgba(251, 238, 190, 0), 0 0 36px rgba(251, 238, 190, 0)'
-      })
+      gsap.set(lines.filter(Boolean), { ...RECEDED, y: 18, transformOrigin: 'left center', textShadow: NO_GLOW })
+      gsap.set(weSpans.filter(Boolean), { opacity: 0, scale: 0.8, transformOrigin: 'left center' })
 
-      // Each line's own "We" pops in as the scroll reaches it (the first
-      // line's is already visible from the start, so it has nothing to
-      // animate here). Full emphasis (brighter + glow) is still reserved for
-      // the closing moment below, so nothing reads as "final" until the
-      // sequence actually reaches the last line.
-      const lineRevealTimes = [0, 0.4, 0.8, 1.2]
-      weSpans.forEach((weSpan, index) => {
-        if (!weSpan || index === 0) return
-        masterTl.fromTo(
-          weSpan,
-          { opacity: 0, scale: 0.8 },
-          { opacity: LIGHT_OPACITY, scale: 1, duration: 0.45, ease: 'back.out(1.6)' },
-          lineRevealTimes[index]
-        )
-      })
+      // Frame 1: the first line starts already active — front and center,
+      // full size and brightness — while the rest wait below it.
+      if (lines[0]) gsap.set(lines[0], { ...ACTIVE, y: 0 })
+      if (weSpans[0]) gsap.set(weSpans[0], { opacity: 1, scale: 1 })
 
-      // Closing emphasis: once the sequence reaches the final line, every
-      // line and every "We" brighten to full opacity AND pick up a soft gold
-      // glow together in one beat — a cohesive "arrival" moment instead of
-      // the last line just being one more fade-in among equals.
-      const emphasisTargets = [...lines.filter(Boolean), ...weSpans.filter(Boolean)]
+      // Frames 2–3: as scroll reaches each line in turn, it rises into the
+      // active position (grows, brightens, moves up to center) while the
+      // line before it recedes past center (shrinks, dims, drifts further
+      // up) — an actual handoff in position, not a crossfade.
+      const lineActiveTimes = [0, 0.4, 0.8, 1.2]
+      for (let i = 1; i < lines.length; i++) {
+        const time = lineActiveTimes[i]
+        const incoming = lines[i]
+        const outgoing = lines[i - 1]
+
+        if (outgoing) {
+          masterTl.to(outgoing, { ...RECEDED, y: -18, duration: TRANSITION_DURATION, ease: 'power2.inOut' }, time)
+        }
+        if (incoming) {
+          masterTl.to(incoming, { ...ACTIVE, y: 0, duration: TRANSITION_DURATION, ease: 'power2.inOut' }, time)
+        }
+        if (weSpans[i]) {
+          masterTl.fromTo(
+            weSpans[i],
+            { opacity: 0, scale: 0.8 },
+            { opacity: 1, scale: 1, duration: TRANSITION_DURATION + 0.05, ease: 'back.out(1.6)' },
+            time
+          )
+        }
+      }
+
+      // Last frame: "We define legacy." has just arrived — now every line,
+      // wherever it currently sits (active, or receded above/below),
+      // travels back to the shared center position together, brightens to
+      // full opacity, and picks up the gold glow, with a springy scale-pop
+      // on the landing. All four finish this beat identically, so nothing
+      // is left dimmed or singled out.
+      const allLines = lines.filter(Boolean)
+      const allWe = weSpans.filter(Boolean)
       masterTl.to(
-        emphasisTargets,
+        [...allLines, ...allWe],
         {
           opacity: 1,
-          textShadow: '0 0 18px rgba(251, 238, 190, 0.55), 0 0 36px rgba(251, 238, 190, 0.25)',
-          duration: 0.4,
-          ease: 'power1.out'
+          scale: 1,
+          y: 0,
+          textShadow: FULL_GLOW,
+          duration: 0.55,
+          ease: 'back.out(1.5)'
         },
-        FINAL_EMPHASIS_TIME
-      )
-
-      // At this same closing beat the lines themselves get a small pop (a
-      // gentle lift-and-settle) so the arrival visibly lifts the whole group
-      // together, on top of the brightening above. Only the lines are
-      // bounced here, not the nested "We" spans — they're carried along by
-      // their parent line's own transform, so bouncing both would double
-      // the motion and throw "We" out of alignment with the rest of its
-      // own line.
-      masterTl.fromTo(
-        lines.filter(Boolean),
-        { y: 6, scale: 0.975 },
-        { y: 0, scale: 1, duration: 0.45, ease: 'back.out(1.6)' },
         FINAL_EMPHASIS_TIME
       )
     }

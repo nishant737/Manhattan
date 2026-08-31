@@ -44,7 +44,7 @@ export const LAYOUT_TYPES = [
   {
     id: '4bhk-duplex-sky',
     brand: 'MANHATTAN',
-    title: '4 BHK Duplex Sky',
+    title: '4 BHK Duplex Sky Villa',
     description: 'Spacious two-level sky residences with private outdoor spaces. An exceptional living experience with premium amenities.',
     cta: 'BOOK A VISIT',
     images: [
@@ -64,7 +64,7 @@ export const LAYOUT_TYPES = [
   {
     id: '5bhk-duplex-sky',
     brand: 'MANHATTAN',
-    title: '5 BHK Duplex Sky',
+    title: '5 BHK Duplex Sky Villa',
     description: 'Premium sky penthouses with panoramic views and luxury finishes. The pinnacle of luxury living in Manhattan.',
     cta: 'BOOK A VISIT',
     images: [

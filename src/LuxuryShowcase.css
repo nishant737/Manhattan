@@ -152,12 +152,17 @@
   border-radius: 3px;
 }
 
-/* ── Carousel Item — sized larger than before so images read as the
-   cinematic centerpiece rather than small thumbnails. ── */
+/* ── Carousel Item — sized so exactly two cards fill the visible track at
+   once (width is half the track's own content width, minus half the gap
+   between them), whatever that width happens to be at the current
+   breakpoint — the third card starts right at the edge, fully offscreen
+   until the visitor scrolls or the auto-slide carries it in. Height follows
+   from aspect-ratio instead of a fixed value so it scales with that fluid
+   width rather than distorting. ── */
 .carousel-item {
   flex: 0 0 auto;
-  width: 640px;
-  height: 460px;
+  width: calc(50% - 10px);
+  aspect-ratio: 640 / 460;
 }
 
 /* ── Prev/Next scroll buttons ── */
@@ -230,6 +235,33 @@
 
 .amenity-card:hover .amenity-image {
   transform: scale(1.05);
+}
+
+/* Placeholder for amenities without final photography yet (e.g. Squash
+   Court) — sits wherever a real photo would via the shared .amenity-image /
+   .grid-image sizing rules above, just rendered as a marked "coming soon"
+   panel instead of an <img>. */
+.amenity-media-placeholder {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(145deg, #161616, #0a0a0a);
+  border: 1px dashed rgba(251, 238, 190, 0.25);
+  color: rgba(251, 238, 190, 0.45);
+}
+
+.amenity-media-placeholder svg {
+  opacity: 0.8;
+}
+
+.amenity-media-placeholder span {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 /* ── Amenity Label ── */
@@ -338,12 +370,12 @@
   padding: 0 60px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
 }
 
 .grid-item {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 .grid-card {
@@ -485,8 +517,8 @@
   }
 
   .carousel-item {
-    width: 520px;
-    height: 380px;
+    width: calc(50% - 10px);
+    aspect-ratio: 520 / 380;
   }
 
   .carousel-nav-btn {
@@ -549,8 +581,8 @@
   }
 
   .carousel-item {
-    width: 340px;
-    height: 260px;
+    width: calc(50% - 10px);
+    aspect-ratio: 340 / 260;
   }
 
   .carousel-nav-btn {
@@ -591,7 +623,7 @@
   }
 
   .grid-item {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
 
   .grid-label h3 {
@@ -639,8 +671,8 @@
   }
 
   .carousel-item {
-    width: 260px;
-    height: 200px;
+    width: calc(50% - 10px);
+    aspect-ratio: 260 / 200;
   }
 
   .carousel-nav-btn {
@@ -668,7 +700,7 @@
   }
 
   .grid-item {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
 
   .grid-label h3 {

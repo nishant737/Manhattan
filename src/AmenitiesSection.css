@@ -12,7 +12,12 @@
 /* ── Sticky Wrapper (pinned via GSAP ScrollTrigger) ── */
 .amenities-sticky-wrapper {
   position: relative;
-  height: 80vh;
+  /* Fills the full pinned viewport (the JS pin holds the section for
+     window.innerHeight * numSlides of scroll — see AmenitiesSection.jsx),
+     so the content below actually centers within the whole screen instead
+     of an 80%-height box that left an empty 20% gap of bare background at
+     the bottom, reading as "stuck at the top" rather than centered. */
+  height: 100vh;
   display: flex;
   align-items: stretch;
   background-color: #0a0a0a;

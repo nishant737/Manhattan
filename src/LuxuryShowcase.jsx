@@ -3,8 +3,8 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './LuxuryShowcase.css'
 import LuxuryAmenitiesImg from './LuxuryAmenities.jpeg'
-import CloseUpImg from './assets/close-up.jpeg'
 import IndoorPoolImg from './assets/Indoor Pool.jpeg'
+import CinemaLoungeImg from './assets/cinema.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -47,7 +47,7 @@ const AMENITIES = [
   {
     id: 6,
     title: 'Cinema Lounge',
-    image: CloseUpImg,
+    image: CinemaLoungeImg,
     description: 'Private screening room with premium audio-visual systems, comfortable seating, and curated entertainment experiences.'
   },
   {
@@ -55,8 +55,38 @@ const AMENITIES = [
     title: 'Sky Lounge',
     image: '/SKY LOUNGE CAFE.jpg',
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
+  },
+  {
+    id: 8,
+    title: 'Squash Court',
+    // No render photographed yet — shown as a clearly-marked placeholder
+    // (see the isPlaceholder branch below) rather than borrowing another
+    // category's image, so it never reads as a second "real" photo of
+    // something else.
+    isPlaceholder: true,
+    description: 'A dedicated indoor squash court for residents, coming soon.'
   }
 ]
+
+// Renders either the amenity's real photo or, for entries still awaiting
+// final photography (see `isPlaceholder` on AMENITIES above), a clearly-
+// marked "coming soon" placeholder — used by both the carousel and grid
+// views so the treatment stays identical everywhere this data renders.
+function AmenityMedia({ amenity, className }) {
+  if (amenity.isPlaceholder) {
+    return (
+      <div className={`${className} amenity-media-placeholder`}>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="12" cy="12" r="9.25" />
+          <path d="M7 15.5 15.5 7" />
+          <path d="M13.5 6 18 10.5" />
+        </svg>
+        <span>Coming Soon</span>
+      </div>
+    )
+  }
+  return <img src={amenity.image} alt={amenity.title} className={className} />
+}
 
 // The track renders the amenity list twice back-to-back so the continuous
 // auto-slide below can jump from the end of the first copy back to the start
@@ -266,7 +296,7 @@ export default function LuxuryShowcase() {
               >
                 <div className="amenity-card">
                   <div className="amenity-image-wrapper">
-                    <img src={amenity.image} alt={amenity.title} className="amenity-image" />
+                    <AmenityMedia amenity={amenity} className="amenity-image" />
                   </div>
                   <div className="amenity-label">
                     <h3>{amenity.title}</h3>
@@ -302,7 +332,7 @@ export default function LuxuryShowcase() {
             >
               <div className="grid-card">
                 <div className="grid-image-wrapper">
-                  <img src={amenity.image} alt={amenity.title} className="grid-image" />
+                  <AmenityMedia amenity={amenity} className="grid-image" />
                 </div>
                 <div className={`grid-label ${hoveredId === amenity.id ? 'expanded' : ''}`}>
                   <h3>{amenity.title}</h3>
@@ -313,9 +343,9 @@ export default function LuxuryShowcase() {
           ))}
         </div>
 
-        {/* Bottom row: 3 items centered */}
+        {/* Bottom row: 4 items */}
         <div className="amenities-grid-bottom">
-          {AMENITIES.slice(4, 7).map((amenity) => (
+          {AMENITIES.slice(4, 8).map((amenity) => (
             <div
               key={amenity.id}
               className="grid-item"
@@ -324,7 +354,7 @@ export default function LuxuryShowcase() {
             >
               <div className="grid-card">
                 <div className="grid-image-wrapper">
-                  <img src={amenity.image} alt={amenity.title} className="grid-image" />
+                  <AmenityMedia amenity={amenity} className="grid-image" />
                 </div>
                 <div className={`grid-label ${hoveredId === amenity.id ? 'expanded' : ''}`}>
                   <h3>{amenity.title}</h3>
