@@ -32,7 +32,7 @@ const AMENITIES = [
   {
     id: 1,
     index: '03',
-    title: 'Elevated Living',
+    title: 'Elevated Experience',
     description: 'Rooftop lounges and sky terraces that place panoramic city views, curated greenery, and refined leisure just an elevator ride from home.',
     backgroundImage: ElevatedLivingImg
   }
@@ -191,7 +191,7 @@ export default function AmenitiesSection() {
               )
             }
           } else if (index === numSlides - 1) {
-            // Elevated Living: fade in and stay visible until end
+            // Elevated Experience: fade in and stay visible until end
             tl.fromTo([imageSet, textItem],
               { opacity: 0, pointerEvents: 'none' },
               {

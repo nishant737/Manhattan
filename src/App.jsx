@@ -10,6 +10,7 @@ import AmenitiesSection from './AmenitiesSection'
 import TailoredSolutions from './TailoredSolutions'
 import LocationConnectivity from './LocationConnectivity'
 import PathToOwnership from './PathToOwnership'
+import ContactSection from './ContactSection'
 import LeadCaptureModal from './LeadCaptureModal'
 import Footer from './Footer'
 import './App.css'
@@ -106,6 +107,7 @@ function App() {
       <TailoredSolutions onSelectLayout={openLayoutModal} />
       <LocationConnectivity />
       <PathToOwnership />
+      <ContactSection />
       <Footer />
 
       <LeadCaptureModal
