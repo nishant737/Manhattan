@@ -5,6 +5,10 @@ import './LuxuryShowcase.css'
 import LuxuryAmenitiesImg from './LuxuryAmenities.jpeg'
 import IndoorPoolImg from './assets/Indoor Pool.jpeg'
 import CinemaLoungeImg from './assets/cinema.jpeg'
+import SpaImg from './assets/Spa.jpeg'
+import SquashCourtImg from './assets/Squash.jpeg'
+import KidsPlayImg from './assets/kidsplay.jpeg'
+import SkyLoungeImg from './assets/sky-lounge.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -53,18 +57,26 @@ const AMENITIES = [
   {
     id: 7,
     title: 'Sky Lounge',
-    image: '/SKY LOUNGE CAFE.jpg',
+    image: SkyLoungeImg,
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
   },
   {
     id: 8,
     title: 'Squash Court',
-    // No render photographed yet — shown as a clearly-marked placeholder
-    // (see the isPlaceholder branch below) rather than borrowing another
-    // category's image, so it never reads as a second "real" photo of
-    // something else.
-    isPlaceholder: true,
-    description: 'A dedicated indoor squash court for residents, coming soon.'
+    image: SquashCourtImg,
+    description: 'A dedicated indoor squash court with professional-grade flooring and lighting for residents.'
+  },
+  {
+    id: 9,
+    title: 'Spa',
+    image: SpaImg,
+    description: 'A tranquil steam and sauna retreat finished in warm stone, designed for quiet recovery and relaxation.'
+  },
+  {
+    id: 10,
+    title: "Kids' Play Area",
+    image: KidsPlayImg,
+    description: 'A vibrant, imaginative play space designed for the youngest residents to explore and unwind.'
   }
 ]
 
@@ -226,6 +238,23 @@ export default function LuxuryShowcase() {
     }
   }, [isGridView])
 
+  // Switching between the carousel and grid views changes this section's
+  // rendered height dramatically (the grid is several rows tall vs. the
+  // carousel's single row) — without recomputing ScrollTrigger's cached
+  // start/end pixel positions afterward, every OTHER pinned/scroll-linked
+  // section further down the page (Amenities, Tailored Solutions, etc.)
+  // stays keyed to stale positions from before the height change, so their
+  // pins fire at the wrong scroll offset — the sudden "next section pops
+  // into view" jump. A single rAF is enough to wait for the toggle's class
+  // change (which swaps `display: none` synchronously, no transition) to
+  // land before GSAP re-measures the page.
+  useEffect(() => {
+    const rafId = requestAnimationFrame(() => {
+      ScrollTrigger.refresh()
+    })
+    return () => cancelAnimationFrame(rafId)
+  }, [isGridView])
+
   // The carousel track is a natively scrollable element (drag/swipe/trackpad/
   // scrollbar all work out of the box) on top of the continuous auto-slide —
   // these buttons are just a discoverable shortcut that nudges it by roughly
@@ -343,9 +372,9 @@ export default function LuxuryShowcase() {
           ))}
         </div>
 
-        {/* Bottom row: 4 items */}
+        {/* Remaining items: wraps into 4 + 2 within the same 4-column grid */}
         <div className="amenities-grid-bottom">
-          {AMENITIES.slice(4, 8).map((amenity) => (
+          {AMENITIES.slice(4, 10).map((amenity) => (
             <div
               key={amenity.id}
               className="grid-item"

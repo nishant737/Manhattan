@@ -111,6 +111,16 @@
   animation-delay: 1.15s;
 }
 
+.hero-logos a {
+  display: block;
+  line-height: 0;
+  transition: opacity 0.25s ease;
+}
+
+.hero-logos a:hover {
+  opacity: 0.8;
+}
+
 .hero-logo {
   height: 76px;
   width: auto;

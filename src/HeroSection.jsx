@@ -46,9 +46,23 @@ function HeroSection() {
         <p className="hero-tagline">Luxury Elevated in the Heart of Mangalore.</p>
 
         <div className="hero-logos">
-          <img src={AllegroLogo} alt="Allegro" className="hero-logo" />
+          <a
+            href="https://allegrobuildersindia.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Allegro Builders website"
+          >
+            <img src={AllegroLogo} alt="Allegro" className="hero-logo" />
+          </a>
           <span className="hero-logo-divider" />
-          <img src={MohtishamLogo} alt="Mohtisham" className="hero-logo" />
+          <a
+            href="https://www.mohtisham.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Mohtisham website"
+          >
+            <img src={MohtishamLogo} alt="Mohtisham" className="hero-logo" />
+          </a>
         </div>
       </div>
     </section>
