@@ -2,13 +2,13 @@ import { useRef, useEffect, useState } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import './LuxuryShowcase.css'
-import LuxuryAmenitiesImg from './LuxuryAmenities.jpeg'
+import LuxuryAmenitiesImg from './assets/communityhall.jpg'
 import IndoorPoolImg from './assets/Indoor Pool.jpeg'
 import CinemaLoungeImg from './assets/cinema.jpeg'
 import SpaImg from './assets/Spa.jpeg'
 import SquashCourtImg from './assets/Squash.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
-import SkyLoungeImg from './assets/sky-lounge.jpeg'
+import SkyLoungeImg from './assets/finalloauge.jpg'
 
 gsap.registerPlugin(ScrollTrigger)
 

@@ -22,7 +22,7 @@ export default function PathToOwnership() {
     <section className="path-to-ownership-section" ref={sectionRef}>
       <div className="path-to-ownership-container">
         <div className="path-to-ownership-content">
-          <h2 className="path-to-ownership-title">Path to Smart Ownership</h2>
+          <h2 className="path-to-ownership-title">Your Journey Into AR & VR</h2>
 
           <div className="path-to-ownership-video-wrapper">
             <video
