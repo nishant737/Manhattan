@@ -35,6 +35,33 @@
   transform: scale(0.95);
 }
 
+/* Pops in on the same 0.5s delay / 0.7s curve as the navbar logo + hamburger
+   (see Navbar.css) so on mobile all three land together. `backwards` fill
+   hides it through the delay but doesn't lock a transform afterwards, so the
+   :active tap-scale still works. */
+@media (max-width: 768px) {
+  .whatsapp-button {
+    animation: whatsappButtonIn 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.5s backwards;
+  }
+}
+
+@keyframes whatsappButtonIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-button {
+    animation: none;
+  }
+}
+
 @media (max-width: 480px) {
   .whatsapp-button {
     width: 42px;

@@ -98,18 +98,6 @@
   min-width: 0;
 }
 
-/* State + City share a row on wider screens to keep the form compact;
-   wraps to stacked full-width fields once there isn't room for both. */
-.lead-modal-field-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.lead-modal-field-row .lead-modal-field {
-  flex: 1 1 160px;
-}
-
 .lead-modal-field label {
   font-family: 'Montserrat', sans-serif;
   font-size: 12px;
@@ -203,6 +191,115 @@
 
 .lead-modal-submit:active {
   transform: translateY(0);
+}
+
+.lead-modal-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+}
+
+/* Secondary link under the form (e.g. "Skip to View Layout") */
+.lead-modal-secondary {
+  margin-top: 4px;
+  background: none;
+  border: none;
+  padding: 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.7);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.lead-modal-secondary:hover {
+  color: rgb(251, 238, 190);
+}
+
+.lead-modal-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lead-modal-field input:disabled,
+.lead-modal-field textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.lead-modal-close:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Loading state ── */
+.lead-modal-submit-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.lead-modal-spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(10, 10, 10, 0.25);
+  border-top-color: #0a0a0a;
+  animation: leadModalSpin 0.7s linear infinite;
+}
+
+@keyframes leadModalSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error state ── */
+.lead-modal-submit-error {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgb(255, 140, 140);
+  background: rgba(255, 99, 99, 0.1);
+  border: 1px solid rgba(255, 99, 99, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0;
+}
+
+/* ── Success state ── */
+.lead-modal-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.lead-modal-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(251, 238, 190);
+  border: 1px solid rgba(251, 238, 190, 0.4);
+  background: rgba(251, 238, 190, 0.08);
+  margin-bottom: 18px;
+}
+
+.lead-modal-success .lead-modal-title,
+.lead-modal-success .lead-modal-subtitle {
+  text-align: center;
+}
+
+.lead-modal-success .lead-modal-submit {
+  min-width: 160px;
 }
 
 /* ── Responsive ── */

@@ -6,17 +6,18 @@ import LuxuryAmenitiesImg from './assets/communityhall.jpg'
 import IndoorPoolImg from './assets/Indoor Pool.jpeg'
 import CinemaLoungeImg from './assets/cinema.jpeg'
 import SpaImg from './assets/Spa.jpeg'
-import SquashCourtImg from './assets/Squash.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
 import SkyLoungeImg from './assets/finalloauge.jpg'
+// Lobby gets its own interior image, deliberately NOT one of the ENTRANCE
+// photos used in the intro (AboutSection), so the Lobby and Entrance never
+// share the same picture. TODO: swap for the final Lobby render when provided.
+import LobbyImg from './assets/aboutus.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Each entry below now points at a distinct, real Manhattan render — the
-// previous data reused just 3 images across all 7 categories (e.g. Community
-// Hall and Gym shared the identical GYM.jpg), which meant several "different"
-// amenities showed the exact same photo. Sourced from the project's own
-// cinematic renders rather than generic stock imagery.
+// Each entry points at a distinct, real Manhattan render. The gallery/grid
+// views show these as landscape tiles, so every image is a landscape render
+// displayed with object-fit: cover (aspect ratio preserved, never stretched).
 const AMENITIES = [
   {
     id: 1,
@@ -39,7 +40,7 @@ const AMENITIES = [
   {
     id: 4,
     title: 'Lobby',
-    image: '/STREET VIEW_ 02.jpg',
+    image: LobbyImg,
     description: 'Grand entrance with sophisticated design, concierge services, and a welcoming atmosphere for residents and guests.'
   },
   {
@@ -61,12 +62,6 @@ const AMENITIES = [
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
   },
   {
-    id: 8,
-    title: 'Squash Court',
-    image: SquashCourtImg,
-    description: 'A dedicated indoor squash court with professional-grade flooring and lighting for residents.'
-  },
-  {
     id: 9,
     title: 'Spa',
     image: SpaImg,
@@ -80,23 +75,10 @@ const AMENITIES = [
   }
 ]
 
-// Renders either the amenity's real photo or, for entries still awaiting
-// final photography (see `isPlaceholder` on AMENITIES above), a clearly-
-// marked "coming soon" placeholder — used by both the carousel and grid
-// views so the treatment stays identical everywhere this data renders.
+// Renders the amenity's photo. Every entry now has real photography, so this
+// is a thin wrapper kept only so the carousel and grid views share one
+// consistent image element.
 function AmenityMedia({ amenity, className }) {
-  if (amenity.isPlaceholder) {
-    return (
-      <div className={`${className} amenity-media-placeholder`}>
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="12" cy="12" r="9.25" />
-          <path d="M7 15.5 15.5 7" />
-          <path d="M13.5 6 18 10.5" />
-        </svg>
-        <span>Coming Soon</span>
-      </div>
-    )
-  }
   return <img src={amenity.image} alt={amenity.title} className={className} />
 }
 
@@ -180,12 +162,18 @@ export default function LuxuryShowcase() {
     const track = trackRef.current
     if (!track || isGridView) return
 
-    const SPEED_PX_PER_SEC = 32
+    const SPEED_PX_PER_SEC = 26
     const RESUME_DELAY_MS = 2200
     let rafId
     let lastTime = null
     let paused = false
     let resumeTimer = null
+
+    // Cache the loop width — reading scrollWidth every frame forces a layout
+    // reflow, which is a big source of scroll jank.
+    let halfWidth = track.scrollWidth / 2
+    const measure = () => { halfWidth = track.scrollWidth / 2 }
+    window.addEventListener('resize', measure)
 
     const pause = () => {
       paused = true
@@ -203,15 +191,15 @@ export default function LuxuryShowcase() {
 
     const step = (time) => {
       if (lastTime == null) lastTime = time
-      const dt = (time - lastTime) / 1000
+      // Clamp dt so returning from a background tab doesn't produce one huge
+      // jump (which reads as a glitch).
+      const dt = Math.min((time - lastTime) / 1000, 0.05)
       lastTime = time
 
-      if (!paused) {
-        const halfWidth = track.scrollWidth / 2
-        track.scrollLeft += SPEED_PX_PER_SEC * dt
-        if (track.scrollLeft >= halfWidth) {
-          track.scrollLeft -= halfWidth
-        }
+      if (!paused && halfWidth > 0) {
+        let x = track.scrollLeft + SPEED_PX_PER_SEC * dt
+        if (x >= halfWidth) x -= halfWidth
+        track.scrollLeft = x
       }
       rafId = requestAnimationFrame(step)
     }
@@ -219,22 +207,25 @@ export default function LuxuryShowcase() {
 
     const handleInteractionStart = () => pause()
     const handleInteractionEnd = () => scheduleResume()
+    const handleWheel = () => { pause(); scheduleResume() }
 
     track.addEventListener('pointerdown', handleInteractionStart)
     track.addEventListener('pointerup', handleInteractionEnd)
     track.addEventListener('pointercancel', handleInteractionEnd)
     track.addEventListener('touchstart', handleInteractionStart, { passive: true })
     track.addEventListener('touchend', handleInteractionEnd, { passive: true })
-    track.addEventListener('wheel', () => { pause(); scheduleResume() }, { passive: true })
+    track.addEventListener('wheel', handleWheel, { passive: true })
 
     return () => {
       cancelAnimationFrame(rafId)
       if (resumeTimer) clearTimeout(resumeTimer)
+      window.removeEventListener('resize', measure)
       track.removeEventListener('pointerdown', handleInteractionStart)
       track.removeEventListener('pointerup', handleInteractionEnd)
       track.removeEventListener('pointercancel', handleInteractionEnd)
       track.removeEventListener('touchstart', handleInteractionStart)
       track.removeEventListener('touchend', handleInteractionEnd)
+      track.removeEventListener('wheel', handleWheel)
     }
   }, [isGridView])
 
@@ -263,8 +254,28 @@ export default function LuxuryShowcase() {
     const track = trackRef.current
     if (!track) return
     pauseAutoScrollRef.current()
-    const amount = track.clientWidth * 0.8 * (direction === 'next' ? 1 : -1)
-    track.scrollBy({ left: amount, behavior: 'smooth' })
+
+    const items = track.querySelectorAll('.carousel-item')
+    const dir = direction === 'next' ? 1 : -1
+
+    if (items.length) {
+      // Land the target card dead-centre in the track (matching the resting
+      // position of a swipe), and stop there — no half-cut edges.
+      const itemW = items[0].getBoundingClientRect().width
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0
+      const stride = itemW + gap
+      const first = items[0].offsetLeft
+      const viewportCenter = track.scrollLeft + track.clientWidth / 2
+
+      let idx = Math.round((viewportCenter - first - itemW / 2) / stride) + dir
+      idx = Math.max(0, Math.min(items.length - 1, idx))
+
+      const target = items[idx].offsetLeft - (track.clientWidth - itemW) / 2
+      track.scrollTo({ left: Math.max(0, target), behavior: 'smooth' })
+    } else {
+      track.scrollBy({ left: track.clientWidth * 0.8 * dir, behavior: 'smooth' })
+    }
+
     scheduleResumeAutoScrollRef.current()
   }
 
@@ -276,7 +287,7 @@ export default function LuxuryShowcase() {
           <button
             className={`view-toggle-btn ${isGridView ? 'grid-mode' : 'carousel-mode'}`}
             onClick={() => setIsGridView(!isGridView)}
-            title={isGridView ? 'Switch to carousel view' : 'Switch to portrait grid view'}
+            title={isGridView ? 'Switch to carousel view' : 'Switch to grid view'}
           >
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               {!isGridView ? (
@@ -319,9 +330,10 @@ export default function LuxuryShowcase() {
             {LOOPED_AMENITIES.map((amenity) => (
               <div
                 key={amenity.key}
-                className="carousel-item"
+                className={`carousel-item ${hoveredId === amenity.id ? 'is-open' : ''}`}
                 onMouseEnter={() => setHoveredId(amenity.id)}
                 onMouseLeave={() => setHoveredId(null)}
+                onClick={() => setHoveredId((prev) => (prev === amenity.id ? null : amenity.id))}
               >
                 <div className="amenity-card">
                   <div className="amenity-image-wrapper">
@@ -347,39 +359,43 @@ export default function LuxuryShowcase() {
             </svg>
           </button>
         </div>
+
+        {/* Mobile-only: centred prev/next arrows below the carousel */}
+        <div className="carousel-mobile-nav">
+          <button
+            type="button"
+            className="carousel-mobile-nav-btn"
+            onClick={() => scrollCarousel('prev')}
+            aria-label="Scroll to previous"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button
+            type="button"
+            className="carousel-mobile-nav-btn"
+            onClick={() => scrollCarousel('next')}
+            aria-label="Scroll to next"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className={`grid-view-section ${!isGridView ? 'hidden' : 'visible'}`}>
-        {/* Top row: 4 items */}
-        <div className="amenities-grid-top">
-          {AMENITIES.slice(0, 4).map((amenity) => (
+        {/* One equal grid of landscape tiles — every amenity the same size,
+            laid out to fit the view without a long vertical scroll. */}
+        <div className="amenities-grid">
+          {AMENITIES.map((amenity) => (
             <div
               key={amenity.id}
               className="grid-item"
               onMouseEnter={() => setHoveredId(amenity.id)}
               onMouseLeave={() => setHoveredId(null)}
-            >
-              <div className="grid-card">
-                <div className="grid-image-wrapper">
-                  <AmenityMedia amenity={amenity} className="grid-image" />
-                </div>
-                <div className={`grid-label ${hoveredId === amenity.id ? 'expanded' : ''}`}>
-                  <h3>{amenity.title}</h3>
-                  <p className="grid-description">{amenity.description}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Remaining items: wraps into 4 + 2 within the same 4-column grid */}
-        <div className="amenities-grid-bottom">
-          {AMENITIES.slice(4, 10).map((amenity) => (
-            <div
-              key={amenity.id}
-              className="grid-item"
-              onMouseEnter={() => setHoveredId(amenity.id)}
-              onMouseLeave={() => setHoveredId(null)}
+              onClick={() => setHoveredId((prev) => (prev === amenity.id ? null : amenity.id))}
             >
               <div className="grid-card">
                 <div className="grid-image-wrapper">

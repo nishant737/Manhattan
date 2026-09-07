@@ -1,69 +1,40 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import LeadCaptureModal from './LeadCaptureModal'
-import { LAYOUT_TYPES } from './apartmentLayouts'
+import { LAYOUT_CATEGORIES } from './apartmentLayouts'
 import './TailoredSolutions.css'
 
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
-// Same 4 apartment types offered in the Layout modal, reused here so this
-// row and that modal never drift out of sync with each other — picking a
-// type here and submitting the lead form opens straight into that same
-// modal, already showing this exact type's detail view. Each type's
-// images[0] is its distinct hero image there (floor-plan drawings for the
-// two duplex types, a distinct lifestyle photo for the other two — see
-// apartmentLayouts.js), so reusing it here guarantees every thumbnail in
-// this row is visually distinct too, with no accidental image reuse.
-const SOLUTIONS = LAYOUT_TYPES.map((type) => ({
-  id: type.id,
-  label: type.title,
-  thumbnail: type.images[0]
+// The same unit types the Layout modal offers, grouped under their category
+// headings for display. A flat running index is assigned so the staggered
+// entrance animation (which keys off accordionItemsRef order) still lines up
+// across groups.
+let runningIndex = 0
+const SOLUTION_GROUPS = LAYOUT_CATEGORIES.map((group) => ({
+  category: group.category,
+  items: group.types.map((type) => ({
+    id: type.id,
+    label: type.title,
+    thumbnail: type.images[0],
+    flatIndex: runningIndex++
+  }))
 }))
 
-const LEAD_SUBMITTED_KEY = 'manhattan_lead_submitted'
-
 export default function TailoredSolutions({ onSelectLayout }) {
-  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
-  const [pendingSolutionId, setPendingSolutionId] = useState(null)
-  const [hasSubmittedLead, setHasSubmittedLead] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return window.localStorage.getItem(LEAD_SUBMITTED_KEY) === 'true'
-  })
   const sectionRef = useRef(null)
   const pinRef = useRef(null)
   const leftColumnRef = useRef(null)
   const rightColumnRef = useRef(null)
   const accordionItemsRef = useRef([])
+  const groupTitlesRef = useRef([])
 
-  // First attempt to view any layout is gated behind a short lead-capture
-  // form; once the visitor has submitted it once, picking a type opens the
-  // shared Layout modal straight away for the rest of the session.
+  // Clicking a unit type opens the shared Layout modal straight to that
+  // type's detail view — no interstitial. Lead capture now lives on the
+  // "Book a Visit" CTA inside that modal instead of gating the whole view.
   const handleSelectSolution = (id) => {
-    if (!hasSubmittedLead) {
-      setPendingSolutionId(id)
-      setIsLeadModalOpen(true)
-      return
-    }
     onSelectLayout?.(id)
-  }
-
-  const handleLeadModalClose = () => {
-    setIsLeadModalOpen(false)
-    setPendingSolutionId(null)
-  }
-
-  const handleLeadSubmit = (formData) => {
-    // TODO: wire this up to the real CRM/lead-capture endpoint once available.
-    const pendingSolution = SOLUTIONS.find((s) => s.id === pendingSolutionId)
-    console.log('Lead captured from TailoredSolutions:', { ...formData, apartmentType: pendingSolution?.label })
-
-    window.localStorage.setItem(LEAD_SUBMITTED_KEY, 'true')
-    setHasSubmittedLead(true)
-    setIsLeadModalOpen(false)
-    onSelectLayout?.(pendingSolutionId)
-    setPendingSolutionId(null)
   }
 
   // Setup scroll-triggered entrance animations with unified timeline.
@@ -98,10 +69,12 @@ export default function TailoredSolutions({ onSelectLayout }) {
                   markers: false
                 }
               : {
+                  // Non-scrubbed on mobile — plays once when it enters view and
+                  // settles. A scrubbed x-offset left the rows shifted right
+                  // (and clipped) whenever the scroll rested mid-animation.
                   trigger: sectionRef.current,
-                  start: 'top 75%',
-                  end: 'top 15%',
-                  scrub: 1,
+                  start: 'top 80%',
+                  toggleActions: 'play none none none',
                   markers: false
                 }
           })
@@ -110,18 +83,36 @@ export default function TailoredSolutions({ onSelectLayout }) {
           tl.fromTo(
             leftColumnRef.current,
             { opacity: 0, y: 50, scale: 0.97 },
-            { opacity: 1, y: 0, scale: 1, duration: isDesktop ? 0.35 : 0.5 },
+            { opacity: 1, y: 0, scale: 1, duration: isDesktop ? 0.35 : 0.6 },
             0
           )
 
-          // Accordion items staggered in from the right
+          const base = isDesktop ? 0.05 : 0.12
+          const step = 0.1
+
+          // Category titles (RESIDENCES / SKY VILLAS) start hidden and reveal
+          // together with their group's first row — never shown on their own
+          // at the start of the section.
+          SOLUTION_GROUPS.forEach((group, gi) => {
+            const title = groupTitlesRef.current[gi]
+            if (!title) return
+            const firstFlatIndex = group.items[0]?.flatIndex ?? 0
+            tl.fromTo(
+              title,
+              { opacity: 0, x: isDesktop ? 110 : 32 },
+              { opacity: 1, x: 0, duration: isDesktop ? 0.3 : 0.45, ease: 'sine.inOut' },
+              Math.max(0, base + firstFlatIndex * step - 0.02)
+            )
+          })
+
+          // Accordion items staggered in
           accordionItemsRef.current.forEach((item, index) => {
             if (!item) return
             tl.fromTo(
               item,
-              { opacity: 0, x: 110 },
-              { opacity: 1, x: 0, duration: isDesktop ? 0.3 : 0.4, ease: 'sine.inOut' },
-              (isDesktop ? 0.05 : 0.1) + index * (isDesktop ? 0.1 : 0.12)
+              { opacity: 0, x: isDesktop ? 110 : 32 },
+              { opacity: 1, x: 0, duration: isDesktop ? 0.3 : 0.45, ease: 'sine.inOut' },
+              base + index * step
             )
           })
 
@@ -160,40 +151,55 @@ export default function TailoredSolutions({ onSelectLayout }) {
             </h2>
           </div>
 
-          {/* Right Column */}
+          {/* Right Column — unit types grouped by category */}
           <div className="tailored-solutions-right" ref={rightColumnRef}>
             <div className="solutions-accordion">
-              {SOLUTIONS.map((solution, index) => (
-                <div
-                  key={solution.id}
-                  ref={(el) => {
-                    if (el) accordionItemsRef.current[index] = el
-                  }}
-                  className="accordion-row"
-                >
-                  <button
-                    className="accordion-trigger"
-                    onClick={() => handleSelectSolution(solution.id)}
-                    aria-label={`View ${solution.label} layout`}
+              {SOLUTION_GROUPS.map((group, gi) => (
+                <div className="solutions-group" key={group.category}>
+                  <h3
+                    className="solutions-group-title"
+                    ref={(el) => {
+                      if (el) groupTitlesRef.current[gi] = el
+                    }}
                   >
-                    <img
-                      src={solution.thumbnail}
-                      alt={solution.label}
-                      className="accordion-thumbnail"
-                    />
-                    <span className="accordion-label">{solution.label}</span>
-                    <svg
-                      className="accordion-arrow"
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
+                    {group.category}
+                  </h3>
+                  {group.items.map((solution) => (
+                    <div
+                      key={solution.id}
+                      ref={(el) => {
+                        if (el) accordionItemsRef.current[solution.flatIndex] = el
+                      }}
+                      className="accordion-row"
                     >
-                      <polyline points="9 6 15 12 9 18"></polyline>
-                    </svg>
-                  </button>
+                      <button
+                        className="accordion-trigger"
+                        onClick={() => handleSelectSolution(solution.id)}
+                        aria-label={`Open ${solution.label} layout`}
+                      >
+                        <img
+                          src={solution.thumbnail}
+                          alt={solution.label}
+                          className="accordion-thumbnail"
+                        />
+                        <span className="accordion-label">{solution.label}</span>
+                        <span className="accordion-open">
+                          Open Layout
+                          <svg
+                            className="accordion-arrow"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline points="9 6 15 12 9 18"></polyline>
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -207,12 +213,6 @@ export default function TailoredSolutions({ onSelectLayout }) {
           <span>LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · ICONIC ARCHITECTURE · SPACIOUS LIVING · ELEVATED EXPERIENCE · LUXURY RESIDENCES · MANGALORE'S FINEST · ARCHITECTURAL EXCELLENCE · ICONIC ARCHITECTURE · SPACIOUS LIVING · ELEVATED EXPERIENCE ·</span>
         </div>
       </div>
-
-      <LeadCaptureModal
-        isOpen={isLeadModalOpen}
-        onClose={handleLeadModalClose}
-        onSubmit={handleLeadSubmit}
-      />
     </section>
   )
 }

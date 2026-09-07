@@ -3,7 +3,19 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import SearchableSelect from './SearchableSelect'
 import { PHONE_CODE_OPTIONS, validateContactFields, formatPhoneForSubmit } from './leadFormShared'
+import { CONTACT_DETAILS, SOCIAL_LINKS } from './siteContact'
 import './ContactSection.css'
+
+// Static copy for the contact-details block — real values come from
+// siteContact.js so they can be updated in one place.
+const CONTACT_COPY = {
+  emailLabel: 'Enquiries',
+  phoneLabel: 'Call Us',
+  addressLabel: 'Visit Us',
+  socialSubheading: 'Connect With Us'
+}
+
+const telHref = (phone) => `tel:${phone.replace(/[^\d+]/g, '')}`
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -88,9 +100,76 @@ export default function ContactSection() {
           <span className="contact-eyebrow">Get In Touch</span>
           <h2 className="contact-title">Contact Us</h2>
           <p className="contact-subtitle">
-            Share your details and our team will reach out to help with anything you need —
+            Share your details and our team will reach out to help with anything you need,
             from booking a private viewing to answering questions about Manhattan.
           </p>
+
+          <ul className="contact-details">
+            <li className="contact-detail">
+              <span className="contact-detail-label">{CONTACT_COPY.emailLabel}</span>
+              {CONTACT_DETAILS.emails.map((email) => (
+                <a key={email} className="contact-detail-value" href={`mailto:${email}`}>
+                  {email}
+                </a>
+              ))}
+            </li>
+
+            <li className="contact-detail">
+              <span className="contact-detail-label">{CONTACT_COPY.phoneLabel}</span>
+              {CONTACT_DETAILS.phones.map((phone) => (
+                <a key={phone} className="contact-detail-value" href={telHref(phone)}>
+                  {phone}
+                </a>
+              ))}
+            </li>
+
+            <li className="contact-detail">
+              <span className="contact-detail-label">{CONTACT_COPY.addressLabel}</span>
+              <span className="contact-detail-value contact-detail-address">
+                {CONTACT_DETAILS.address.map((line, i) => (
+                  <span key={i}>{line}</span>
+                ))}
+              </span>
+            </li>
+          </ul>
+
+          <div className="contact-social">
+            <h3 className="contact-social-subheading">{CONTACT_COPY.socialSubheading}</h3>
+            <div className="contact-social-icons">
+              <a
+                href={SOCIAL_LINKS.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat with us on WhatsApp"
+              >
+                <svg viewBox="0 0 32 32" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.386.7 4.61 1.902 6.478L4 29l7.72-1.868A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3zm0 21.818a9.77 9.77 0 0 1-4.98-1.363l-.357-.212-4.583 1.11 1.127-4.462-.233-.366A9.77 9.77 0 0 1 5.818 15c0-5.618 4.564-10.182 10.183-10.182S26.182 9.382 26.182 15 21.62 24.818 16.001 24.818zm5.593-7.626c-.306-.153-1.81-.893-2.09-.995-.28-.102-.484-.153-.687.153-.204.306-.79.995-.968 1.2-.178.203-.357.229-.663.076-.306-.153-1.293-.477-2.463-1.52-.911-.812-1.526-1.815-1.705-2.121-.178-.306-.019-.472.134-.624.138-.137.306-.357.459-.535.153-.178.204-.306.306-.51.102-.204.05-.382-.026-.535-.076-.153-.687-1.655-.941-2.267-.248-.596-.5-.516-.687-.525-.178-.008-.382-.01-.586-.01-.204 0-.535.076-.815.382-.28.306-1.069 1.044-1.069 2.546 0 1.502 1.094 2.953 1.247 3.157.153.204 2.153 3.287 5.216 4.61.729.314 1.298.502 1.741.643.732.233 1.398.2 1.925.121.587-.088 1.81-.74 2.065-1.454.255-.714.255-1.326.178-1.454-.076-.128-.28-.204-.586-.357z" />
+                </svg>
+              </a>
+              <a
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Instagram"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                  <rect x="2" y="2" width="20" height="20" rx="5" />
+                  <circle cx="12" cy="12" r="4.2" />
+                  <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none" />
+                </svg>
+              </a>
+              <a
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Find us on Facebook"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                  <path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.5-3.9 3.77-3.9 1.09 0 2.24.19 2.24.19v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z" />
+                </svg>
+              </a>
+            </div>
+          </div>
         </div>
 
         <div className="contact-form-card">

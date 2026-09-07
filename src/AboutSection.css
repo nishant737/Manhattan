@@ -1,7 +1,10 @@
 .about-section {
   position: relative;
   background-color: #0a0a0a;
-  padding: 140px 0 200px;
+  /* Enough top room to clear the fixed navbar, but far less than before so the
+     image + tagline animation both sit fully in view while the section is
+     pinned. */
+  padding: 96px 0 140px;
   box-sizing: border-box;
   width: 100%;
 }
@@ -32,8 +35,13 @@
 .about-image-wrapper {
   position: relative;
   width: 100%;
-  max-width: 550px;
+  max-width: 640px;
   aspect-ratio: 3 / 4;
+  /* Never taller than the pinned viewport (minus the navbar + section
+     padding), so the whole image and the tagline animation are visible
+     together while the section is pinned. Aspect ratio is kept, so the box
+     just narrows to fit — object-fit:cover means no distortion. */
+  max-height: calc(100vh - 210px);
   overflow: hidden;
   border-radius: 4px;
   will-change: opacity;
@@ -53,6 +61,35 @@
   display: block;
   opacity: 1;
   transition: opacity 1.5s ease-in-out;
+}
+
+/* ── Intro image manual control: dot indicators ── */
+.about-image-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.about-image-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  padding: 0;
+  border: 1px solid rgba(251, 238, 190, 0.7);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.about-image-dot.is-active {
+  background: rgb(251, 238, 190);
+  transform: scale(1.25);
 }
 
 /* ── Right Column ── */
@@ -83,6 +120,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  /* Anchor for the absolutely-positioned floating "We" (AboutSection.jsx). */
+  position: relative;
 }
 
 .tagline-line {
@@ -97,12 +136,29 @@
   will-change: opacity, transform, text-shadow;
 }
 
-/* Each line's own "We " prefix — pops in together with the rest of that
-   line as the scroll reaches it (see AboutSection.jsx). */
+/* Each line's own "We " prefix. Invisible while the floating "We" is
+   travelling (it only reserves the inline space so the sentence bodies never
+   shift); every one fades in during the finale. */
 .tagline-we {
   display: inline-block;
   font-weight: 700;
-  will-change: opacity, transform;
+  opacity: 0;
+}
+
+/* The single "We" that slides down the lines with the scroll. Inherits the
+   tagline font-size; matches .tagline-line's weight + line-height so it sits
+   exactly where each line's own "We" would. */
+.tagline-we-float {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: rgb(251, 238, 190);
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .about-description {
@@ -178,41 +234,51 @@
 /* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
   .about-section {
-    padding: 100px 0 140px;
+    padding: 70px 0 60px;
   }
 
+  /* Single centred column: image on top, the two paragraphs below it. The
+     animated "We …" tagline is a desktop-only flourish — hidden here. */
   .about-container {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 0 20px;
   }
 
-  .about-left {
-    gap: 0;
-  }
-
-  .about-image-wrapper {
-    width: 90%;
-    aspect-ratio: 9 / 12;
-  }
-
+  .about-left,
   .about-right {
-    gap: 20px;
+    display: contents;
   }
 
   .about-tagline-wrapper {
-    margin-bottom: 0;
+    display: none;
   }
 
-  .about-tagline-text {
-    font-size: clamp(18px, 5vw, 28px);
-    gap: 10px;
+  .about-image-wrapper {
+    order: 1;
+    width: 100%;
+    max-width: 480px;
+    max-height: none; /* not pinned on mobile — keep the intended size */
+    margin: 0 auto;
+    aspect-ratio: 9 / 12;
+  }
+
+  .about-description {
+    order: 2;
+  }
+
+  .about-description-secondary {
+    order: 3;
   }
 
   .about-description,
   .about-description-secondary {
     font-size: clamp(13px, 3vw, 15px);
-    line-height: 1.7;
+    line-height: 1.75;
+    text-align: center;
+    width: 100%;
   }
 
   .about-cta {
@@ -224,35 +290,26 @@
 /* ── Responsive: Small Mobile ── */
 @media (max-width: 480px) {
   .about-section {
-    padding: 80px 0 120px;
+    padding: 56px 0 48px;
   }
 
   .about-container {
-    gap: 30px;
+    gap: 14px;
     padding: 0 16px;
   }
 
-  .about-left {
-    gap: 0;
-  }
-
   .about-image-wrapper {
-    width: 90%;
+    width: 100%;
+    max-width: 400px;
+    max-height: none;
+    margin: 0 auto;
     aspect-ratio: 9 / 12;
-  }
-
-  .about-tagline-wrapper {
-    margin-bottom: 0;
-  }
-
-  .about-tagline-text {
-    font-size: clamp(16px, 5.5vw, 22px);
-    gap: 8px;
   }
 
   .about-description,
   .about-description-secondary {
     font-size: clamp(12px, 3.2vw, 13px);
+    text-align: center;
   }
 
   .about-cta {

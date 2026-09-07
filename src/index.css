@@ -50,19 +50,23 @@
   }
 }
 
+/* `overflow-x: clip` (not `hidden`) — `hidden` forces `overflow-y: auto`,
+   turning these into scroll containers, which breaks GSAP ScrollTrigger's
+   pinning and `position: sticky` on mobile (pin won't stick / jitters).
+   `clip` just clips horizontally without creating a scroll container. */
 html {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 #root {
   width: 100%;
   min-height: 100svh;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1,

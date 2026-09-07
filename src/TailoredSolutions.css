@@ -61,6 +61,50 @@
   gap: 16px;
 }
 
+/* ── Category grouping ── */
+.solutions-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.solutions-group + .solutions-group {
+  margin-top: 22px;
+}
+
+.solutions-group-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.55);
+  margin: 0;
+  /* Revealed by GSAP alongside its group's first row (see TailoredSolutions.jsx),
+     matching how .accordion-row reveals — so the labels are never shown alone. */
+  will-change: opacity, transform;
+}
+
+/* "Open Layout" affordance at the end of each row */
+.accordion-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.7);
+  transition: color 0.3s ease;
+}
+
+.accordion-trigger:hover .accordion-open {
+  color: rgb(251, 238, 190);
+}
+
 /* Accordion Row */
 .accordion-row {
   background-color: #1a1a1a;
@@ -170,6 +214,14 @@
     gap: 12px;
   }
 
+  .solutions-group {
+    gap: 12px;
+  }
+
+  .solutions-group + .solutions-group {
+    margin-top: 14px;
+  }
+
   .accordion-trigger {
     padding: 18px 40px 18px 26px;
     gap: 18px;
@@ -235,15 +287,25 @@
     padding: 80px 0 80px 0;
   }
 
+  .tailored-solutions-section {
+    overflow-x: clip;
+  }
+
   .tailored-solutions-container {
-    padding: 0 24px;
-    gap: 40px;
+    padding: 0 20px;
+    gap: 20px;
     width: 100%;
     box-sizing: border-box;
   }
 
+  .tailored-solutions-left {
+    align-items: center;
+  }
+
   .tailored-solutions-heading {
-    font-size: 36px;
+    font-size: 34px;
+    text-align: center;
+    margin-bottom: 4px;
   }
 
   .solutions-accordion {
@@ -259,7 +321,7 @@
   }
 
   .accordion-trigger {
-    padding: 18px 32px 18px 20px;
+    padding: 18px 20px;
     gap: 16px;
     font-size: 14px;
   }
@@ -285,15 +347,15 @@
   }
 
   .tailored-solutions-container {
-    padding: 0 16px;
-    gap: 30px;
+    padding: 0 14px;
+    gap: 16px;
     width: 100%;
     box-sizing: border-box;
   }
 
   .tailored-solutions-heading {
-    font-size: 28px;
-    margin-bottom: 30px;
+    font-size: 26px;
+    margin-bottom: 2px;
   }
 
   .solutions-accordion {
@@ -309,7 +371,7 @@
   }
 
   .accordion-trigger {
-    padding: 16px 26px 16px 16px;
+    padding: 15px 16px;
     gap: 12px;
     font-size: 13px;
   }
@@ -321,6 +383,12 @@
 
   .accordion-label {
     font-size: 13px;
+  }
+
+  .accordion-open {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    gap: 4px;
   }
 
   .solutions-ticker {

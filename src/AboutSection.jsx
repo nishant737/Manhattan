@@ -18,164 +18,192 @@ const TAGLINE_LINES = [
 
 export default function AboutSection() {
   const sectionRef = useRef(null)
-  const headingRef = useRef(null)
   const imageRef = useRef(null)
   const taglineContainerRef = useRef(null)
   const taglineLinesRef = useRef([])
   const taglineWeRefs = useRef([])
+  const weFloatRef = useRef(null)
   const descriptionRef = useRef(null)
   const descriptionSecondaryRef = useRef(null)
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const images = [Entrance01, Entrance02, Entrance03]
 
-  // Slideshow effect - changes image every 3 seconds
+  // Auto-advance slideshow — re-armed as a timeout keyed on the current index
+  // so a manual dot tap also resets the 3s timer.
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setTimeout(() => {
       setCurrentImageIndex((prev) => (prev + 1) % images.length)
     }, 3000)
 
-    return () => clearInterval(interval)
-  }, [images.length])
+    return () => clearTimeout(timer)
+  }, [currentImageIndex, images.length])
 
   useEffect(() => {
     const section = sectionRef.current
-    const image = imageRef.current
+    const imageWrap = imageRef.current
+    const taglineWrap = taglineContainerRef.current
     const description = descriptionRef.current
     const descSecondary = descriptionSecondaryRef.current
 
     if (!section) return
 
     gsap.registerPlugin(ScrollTrigger)
+    // Mobile address-bar show/hide fires a resize mid-scroll; don't let
+    // ScrollTrigger recompute positions on it.
+    ScrollTrigger.config({ ignoreMobileResize: true })
 
-    // Create single master timeline that pins the section and reveals all content
-    const masterTl = gsap.timeline({
-      scrollTrigger: {
+    const prefersReduced =
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    const NO_GLOW = '0 0 0px rgba(251, 238, 190, 0)'
+
+    const ctx = gsap.context(() => {
+      const lines = taglineLinesRef.current.filter(Boolean)
+      const weSpans = taglineWeRefs.current.filter(Boolean)
+      const weFloat = weFloatRef.current
+      const linesEl = lines[0] ? lines[0].parentElement : null // .about-tagline-lines
+      const N = lines.length
+      const revealEls = [imageWrap, taglineWrap, description, descSecondary].filter(Boolean)
+
+      // The sentence bodies ("reimagine luxury." …) never move. A single
+      // floating "We" slides down (and back up) with the scroll, and the line
+      // it currently fronts is the highlighted one. In the last stretch every
+      // line's own "We" fades in and all lines settle to fully lit.
+      const TRAVEL_END = 0.76 // share of scroll spent moving "We"; rest = finale
+
+      // Highlight look for one line; `a` = 0 (muted) → 1 (lit). Opacity + glow
+      // only — the line itself never moves or scales, so the sentence bodies
+      // stay pixel-static while just the floating "We" travels.
+      const setLine = (el, a) => {
+        const g1 = (0.5 * a).toFixed(3)
+        const g2 = (0.2 * a).toFixed(3)
+        gsap.set(el, {
+          opacity: 0.24 + 0.76 * a,
+          textShadow: `0 0 22px rgba(251, 238, 190, ${g1}), 0 0 46px rgba(251, 238, 190, ${g2})`
+        })
+      }
+
+      // Vertical offset (within .about-tagline-lines) of line `idx`; `idx` may
+      // be fractional so the floating "We" travels smoothly between lines.
+      const lineTop = (idx) => {
+        const lo = Math.max(0, Math.floor(idx))
+        const hi = Math.min(N - 1, Math.ceil(idx))
+        const f = idx - lo
+        return lines[lo].offsetTop * (1 - f) + lines[hi].offsetTop * f
+      }
+
+      const renderTagline = (p) => {
+        if (!linesEl || N < 2) return
+
+        if (p < TRAVEL_END) {
+          const t = p / TRAVEL_END          // 0 → 1 over the travel phase
+          const focal = t * (N - 1)         // "We" position, 0 → N-1
+          if (weFloat) gsap.set(weFloat, { y: lineTop(focal), opacity: 1 })
+          gsap.set(weSpans, { opacity: 0 }) // per-line "We"s stay hidden while travelling
+          for (let i = 0; i < N; i++) {
+            setLine(lines[i], Math.max(0, 1 - Math.abs(i - focal)))
+          }
+        } else {
+          const f = (p - TRAVEL_END) / (1 - TRAVEL_END) // 0 → 1 over the finale
+          if (weFloat) gsap.set(weFloat, { y: lineTop(N - 1), opacity: 1 - f })
+          gsap.set(weSpans, { opacity: f })
+          for (let i = 0; i < N; i++) {
+            const startA = Math.max(0, 1 - Math.abs(i - (N - 1))) // state at travel-end
+            setLine(lines[i], startA + (1 - startA) * f)
+          }
+        }
+      }
+
+      const primeTagline = () => {
+        if (!N) return
+        renderTagline(0) // opening frame: floating "We reimagine luxury." lit
+      }
+
+      // Adds the scroll-scrubbed 0→1 drive onto `tl`. A single proxy tween +
+      // onUpdate keeps the motion perfectly interpolated and reversible on
+      // scroll-up.
+      const addTaglineScrub = (tl) => {
+        if (N < 2) return
+        const proxy = { p: 0 }
+        tl.to(proxy, {
+          p: 1,
+          ease: 'none',
+          duration: 1,
+          onUpdate: () => renderTagline(proxy.p)
+        })
+      }
+
+      // ── Reduced motion: the finale state, static ──
+      if (prefersReduced) {
+        gsap.set(revealEls, { opacity: 1, y: 0 })
+        gsap.set(lines, { opacity: 1, scale: 1, textShadow: NO_GLOW })
+        gsap.set(weSpans, { opacity: 1 })
+        if (weFloat) gsap.set(weFloat, { opacity: 0 })
+        return
+      }
+
+      // ── Entrance reveal (all breakpoints): image + tagline + copy rise in
+      //    once as the section enters view. Not scrubbed / not pinned, so
+      //    normal page scrolling is never held by this. ──
+      gsap.set(revealEls, { opacity: 0, y: 28 })
+      primeTagline()
+      ScrollTrigger.create({
         trigger: section,
-        start: 'top top',
-        end: '+=2000px',
-        scrub: 2.5,
-        pin: true,
-        markers: false
-      }
-    })
+        start: 'top 80%',
+        once: true,
+        onEnter: () =>
+          gsap.to(revealEls, {
+            opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: 'power2.out'
+          })
+      })
 
-    // Image fade in at start - synced with first line
-    if (image) {
-      masterTl.fromTo(
-        image,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.35 },
-        0
-      )
-    }
+      const mm = gsap.matchMedia()
 
-    const FINAL_EMPHASIS_TIME = 1.6
-    const TRANSITION_DURATION = 0.4
+      // ── Desktop (two-column): PIN the section on arrival, scrub the whole
+      //    "We" travel + finale across a set distance, then release to the
+      //    next section. pinSpacing keeps page flow intact afterwards. ──
+      mm.add('(min-width: 1025px)', () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: () => '+=' + Math.round(window.innerHeight * 1.6),
+            scrub: 1,
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+          }
+        })
+        addTaglineScrub(tl)
+        return () => tl.kill()
+      })
 
-    // Per-line states the timeline below moves each line through — real
-    // position + scale changes, not just an opacity fade, so the block
-    // reads as physically travelling rather than four static lines quietly
-    // lighting up in place:
-    //   BELOW   — not reached yet: small, dim, sitting slightly lower.
-    //   ACTIVE  — the current line: full size, full brightness, centered.
-    //   PASSED  — already moved through: small, dim, sitting slightly
-    //             higher (drifted up and out, mirroring BELOW).
-    //   FINAL   — the closing convergence: every line (arriving from
-    //             whichever of the above states it was last in) settles
-    //             back to center together, at full brightness, with a
-    //             glow and a slight scale-pop.
-    const RECEDED = { opacity: 0.35, scale: 0.9 }
-    const ACTIVE = { opacity: 1, scale: 1.06 }
-    const NO_GLOW = '0 0 18px rgba(251, 238, 190, 0), 0 0 36px rgba(251, 238, 190, 0)'
-    const FULL_GLOW = '0 0 18px rgba(251, 238, 190, 0.55), 0 0 36px rgba(251, 238, 190, 0.25)'
+      // ── Tablet (stacked layout, taller than a viewport): NO pin — the "We"
+      //    travels as the tagline block scrolls up through the viewport. ──
+      mm.add('(min-width: 769px) and (max-width: 1024px)', () => {
+        if (!taglineWrap) return
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: taglineWrap,
+            start: 'top 82%',
+            end: 'bottom 22%',
+            scrub: 1,
+            invalidateOnRefresh: true
+          }
+        })
+        addTaglineScrub(tl)
+        return () => tl.kill()
+      })
 
-    const weSpans = taglineWeRefs.current
-    const lines = taglineLinesRef.current
+      // ── Mobile (≤768): CSS hides the tagline block; the entrance reveal
+      //    above is the whole animation. ──
 
-    if (lines.length > 0) {
-      gsap.set(lines.filter(Boolean), { ...RECEDED, y: 18, transformOrigin: 'left center', textShadow: NO_GLOW })
-      gsap.set(weSpans.filter(Boolean), { opacity: 0, scale: 0.8, transformOrigin: 'left center' })
+      return () => mm.revert()
+    }, section)
 
-      // Frame 1: the first line starts already active — front and center,
-      // full size and brightness — while the rest wait below it.
-      if (lines[0]) gsap.set(lines[0], { ...ACTIVE, y: 0 })
-      if (weSpans[0]) gsap.set(weSpans[0], { opacity: 1, scale: 1 })
-
-      // Frames 2–3: as scroll reaches each line in turn, it rises into the
-      // active position (grows, brightens, moves up to center) while the
-      // line before it recedes past center (shrinks, dims, drifts further
-      // up) — an actual handoff in position, not a crossfade.
-      const lineActiveTimes = [0, 0.4, 0.8, 1.2]
-      for (let i = 1; i < lines.length; i++) {
-        const time = lineActiveTimes[i]
-        const incoming = lines[i]
-        const outgoing = lines[i - 1]
-
-        if (outgoing) {
-          masterTl.to(outgoing, { ...RECEDED, y: -18, duration: TRANSITION_DURATION, ease: 'power2.inOut' }, time)
-        }
-        if (incoming) {
-          masterTl.to(incoming, { ...ACTIVE, y: 0, duration: TRANSITION_DURATION, ease: 'power2.inOut' }, time)
-        }
-        if (weSpans[i]) {
-          masterTl.fromTo(
-            weSpans[i],
-            { opacity: 0, scale: 0.8 },
-            { opacity: 1, scale: 1, duration: TRANSITION_DURATION + 0.05, ease: 'back.out(1.6)' },
-            time
-          )
-        }
-      }
-
-      // Last frame: "We define legacy." has just arrived — now every line,
-      // wherever it currently sits (active, or receded above/below),
-      // travels back to the shared center position together, brightens to
-      // full opacity, and picks up the gold glow, with a springy scale-pop
-      // on the landing. All four finish this beat identically, so nothing
-      // is left dimmed or singled out.
-      const allLines = lines.filter(Boolean)
-      const allWe = weSpans.filter(Boolean)
-      masterTl.to(
-        [...allLines, ...allWe],
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          textShadow: FULL_GLOW,
-          duration: 0.55,
-          ease: 'back.out(1.5)'
-        },
-        FINAL_EMPHASIS_TIME
-      )
-    }
-
-    // Description 1 fades in - synced with animation
-    if (description) {
-      masterTl.fromTo(
-        description,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4 },
-        0.85
-      )
-    }
-
-    // Description 2 fades in - synced with animation
-    if (descSecondary) {
-      masterTl.fromTo(
-        descSecondary,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.4 },
-        1.35
-      )
-    }
-
-    return () => {
-      if (masterTl.scrollTrigger) {
-        masterTl.scrollTrigger.kill()
-      }
-      masterTl.kill()
-    }
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -196,15 +224,30 @@ export default function AboutSection() {
                 }}
               />
             ))}
+
+            {/* Manual control: subtle dot indicators (no overlay arrows). */}
+            <div className="about-image-dots" role="tablist" aria-label="Image navigation">
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`about-image-dot ${currentImageIndex === index ? 'is-active' : ''}`}
+                  onClick={() => setCurrentImageIndex(index)}
+                  aria-label={`Go to image ${index + 1}`}
+                  aria-selected={currentImageIndex === index}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Right Column */}
         <div className="about-right">
-          {/* Tagline — every sentence is on screen from the start; only each
-              line's own "We" animates, appearing on the first line
-              immediately and popping in on each line below it in turn as
-              the scroll reaches it. */}
+          {/* Tagline — all four statements are on screen together. Exactly one
+              is highlighted at a time (starting with "We reimagine luxury.");
+              as the visitor scrolls through the section the highlight hands
+              off statement by statement, driven by the scroll-scrubbed
+              timeline in the effect above. */}
           <div className="about-tagline-wrapper" ref={taglineContainerRef}>
             <div className="about-tagline-text">
               <div className="about-tagline-lines">
@@ -227,16 +270,23 @@ export default function AboutSection() {
                     {line}
                   </div>
                 ))}
+
+                {/* The single "We" that travels down the lines with the scroll
+                    (the per-line "We" spans above stay invisible until the
+                    finale, only reserving the space so the bodies never move). */}
+                <span className="tagline-we-float" ref={weFloatRef} aria-hidden="true">
+                  We
+                </span>
               </div>
             </div>
           </div>
 
           <p className="about-description" ref={descriptionRef}>
-            Manhattan emerges as Mangalore's most coveted luxury residence—a beacon of refined living and architectural excellence. Born from the visionary collaboration between Mothisham and Allergo Group, this exclusive apartment project redefines urban sophistication. Each residence is meticulously designed to capture light, space, and elegance in perfect harmony, creating sanctuaries for those who appreciate the finest nuances of contemporary living.
+            Manhattan emerges as Mangalore's most coveted luxury residence, a beacon of refined living and architectural excellence. Born from the visionary collaboration between Mothisham and Allergo Group, this exclusive apartment project redefines urban sophistication. Each residence is meticulously designed to capture light, space, and elegance in perfect harmony, creating sanctuaries for those who appreciate the finest nuances of contemporary living.
           </p>
 
           <p className="about-description-secondary" ref={descriptionSecondaryRef}>
-            Here, luxury is not merely a concept—it is an experience. From carefully curated finishes to bespoke design details, every element speaks to our unwavering commitment to excellence. Manhattan stands as a testament to what happens when visionary design meets unbridled ambition, transforming Mangalore's skyline and setting a new standard for premium residential architecture.
+            Here, luxury is not merely a concept; it is an experience. From carefully curated finishes to bespoke design details, every element speaks to our unwavering commitment to excellence. Manhattan stands as a testament to what happens when visionary design meets unbridled ambition, transforming Mangalore's skyline and setting a new standard for premium residential architecture.
           </p>
         </div>
       </div>

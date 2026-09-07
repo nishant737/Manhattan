@@ -1,14 +1,29 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import './HeroSection.css'
 import AllegroLogo from './assets/Allegro-Logo-2-cream.png'
 import MohtishamLogo from './assets/mohtisham-logo-cream.png'
 
+const MOBILE_QUERY = '(max-width: 768px)'
+
 function HeroSection() {
   const videoRef = useRef(null)
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
+  )
+
+  useEffect(() => {
+    const mql = window.matchMedia(MOBILE_QUERY)
+    const handleChange = (e) => setIsMobile(e.matches)
+    mql.addEventListener('change', handleChange)
+    return () => mql.removeEventListener('change', handleChange)
+  }, [])
 
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
+
+    video.muted = true
+    video.load()
 
     setTimeout(() => {
       video.play().catch(() => {})
@@ -23,11 +38,12 @@ function HeroSection() {
 
     video.addEventListener('timeupdate', handleTimeUpdate)
     return () => video.removeEventListener('timeupdate', handleTimeUpdate)
-  }, [])
+  }, [isMobile])
 
   return (
     <section className="hero-section">
       <video
+        key={isMobile ? 'mobile' : 'desktop'}
         ref={videoRef}
         className="hero-video"
         autoPlay
@@ -35,7 +51,10 @@ function HeroSection() {
         playsInline
         preload="auto"
       >
-        <source src="/heroseection.mp4" type="video/mp4" />
+        <source
+          src={isMobile ? '/mobile001.mp4' : '/heroseection.mp4'}
+          type="video/mp4"
+        />
       </video>
       <div className="hero-overlay" />
 

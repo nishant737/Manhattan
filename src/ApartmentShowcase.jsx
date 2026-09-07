@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import LeadCaptureModal from './LeadCaptureModal'
-import { LAYOUT_TYPES } from './apartmentLayouts'
+import { LAYOUT_TYPES, LAYOUT_CATEGORIES } from './apartmentLayouts'
 import './ApartmentShowcase.css'
 
 export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
   const [selectedTypeId, setSelectedTypeId] = useState(initialTypeId)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [viewMode, setViewMode] = useState('gallery') // 'gallery' | 'floorplan'
   const [isAnimating, setIsAnimating] = useState(false)
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
   const containerRef = useRef(null)
   const mainImageRef = useRef(null)
 
   const data = LAYOUT_TYPES.find((t) => t.id === selectedTypeId) || null
+  const gallery = data?.gallery ?? []
 
   // Slide down animation on mount
   useEffect(() => {
@@ -28,38 +30,35 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
   const handleSelectType = (id) => {
     setSelectedTypeId(id)
     setActiveImageIndex(0)
+    setViewMode('gallery')
   }
 
   const handleBackToSelection = () => {
     setSelectedTypeId(null)
     setActiveImageIndex(0)
+    setViewMode('gallery')
   }
 
-  const handleImageClick = (index) => {
-    if (index === activeImageIndex || isAnimating) return
+  // Shared cross-fade used by the thumbnail strip and the prev/next arrows.
+  const swapImage = (nextIndex) => {
+    if (nextIndex === activeImageIndex || isAnimating || viewMode !== 'gallery') return
     setIsAnimating(true)
 
     const timeline = gsap.timeline()
+    timeline.to(mainImageRef.current, { opacity: 0, duration: 0.3, ease: 'power2.inOut' }, 0)
+    timeline.add(() => setActiveImageIndex(nextIndex), 0.3)
+    timeline.to(mainImageRef.current, { opacity: 1, duration: 0.4, ease: 'power2.inOut' }, 0.35)
+    timeline.add(() => setIsAnimating(false), '-=0')
+  }
 
-    timeline.to(mainImageRef.current, {
-      opacity: 0,
-      duration: 0.3,
-      ease: 'power2.inOut'
-    }, 0)
+  const handleImageClick = (index) => swapImage(index)
+  const goToPrevImage = () =>
+    swapImage((activeImageIndex - 1 + gallery.length) % gallery.length)
+  const goToNextImage = () =>
+    swapImage((activeImageIndex + 1) % gallery.length)
 
-    timeline.add(() => {
-      setActiveImageIndex(index)
-    }, 0.3)
-
-    timeline.to(mainImageRef.current, {
-      opacity: 1,
-      duration: 0.4,
-      ease: 'power2.inOut'
-    }, 0.35)
-
-    timeline.add(() => {
-      setIsAnimating(false)
-    }, '-=0')
+  const toggleFloorPlan = () => {
+    setViewMode((prev) => (prev === 'floorplan' ? 'gallery' : 'floorplan'))
   }
 
   const handleClose = () => {
@@ -80,6 +79,10 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
     setIsLeadModalOpen(false)
   }
 
+  const showingFloorPlan = viewMode === 'floorplan' && data?.hasFloorPlan
+  const mainImageSrc = showingFloorPlan ? data.floorPlan : gallery[activeImageIndex]
+  const hasMultipleImages = gallery.length > 1
+
   return (
     <div className="apartment-showcase-backdrop" onClick={handleClose}>
       <div className="apartment-showcase" ref={containerRef} onClick={(e) => e.stopPropagation()}>
@@ -92,25 +95,39 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
         </button>
 
         {!data ? (
-          /* ── Layout selection screen ── */
+          /* ── Layout selection screen — types grouped by category ── */
           <div className="apartment-selection-screen">
             <div className="apartment-selection-header">
               <span className="apartment-brand">MANHATTAN</span>
               <h2 className="apartment-selection-title">Choose Your Layout</h2>
               <p className="apartment-selection-subtitle">Select an apartment layout to explore its images and specifications.</p>
             </div>
-            <div className="apartment-selection-grid">
-              {LAYOUT_TYPES.map((type) => (
-                <button
-                  key={type.id}
-                  className="apartment-selection-card"
-                  onClick={() => handleSelectType(type.id)}
-                >
-                  <img src={type.images[0]} alt={type.title} className="apartment-selection-image" />
-                  <span className="apartment-selection-card-label">{type.title}</span>
-                </button>
-              ))}
-            </div>
+
+            {LAYOUT_CATEGORIES.map((group) => (
+              <div className="apartment-selection-group" key={group.category}>
+                <h3 className="apartment-selection-group-title">{group.category}</h3>
+                <div className="apartment-selection-grid">
+                  {group.types.map((type) => (
+                    <button
+                      key={type.id}
+                      className={`apartment-selection-card ${type.hasFloorPlan ? 'apartment-selection-card--plan' : ''}`}
+                      onClick={() => handleSelectType(type.id)}
+                    >
+                      <img src={type.images[0]} alt={type.title} className="apartment-selection-image" />
+                      <span className="apartment-selection-card-label">
+                        <span className="apartment-selection-card-name">{type.title}</span>
+                        <span className="apartment-selection-card-open">
+                          Open Layout
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <polyline points="9 6 15 12 9 18"></polyline>
+                          </svg>
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <>
@@ -119,25 +136,64 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
               <div className="apartment-main-image-wrapper">
                 <img
                   ref={mainImageRef}
-                  src={data.images[activeImageIndex]}
-                  alt={data.title}
-                  className="apartment-main-image"
+                  src={mainImageSrc}
+                  alt={showingFloorPlan ? `${data.title} floor plan` : data.title}
+                  className={`apartment-main-image ${showingFloorPlan ? 'is-floorplan' : ''}`}
                 />
+
+                {/* Manual prev/next arrows — only for the photo gallery */}
+                {!showingFloorPlan && hasMultipleImages && (
+                  <>
+                    <button
+                      type="button"
+                      className="apartment-image-nav apartment-image-nav--prev"
+                      onClick={goToPrevImage}
+                      aria-label="Previous image"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      className="apartment-image-nav apartment-image-nav--next"
+                      onClick={goToNextImage}
+                      aria-label="Next image"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                  </>
+                )}
+
+                {/* Floor-plan toggle — only when a separate layout drawing exists */}
+                {data.hasFloorPlan && (
+                  <button
+                    type="button"
+                    className={`apartment-floorplan-toggle ${showingFloorPlan ? 'is-active' : ''}`}
+                    onClick={toggleFloorPlan}
+                  >
+                    {showingFloorPlan ? 'View Photos' : 'View Floor Plan'}
+                  </button>
+                )}
               </div>
 
-              {/* Thumbnail strip */}
-              <div className="apartment-thumbnails">
-                {data.images.map((image, index) => (
-                  <button
-                    key={index}
-                    className={`apartment-thumbnail ${index === activeImageIndex ? 'active' : ''}`}
-                    onClick={() => handleImageClick(index)}
-                    aria-label={`View image ${index + 1}`}
-                  >
-                    <img src={image} alt={`Thumbnail ${index + 1}`} />
-                  </button>
-                ))}
-              </div>
+              {/* Thumbnail strip — photos only */}
+              {!showingFloorPlan && (
+                <div className="apartment-thumbnails">
+                  {gallery.map((image, index) => (
+                    <button
+                      key={index}
+                      className={`apartment-thumbnail ${index === activeImageIndex ? 'active' : ''}`}
+                      onClick={() => handleImageClick(index)}
+                      aria-label={`View image ${index + 1}`}
+                    >
+                      <img src={image} alt={`Thumbnail ${index + 1}`} />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Right side - Info panel */}
@@ -150,7 +206,8 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
                 {/* Brand */}
                 <div className="apartment-brand">{data.brand}</div>
 
-                {/* Divider */}
+                {/* Category + Divider */}
+                <div className="apartment-category">{data.category}</div>
                 <div className="apartment-divider"></div>
 
                 {/* Title */}

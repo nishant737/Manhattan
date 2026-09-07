@@ -1,13 +1,13 @@
 .stats-section {
   background-color: #0a0a0a;
-  padding: 60px 0 80px;
+  padding: 80px 0 96px;
   box-sizing: border-box;
   width: 100%;
 }
 
 .stats-heading {
   max-width: 1200px;
-  margin: 0 auto 20px;
+  margin: 0 auto 48px;
   padding: 0 40px;
   box-sizing: border-box;
   text-align: center;
@@ -23,20 +23,84 @@
   text-transform: uppercase;
 }
 
-.stats-box {
-  position: relative;
-  width: 100%;
+/* Responsive grid — 4-up on desktop, 2-up on tablet, stacked on mobile.
+   Replaces the previous absolutely-positioned scatter layout so the number
+   of summary metrics can change (they're data-driven now) without any
+   hand-tuned offsets breaking. */
+.stats-grid {
   max-width: 1200px;
   margin: 0 auto;
-  height: 400px;
   padding: 0 40px;
   box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px 32px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(251, 238, 190, 0.18);
+}
+
+/* Fixed-height figure area so every tile's number occupies the same vertical
+   space — the labels below it stay on one aligned row no matter how long the
+   number is or whether it has a unit. */
+.stat-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: clamp(72px, 7vw, 100px);
+}
+
+.stat-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(42px, 4.4vw, 68px);
+  font-weight: 300;
+  color: rgb(251, 238, 190);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.stat-unit {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(12px, 1.2vw, 16px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: rgba(251, 238, 190, 0.6);
+  margin-top: 5px;
+}
+
+.stat-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(9px, 0.75vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.6);
+  margin: 6px 0 2px;
+}
+
+.stat-sublabel {
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(9px, 0.75vw, 12px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: rgba(251, 238, 190, 0.35);
+  margin: 0;
+  line-height: 1.6;
 }
 
 .stats-cta-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 24px;
+  margin-top: 56px;
 }
 
 .stats-cta-btn {
@@ -63,140 +127,45 @@
   transform: translateY(0);
 }
 
-/* ── 60% — upper right of center ── */
-.stat--60 {
-  position: absolute;
-  top: 4%;
-  left: 50%;
-}
-
-/* ── 30 — upper far-right ── */
-.stat--30 {
-  position: absolute;
-  top: 4%;
-  right: -100px;
-}
-
-/* ── 150k — lower left, flush to edge ── */
-.stat--150 {
-  position: absolute;
-  bottom: 18%;
-  left: -100px;
-}
-
-/* ── 24/7 — lower center-right ── */
-.stat--247 {
-  position: absolute;
-  bottom: -50px;
-  left: 50%;
-}
-
-/* ── shared ── */
-.stat {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-number {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(64px, 7vw, 110px);
-  font-weight: 300;
-  color: rgb(251, 238, 190);
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.stat-number--xl {
-  font-size: clamp(80px, 10vw, 150px);
-}
-
-.stat-suffix-small {
-  font-size: 0.35em;
-  vertical-align: super;
-  font-weight: 300;
-}
-
-.stat-sqft {
-  display: block;
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(14px, 1.6vw, 24px);
-  font-weight: 300;
-  color: rgb(251, 238, 190);
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-
-.stat-label {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(8px, 0.65vw, 11px);
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(251, 238, 190, 0.5);
-  margin: 10px 0 4px;
-}
-
-.stat-sublabel {
-  font-family: 'Montserrat', sans-serif;
-  font-size: clamp(8px, 0.65vw, 11px);
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: rgba(251, 238, 190, 0.3);
-  margin: 0;
-  line-height: 1.6;
-}
-
-@media (max-width: 900px) {
-  .stats-heading {
-    padding: 0 28px;
-  }
-
-  .stats-box {
-    height: 480px;
-    padding: 0 28px;
-  }
-
-  .stat--60  { top: 4%;     left: 48%;   }
-  .stat--30  { top: 4%;     right: 28px; }
-  .stat--150 { bottom: 20%; left: 28px;  }
-  .stat--247 { bottom: 4%;  left: 48%;   }
-}
-
-@media (max-width: 600px) {
+/* ── Responsive: Tablet ── */
+@media (max-width: 1024px) {
   .stats-section {
-    padding: 48px 0 64px;
-    background-color: #0a0a0a;
+    padding: 64px 0 80px;
   }
 
-  .stats-box {
-    position: static;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 44px;
-    padding: 44px 28px;
-    transform: none;
+  .stats-heading {
+    margin-bottom: 40px;
+    padding: 0 28px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 36px 28px;
+    padding: 0 28px;
+  }
+}
+
+/* ── Responsive: Mobile ── */
+@media (max-width: 560px) {
+  .stats-section {
+    padding: 52px 0 64px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 0 28px;
   }
 
   .stat {
-    position: static !important;
-    align-items: center;
-    text-align: center;
-    width: 100%;
-  }
-
-  .stat-sqft {
-    text-align: center;
+    padding-top: 20px;
   }
 
   .stat-number {
-    font-size: clamp(52px, 14vw, 80px);
-    text-align: center;
+    font-size: clamp(44px, 14vw, 64px);
   }
 
-  .stat-number--xl {
-    font-size: clamp(64px, 16vw, 100px);
-    text-align: center;
+  .stats-cta-wrapper {
+    margin-top: 44px;
   }
 }

@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { GOOGLE_MAPS_URL, MANHATTAN_MAPS_LABEL } from './siteContact'
 import './LocationConnectivity.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -44,7 +45,7 @@ const createManhattanMarker = (isActive) => {
 // Main Manhattan Location
 const MANHATTAN_LOCATION = {
   id: 0,
-  name: 'Manhattan - Luxury Residences',
+  name: 'Manhattan Luxury Residences',
   time: 'Your Location',
   category: 'Residential',
   description: 'Premium luxury residential development in Mangalore',
@@ -146,6 +147,10 @@ const MAP_BOUNDS = L.latLngBounds([
     .map((loc) => [loc.coordinates.lat, loc.coordinates.lng])
 ])
 
+// Google Maps "directions to" link for a point — opens the Maps app on mobile.
+const directionsUrl = (loc) =>
+  `https://www.google.com/maps/dir/?api=1&destination=${loc.coordinates.lat},${loc.coordinates.lng}`
+
 export default function LocationConnectivity() {
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 })
@@ -156,27 +161,33 @@ export default function LocationConnectivity() {
   const cardRef = useRef(null)
   const mapInstanceRef = useRef(null)
 
-  // Entrance animation: the section can only ever start entering the
-  // viewport once TailoredSolutions' pin has released (they are adjacent
-  // siblings, so this is structurally guaranteed, not just timed). Starting
-  // the reveal at "top bottom" — the exact instant it first appears — and
-  // driving it off the whole content wrapper produces a single, cohesive
-  // rise-and-settle motion instead of a delayed pop-in.
+  // Entrance animation: a self-contained ScrollTrigger keyed to this
+  // section's own position ("top bottom" → "top 40%"), so it works wherever
+  // the section sits in the page order. Driving the reveal off the whole
+  // content wrapper produces a single, cohesive rise-and-settle motion
+  // instead of a delayed pop-in.
   useEffect(() => {
     if (!sectionRef.current || !contentWrapperRef.current) return
 
     const section = sectionRef.current
 
-    gsap.set(contentWrapperRef.current, { opacity: 0, y: 90 })
-    if (leftColumnRef.current) gsap.set(leftColumnRef.current, { x: -30 })
-    if (mapRef.current) gsap.set(mapRef.current, { x: 30 })
+    // On mobile the section wraps a Leaflet map — scrubbing a transform on it
+    // every scroll frame forces the map's layer to repaint and reads as
+    // friction. There it plays once on entry instead; desktop keeps the
+    // scrubbed rise-and-settle.
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
+
+    gsap.set(contentWrapperRef.current, { opacity: 0, y: isMobile ? 40 : 90 })
+    if (leftColumnRef.current) gsap.set(leftColumnRef.current, { x: isMobile ? 0 : -30 })
+    if (mapRef.current) gsap.set(mapRef.current, { x: isMobile ? 0 : 30 })
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: 'top bottom',
+        start: isMobile ? 'top 82%' : 'top bottom',
         end: 'top 40%',
-        scrub: 1.2,
+        scrub: isMobile ? false : 1.2,
+        once: isMobile,
         markers: false
       }
     })
@@ -233,45 +244,43 @@ export default function LocationConnectivity() {
     return () => document.removeEventListener('mousedown', handleOutsideClick)
   }, [selectedLocation])
 
-  const handleLocationClick = (location, event) => {
+  const handleLocationClick = (location) => {
     setSelectedLocation(location)
 
-    // Calculate card position relative to marker on map
-    if (mapInstanceRef.current && event) {
-      const map = mapInstanceRef.current
-      const markerLatLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
+    const map = mapInstanceRef.current
+    if (!map) return
 
-      // Locations excluded from the default fitted bounds (currently just
-      // the airport) can sit outside the current view — pan it into view
-      // first (instantly) so the card doesn't get positioned off-screen.
-      if (!map.getBounds().contains(markerLatLng)) {
-        map.panTo(markerLatLng, { animate: false })
-      }
-
-      const mapContainer = map.getContainer()
-      const mapRect = mapContainer.getBoundingClientRect()
-      const mapWidth = mapRect.width
-      const mapHeight = mapRect.height
-
-      // Get marker position in pixels
-      const markerPoint = map.latLngToContainerPoint(markerLatLng)
-
-      // Card dimensions (kept in sync with the reduced .location-card CSS size)
-      const cardWidth = 240
-      const cardHeight = 220
-
-      // Calculate initial card position (centered above marker)
-      let cardX = markerPoint.x - cardWidth / 2
-      let cardY = markerPoint.y - cardHeight - 20
-
-      // Check boundaries and adjust
-      if (cardX < 10) cardX = 10 // Left boundary
-      if (cardX + cardWidth > mapWidth - 10) cardX = mapWidth - cardWidth - 10 // Right boundary
-      if (cardY < 10) cardY = markerPoint.y + 40 // If too high, position below marker instead
-
-      setCardPosition({ x: cardX, y: cardY })
-    }
+    // Recentre the map on the clicked point so its marker is always in view —
+    // the card (positioned in the layout effect below) then sits right beside
+    // it instead of off in a corner.
+    const latLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
+    map.setView(latLng, Math.max(map.getZoom(), 14), { animate: true, duration: 0.5 })
   }
+
+  // Position the card next to the (now centred) marker using its REAL measured
+  // size, and clamp it fully inside the map so nothing is ever clipped.
+  useLayoutEffect(() => {
+    const map = mapInstanceRef.current
+    const card = cardRef.current
+    if (!selectedLocation || !map || !card) return
+
+    const place = () => {
+      const size = map.getSize() // Leaflet Point: { x: width, y: height }
+      const cw = card.offsetWidth
+      const ch = card.offsetHeight
+      const M = 12
+      let x = size.x / 2 - cw / 2
+      let y = size.y / 2 - ch - 18 // above the centred marker …
+      if (y < M) y = size.y / 2 + 18 // … or below it when there's no headroom
+      x = Math.max(M, Math.min(x, size.x - cw - M))
+      y = Math.max(M, Math.min(y, size.y - ch - M))
+      setCardPosition({ x, y })
+    }
+
+    place()
+    map.once('moveend', place) // re-clamp once the recentre pan settles
+    return () => map.off('moveend', place)
+  }, [selectedLocation])
 
   return (
     <section className="location-connectivity-section" ref={sectionRef}>
@@ -279,6 +288,7 @@ export default function LocationConnectivity() {
         <div className="location-content-wrapper" ref={contentWrapperRef}>
           {/* Left Column: Text List */}
           <div className="location-left-column" ref={leftColumnRef}>
+            <span className="location-eyebrow">Location</span>
             <div className="location-title">
               <span className="title-line">In the Heart of the City &</span>
               <span className="title-line">Ideally Connected</span>
@@ -301,6 +311,20 @@ export default function LocationConnectivity() {
           {/* Right Column: Interactive Map */}
           <div className="location-right-column" ref={mapRef}>
             <div className="location-map-wrapper">
+              <a
+                className="location-maps-link"
+                href={GOOGLE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open ${MANHATTAN_MAPS_LABEL} in Google Maps`}
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                Open in Google Maps
+              </a>
+
               <MapContainer
                 ref={mapInstanceRef}
                 bounds={MAP_BOUNDS}
@@ -321,7 +345,7 @@ export default function LocationConnectivity() {
                   position={[MANHATTAN_LOCATION.coordinates.lat, MANHATTAN_LOCATION.coordinates.lng]}
                   icon={createManhattanMarker(selectedLocation?.id === MANHATTAN_LOCATION.id)}
                   eventHandlers={{
-                    click: (e) => handleLocationClick(MANHATTAN_LOCATION, e)
+                    click: () => handleLocationClick(MANHATTAN_LOCATION)
                   }}
                 />
 
@@ -332,7 +356,7 @@ export default function LocationConnectivity() {
                     position={[location.coordinates.lat, location.coordinates.lng]}
                     icon={createLuxuryMarker(selectedLocation?.id === location.id)}
                     eventHandlers={{
-                      click: (e) => handleLocationClick(location, e)
+                      click: () => handleLocationClick(location)
                     }}
                   />
                 ))}
@@ -360,7 +384,18 @@ export default function LocationConnectivity() {
                   </div>
 
                   <div className="card-content">
-                    <h3 className="card-title">{selectedLocation.name}</h3>
+                    {selectedLocation.id === MANHATTAN_LOCATION.id ? (
+                      <a
+                        className="card-title card-title-link"
+                        href={GOOGLE_MAPS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {selectedLocation.name}
+                      </a>
+                    ) : (
+                      <h3 className="card-title">{selectedLocation.name}</h3>
+                    )}
 
                     <div className="card-meta">
                       <span className="card-time">{selectedLocation.time}</span>
@@ -368,6 +403,18 @@ export default function LocationConnectivity() {
                     </div>
 
                     <p className="card-description">{selectedLocation.description}</p>
+
+                    <a
+                      className="card-directions"
+                      href={directionsUrl(selectedLocation)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                      </svg>
+                      Get Directions
+                    </a>
                   </div>
                 </div>
               )}

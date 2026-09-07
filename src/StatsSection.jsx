@@ -1,29 +1,34 @@
 import { useEffect, useRef, useState } from 'react'
+import { SUMMARY_METRICS } from './projectData'
 import './StatsSection.css'
+
+// ── Summary ("Manhattan, At a Glance") ──
+// A concise, scannable recap of the project's key figures. Every number and
+// every line of copy comes from projectData.js (SUMMARY_METRICS) — nothing is
+// hardcoded here — so the count of home types stays tied to the real layout
+// catalogue and the rest can be updated in one place. Headings/labels are
+// data too, ready for the copywriter's final wording without touching layout.
+const SUMMARY_COPY = {
+  heading: 'Manhattan, At a Glance',
+  ctaLabel: 'Download Brochure'
+}
 
 export default function StatsSection({ onCtaClick }) {
   const sectionRef = useRef(null)
-  const [counts, setCounts] = useState({ c2: 0, c30: 0, c7035: 0, c24: 0 })
+  const [progress, setProgress] = useState(0)
 
+  // Drive a scroll-linked 0 → 1 progress value; each metric's displayed number
+  // is that progress eased and scaled to its own target, so they all count up
+  // together as the section arrives, whatever the individual target sizes are.
   useEffect(() => {
-    function onScroll() {
+    const onScroll = () => {
       const section = sectionRef.current
       if (!section) return
 
       const rect = section.getBoundingClientRect()
       const vh = window.innerHeight
-
-      // progress: 0 when section top hits bottom of viewport, 1 when section bottom hits top
-      const progress = Math.min(1, Math.max(0, (-rect.top + vh * 0.6) / (rect.height + vh * 0.4)))
-
-      const eased = Math.min(1, progress * 3.5)
-
-      setCounts({
-        c2:     Math.floor(eased * 2),
-        c30:    Math.floor(eased * 30),
-        c7035:  Math.floor(eased * 7035),
-        c24:    Math.floor(eased * 24),
-      })
+      const raw = (-rect.top + vh * 0.6) / (rect.height + vh * 0.4)
+      setProgress(Math.min(1, Math.max(0, raw)))
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -31,55 +36,37 @@ export default function StatsSection({ onCtaClick }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const { c2, c30, c7035, c24 } = counts
+  const eased = Math.min(1, progress * 3.5)
 
   return (
-    <section className="stats-section" ref={sectionRef}>
+    <section className="stats-section" ref={sectionRef} id="summary">
       <div className="stats-heading">
-        <h2>Manhattan, At a Glance</h2>
+        <h2>{SUMMARY_COPY.heading}</h2>
       </div>
 
-      <div className="stats-box">
-
-        {/* 2 — upper center */}
-        <div className="stat stat--60">
-          <div className="stat-number">
-            {c2}<span className="stat-suffix-small"></span>
-          </div>
-          <p className="stat-label">Residences per floor</p>
-          <p className="stat-sublabel">Private luxury living.</p>
-
-        </div>
-
-        {/* 30 — upper right */}
-        <div className="stat stat--30">
-          <div className="stat-number">{c30}</div>
-          <p className="stat-label">exclusive residences,</p>
-          <p className="stat-sublabel">each tailored for comfort<br />&amp; elegance.</p>
-        </div>
-
-        {/* 7,035k — lower left */}
-        <div className="stat stat--150">
-          <div className="stat-number stat-number--xl">{c7035.toLocaleString()}k</div>
-          <span className="stat-sqft">sq. ft.</span>
-          <p className="stat-label">Sky Villas</p>
-          <p className="stat-sublabel">Largest duplex residences</p>
-        </div>
-
-        {/* 24/7 — lower center */}
-        <div className="stat stat--247">
-          <div className="stat-number stat-number--xl">{c24}/7</div>
-          <p className="stat-label">concierge services, meeting</p>
-          <p className="stat-sublabel">every need effortlessly.</p>
-        </div>
-
+      <div className="stats-grid">
+        {SUMMARY_METRICS.map((metric) => {
+          const current = Math.round(eased * metric.value)
+          return (
+            <div className="stat" key={metric.id}>
+              <div className="stat-figure">
+                <span className="stat-number">{metric.format(current)}</span>
+                {metric.unit && <span className="stat-unit">{metric.unit}</span>}
+              </div>
+              <p className="stat-label">{metric.label}</p>
+              <p className="stat-sublabel">{metric.sublabel}</p>
+            </div>
+          )
+        })}
       </div>
 
-      <div className="stats-cta-wrapper">
-        <button type="button" className="stats-cta-btn" onClick={onCtaClick}>
-          Download Brochure
-        </button>
-      </div>
+      {onCtaClick && (
+        <div className="stats-cta-wrapper">
+          <button type="button" className="stats-cta-btn" onClick={onCtaClick}>
+            {SUMMARY_COPY.ctaLabel}
+          </button>
+        </div>
+      )}
     </section>
   )
 }

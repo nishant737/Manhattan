@@ -1,17 +1,5 @@
 import './WhatsAppButton.css'
-
-// TODO: replace with your real WhatsApp Business number. Digits only,
-// including the country code, with NO leading "+", "00", spaces, or dashes.
-// Example: for +91 98765 43210, use '919876543210'.
-const WHATSAPP_NUMBER = '910000000000'
-
-// Pre-fills the chat's first message; the visitor can still edit it before
-// sending. Set to '' if you'd rather the chat open blank.
-const DEFAULT_MESSAGE = "Hi, I'm interested in Manhattan — Luxury Residences in Mangalore."
-
-const WHATSAPP_HREF =
-  `https://wa.me/${WHATSAPP_NUMBER}` +
-  (DEFAULT_MESSAGE ? `?text=${encodeURIComponent(DEFAULT_MESSAGE)}` : '')
+import { WHATSAPP_HREF } from './siteContact'
 
 export default function WhatsAppButton() {
   return (

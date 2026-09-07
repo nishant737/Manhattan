@@ -10,6 +10,7 @@ import AmenitiesSection from './AmenitiesSection'
 import TailoredSolutions from './TailoredSolutions'
 import LocationConnectivity from './LocationConnectivity'
 import PathToOwnership from './PathToOwnership'
+import StatsSection from './StatsSection'
 import ContactSection from './ContactSection'
 import LeadCaptureModal from './LeadCaptureModal'
 import Footer from './Footer'
@@ -17,15 +18,16 @@ import './App.css'
 
 const BROCHURE_FILE = '/Manhattan-Brochure.pdf'
 
-// Sections that "Amenities", "3D Walkthrough" and "VR Experience" scroll to —
-// none of those three had any real page destination or feature behind them
-// before (every nav item, including these, incorrectly opened the apartment
-// modal), so each is pointed at the closest matching existing section
-// instead of continuing to open an unrelated modal.
+// Nav items that resolve to an in-page scroll (via the existing
+// scrollIntoView flow) rather than opening a modal. "3D Walkthrough" and
+// "VR Experience" both lead to the AR/VR section, which holds the YouTube
+// walkthrough card and the AR/VR experience link.
 const SCROLL_TARGETS = {
   amenities: '.amenities-section',
-  '3d-walkthrough': '.luxury-showcase',
-  'vr-experience': '.hero-section'
+  '3d-walkthrough': '.arvr-section',
+  'vr-experience': '.arvr-section',
+  // "Contact Us" scrolls to the inline "Get In Touch" section (not a modal).
+  contact: '.contact-section'
 }
 
 const LEAD_MODAL_COPY = {
@@ -33,20 +35,27 @@ const LEAD_MODAL_COPY = {
     eyebrow: 'Get In Touch',
     title: 'Contact Us',
     subtitle: "Share your details and our team will reach out to help with anything you need.",
-    submitLabel: 'Send Message'
+    submitLabel: 'Send Message',
+    loadingLabel: 'Sending…',
+    successTitle: 'Message Sent',
+    successMessage: "Thank you. We've received your details and will be in touch shortly."
   },
   brochure: {
-    eyebrow: 'Manhattan — Luxury Residences',
+    eyebrow: 'Manhattan Luxury Residences',
     title: 'Download the Brochure',
-    subtitle: 'Share your email or mobile number and the brochure will download right away.',
-    submitLabel: 'Download Brochure'
+    subtitle: 'Enter your email address or mobile number to unlock the brochure. No other details needed.',
+    submitLabel: 'Unlock Brochure',
+    loadingLabel: 'Preparing your download…',
+    successTitle: 'Brochure Unlocked',
+    successMessage: 'Your download has started. If it doesn’t begin automatically, check your browser’s downloads.',
+    autoCloseMs: 2600
   }
 }
 
 function App() {
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false)
   const [layoutModalTypeId, setLayoutModalTypeId] = useState(null)
-  const [leadModalMode, setLeadModalMode] = useState(null) // 'contact' | 'brochure' | null
+  const [leadModalMode, setLeadModalMode] = useState(null) // 'brochure' | null
 
   // Opens the shared Layout modal — either to the "choose your layout" grid
   // (typeId omitted, e.g. from the navbar) or straight to one specific
@@ -63,8 +72,8 @@ function App() {
       return
     }
 
-    if (id === 'contact' || id === 'brochure') {
-      setLeadModalMode(id)
+    if (id === 'brochure') {
+      setLeadModalMode('brochure')
       return
     }
 
@@ -73,20 +82,29 @@ function App() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const handleLeadModalSubmit = (formData) => {
-    // TODO: wire this up to the real CRM/lead-capture endpoint once available.
+  const triggerBrochureDownload = () => {
+    const link = document.createElement('a')
+    link.href = BROCHURE_FILE
+    link.download = 'Manhattan-Brochure.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  // Returns a promise so LeadCaptureModal can show its loading state while the
+  // submission is in flight and a success/error state once it settles. The
+  // brochure download only fires after the "unlock" resolves successfully.
+  const handleLeadModalSubmit = async (formData) => {
+    // TODO: replace this stub with the real CRM/lead-capture API call. Throw
+    // (or reject) on failure and the modal will surface its error state.
     console.log(`Lead captured (${leadModalMode}):`, formData)
+    await new Promise((resolve) => setTimeout(resolve, 600))
 
     if (leadModalMode === 'brochure') {
-      const link = document.createElement('a')
-      link.href = BROCHURE_FILE
-      link.download = 'Manhattan-Brochure.pdf'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      triggerBrochureDownload()
     }
-
-    setLeadModalMode(null)
+    // Modal stays open on its own success screen; for the brochure it
+    // auto-closes shortly after (autoCloseMs in LEAD_MODAL_COPY.brochure).
   }
 
   return (
@@ -100,21 +118,37 @@ function App() {
           onClose={() => setIsLayoutModalOpen(false)}
         />
       )}
+      {/* Section order: Hero → Intro → Amenities/Showcase → Layouts → AR/VR →
+          Summary ("Manhattan, At a Glance") → Map ("Location") → Contact.
+          Every section is an independent sibling with its own ScrollTrigger,
+          so the order changes nothing about how each one animates. */}
       <HeroSection />
       <AboutSection />
       <LuxuryShowcase />
       <AmenitiesSection />
       <TailoredSolutions onSelectLayout={openLayoutModal} />
-      <LocationConnectivity />
       <PathToOwnership />
+      <StatsSection onCtaClick={() => handleNavClick('brochure')} />
+      <LocationConnectivity />
       <ContactSection />
-      <Footer />
+      <Footer onNavClick={handleNavClick} />
 
       <LeadCaptureModal
         isOpen={leadModalMode !== null}
         onClose={() => setLeadModalMode(null)}
         onSubmit={handleLeadModalSubmit}
         {...(leadModalMode ? LEAD_MODAL_COPY[leadModalMode] : {})}
+        secondaryAction={
+          leadModalMode === 'brochure'
+            ? {
+                label: 'Skip to View Layout',
+                onClick: () => {
+                  setLeadModalMode(null)
+                  openLayoutModal(null)
+                }
+              }
+            : null
+        }
       />
     </>
   )

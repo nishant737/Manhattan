@@ -92,7 +92,7 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  padding: 20px 0 60px;
+  padding: 12px 0 40px;
   background: #0a0a0a;
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
@@ -126,8 +126,10 @@
    buttons), instead of only ever auto-playing on a fixed loop. ── */
 .carousel-track {
   display: flex;
-  gap: 20px;
-  padding: 4px 4px 16px;
+  gap: 16px;
+  /* Trimmed from 4px 4px 16px — the extra inset read as an unnecessary gap
+     framing every image. Just enough bottom room left for the scrollbar. */
+  padding: 2px 2px 12px;
   overflow-x: auto;
   /* Deliberately no `scroll-snap-type` or `scroll-behavior: smooth` here —
      the continuous auto-slide writes `scrollLeft` directly every animation
@@ -152,16 +154,15 @@
   border-radius: 3px;
 }
 
-/* ── Carousel Item — sized so exactly two cards fill the visible track at
-   once (width is half the track's own content width, minus half the gap
-   between them), whatever that width happens to be at the current
-   breakpoint — the third card starts right at the edge, fully offscreen
-   until the visitor scrolls or the auto-slide carries it in. Height follows
-   from aspect-ratio instead of a fixed value so it scales with that fluid
-   width rather than distorting. ── */
+/* ── Carousel Item — larger now for more presence: a bit over one and a half
+   cards fill the visible track (width ≈ 56% of the track's content width,
+   minus half the 16px gap), so the current image dominates while the next
+   one still peeks in as a scroll affordance. Height follows from
+   aspect-ratio, never a fixed value, so the image scales with the fluid
+   width instead of distorting. ── */
 .carousel-item {
   flex: 0 0 auto;
-  width: calc(50% - 10px);
+  width: calc(56% - 8px);
   aspect-ratio: 640 / 460;
 }
 
@@ -196,6 +197,32 @@
 
 .carousel-nav-next {
   right: 4px;
+}
+
+/* ── Mobile-only centred prev/next control below the carousel ── */
+.carousel-mobile-nav {
+  display: none;
+}
+
+.carousel-mobile-nav-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.75);
+  border: 1.5px solid rgba(251, 238, 190, 0.4);
+  color: rgb(251, 238, 190);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+}
+
+.carousel-mobile-nav-btn:active {
+  transform: scale(0.92);
+  background: rgba(10, 10, 10, 0.95);
+  border-color: rgb(251, 238, 190);
 }
 
 .amenity-card {
@@ -237,33 +264,6 @@
   transform: scale(1.05);
 }
 
-/* Placeholder for amenities without final photography yet (e.g. Squash
-   Court) — sits wherever a real photo would via the shared .amenity-image /
-   .grid-image sizing rules above, just rendered as a marked "coming soon"
-   panel instead of an <img>. */
-.amenity-media-placeholder {
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: linear-gradient(145deg, #161616, #0a0a0a);
-  border: 1px dashed rgba(251, 238, 190, 0.25);
-  color: rgba(251, 238, 190, 0.45);
-}
-
-.amenity-media-placeholder svg {
-  opacity: 0.8;
-}
-
-.amenity-media-placeholder span {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
 /* ── Amenity Label ── */
 .amenity-label {
   position: absolute;
@@ -295,7 +295,8 @@
   transform: translateY(0);
 }
 
-.amenity-card:hover .amenity-label h3 {
+.amenity-card:hover .amenity-label h3,
+.carousel-item.is-open .amenity-label h3 {
   opacity: 0;
   transform: translateY(-20px);
   pointer-events: none;
@@ -330,14 +331,15 @@
   z-index: 11;
 }
 
-.amenity-card:hover .amenity-description {
+.amenity-card:hover .amenity-description,
+.carousel-item.is-open .amenity-description {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* ── Grid View Section ── */
 .grid-view-section {
-  padding: 60px 0;
+  padding: 24px 0 8px;
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
@@ -353,36 +355,22 @@
   visibility: visible;
 }
 
-/* ── Grid Layout - 4 top / 3 bottom (7 items total) ── */
-.amenities-grid-top {
-  max-width: 1400px;
+/* ── Grid Layout ──
+   Single column: one large LANDSCAPE image per row, one image at a time as
+   the visitor scrolls the list. object-fit: cover keeps each render's real
+   aspect ratio — never stretched. */
+.amenities-grid {
+  max-width: 1040px;
   margin: 0 auto;
   padding: 0 60px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-}
-
-.amenities-grid-bottom {
-  max-width: 1400px;
-  margin: 24px auto 0;
-  padding: 0 60px;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: 1fr;
+  gap: 30px;
 }
 
 .grid-item {
-  /* Was 4/3 (landscape) - this toggle is explicitly labelled "portrait grid
-     view" (see the toggle button's title/icon in LuxuryShowcase.jsx), so a
-     wide/short ratio here was fighting the view's own stated intent and
-     made every tile read as cramped. 3/4 gives real portrait tiles, tall
-     enough for the image to actually read at a glance instead of being
-     squeezed into a strip - grid-template-columns is untouched, so this
-     only changes each tile's height, not the column layout. */
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 9;
 }
 
 .grid-card {
@@ -529,7 +517,7 @@
   }
 
   .carousel-item {
-    width: calc(50% - 10px);
+    width: calc(62% - 8px);
     aspect-ratio: 520 / 380;
   }
 
@@ -538,15 +526,10 @@
     height: 42px;
   }
 
-  .amenities-grid-top,
-  .amenities-grid-bottom {
+  .amenities-grid {
     padding: 0 48px;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .amenities-grid-bottom {
-    margin-top: 20px;
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   .grid-label h3 {
@@ -557,12 +540,12 @@
 /* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
   .luxury-showcase {
-    padding: 40px 0 80px;
+    padding: 20px 0 64px;
   }
 
   .showcase-header {
     padding: 0 32px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
 
   .showcase-main-title {
@@ -585,57 +568,57 @@
   }
 
   .carousel-section {
-    padding: 40px 0;
+    padding: 16px 0 32px;
   }
 
   .carousel-wrapper {
-    padding: 0 16px;
+    padding: 0 10px;
   }
 
+  .carousel-track {
+    gap: 14px;
+    transform: translateZ(0);
+  }
+
+  /* One big card with a small peek of the neighbours on each side. No CSS
+     scroll-snap here — it fights the continuous auto-slide (see the note on
+     .carousel-track above); the arrow buttons re-centre a card in JS. */
   .carousel-item {
-    width: calc(50% - 10px);
-    aspect-ratio: 340 / 260;
+    width: 90%;
+    aspect-ratio: 5 / 4;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
+  /* Side arrows off on mobile — replaced by the centred control below. */
   .carousel-nav-btn {
-    width: 38px;
-    height: 38px;
+    display: none;
   }
 
-  .carousel-nav-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .carousel-nav-prev {
-    left: 4px;
-  }
-
-  .carousel-nav-next {
-    right: 4px;
+  .carousel-mobile-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
   }
 
   .amenity-label h3 {
-    font-size: 17px;
+    font-size: 19px;
   }
 
   .amenity-description {
     font-size: 13px;
   }
 
-  .amenities-grid-top,
-  .amenities-grid-bottom {
+  .amenities-grid {
     padding: 0 32px;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .amenities-grid-bottom {
-    margin-top: 16px;
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 
   .grid-item {
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 16 / 10;
   }
 
   .grid-label h3 {
@@ -646,12 +629,12 @@
 /* ── Responsive: Small Mobile ── */
 @media (max-width: 480px) {
   .luxury-showcase {
-    padding: 40px 0 60px;
+    padding: 16px 0 48px;
   }
 
   .showcase-header {
     padding: 0 20px;
-    margin-bottom: 40px;
+    margin-bottom: 18px;
   }
 
   .showcase-main-title {
@@ -675,44 +658,49 @@
   }
 
   .carousel-section {
-    padding: 30px 0;
+    padding: 12px 0 28px;
   }
 
   .carousel-wrapper {
-    padding: 0 12px;
+    padding: 0 8px;
   }
 
   .carousel-item {
-    width: calc(50% - 10px);
-    aspect-ratio: 260 / 200;
+    width: 92%;
+    aspect-ratio: 5 / 4;
   }
 
   .carousel-nav-btn {
     display: none;
   }
 
+  .carousel-mobile-nav {
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .carousel-mobile-nav-btn {
+    width: 42px;
+    height: 42px;
+  }
+
   .amenity-label h3 {
-    font-size: 15px;
+    font-size: 18px;
     letter-spacing: 0.06em;
   }
 
   .amenity-description {
-    font-size: 12px;
+    font-size: 12.5px;
   }
 
-  .amenities-grid-top,
-  .amenities-grid-bottom {
+  .amenities-grid {
     padding: 0 20px;
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .amenities-grid-bottom {
-    margin-top: 12px;
-  }
-
   .grid-item {
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 16 / 10;
   }
 
   .grid-label h3 {

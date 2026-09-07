@@ -53,6 +53,93 @@
   max-width: 380px;
 }
 
+/* ── Contact details (email / phone / address) ── */
+.contact-details {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.contact-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-detail-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.55);
+}
+
+.contact-detail-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14.5px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a.contact-detail-value:hover {
+  color: rgb(251, 238, 190);
+}
+
+.contact-detail-address {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Connect With Us (social icons) ── */
+.contact-social {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(251, 238, 190, 0.15);
+}
+
+.contact-social-subheading {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(251, 238, 190);
+  margin: 0 0 16px;
+}
+
+.contact-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.contact-social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(251, 238, 190, 0.4);
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.contact-social-icons a:hover {
+  background: rgb(251, 238, 190);
+  border-color: rgb(251, 238, 190);
+  color: #0a0a0a;
+  transform: translateY(-2px);
+}
+
 /* ── Right: Form Card ── */
 .contact-form-card {
   background-color: rgba(255, 255, 255, 0.03);
@@ -251,8 +338,40 @@
     gap: 36px;
   }
 
+  .contact-intro {
+    text-align: center;
+  }
+
   .contact-title {
     font-size: 30px;
+  }
+
+  .contact-subtitle {
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contact-details {
+    align-items: center;
+  }
+
+  .contact-detail {
+    align-items: center;
+  }
+
+  .contact-detail-address {
+    align-items: center;
+  }
+
+  .contact-social {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-social-icons {
+    justify-content: center;
   }
 
   .contact-form-card {

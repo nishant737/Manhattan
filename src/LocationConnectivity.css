@@ -1,13 +1,17 @@
 .location-connectivity-section {
   background-color: #0a0a0a;
-  padding: 0 0 120px 0;
+  /* Own top padding now that the section can sit directly after Contact
+     rather than immediately after a section with its own bottom spacing. */
+  padding: 100px 0 120px 0;
   position: relative;
 }
 
 .location-container {
-  max-width: 1400px;
+  /* Match the Summary / Contact sections above and below so the left edge
+     lines up down the page. */
+  max-width: 1200px;
   margin: 0 auto;
- padding: 0 100px 0 60px; 
+  padding: 0 60px;
 }
 
 .location-content-wrapper {
@@ -25,6 +29,17 @@
   gap: 20px;
   flex: 0 0 40%;
   will-change: opacity, transform;
+}
+
+/* Eyebrow — matches the AR/VR and Contact section intros so the redesigned
+   sections share one hierarchy. */
+.location-eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(251, 238, 190, 0.6);
 }
 
 .location-title {
@@ -117,6 +132,51 @@
   aspect-ratio: 4 / 3;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: #0a0a0a;
+}
+
+/* Always-visible "Open in Google Maps" pill, top-right of the map. Sits above
+   the Leaflet panes; styled to match the redesigned page's gold-on-dark CTAs. */
+.location-maps-link {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  /* Above the map tiles/panes, below the pop-up location card (z-index 20)
+     so an opened card is never obscured by the pill. */
+  z-index: 15;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  border-radius: 50px;
+  background: rgba(10, 10, 10, 0.82);
+  border: 1px solid rgba(251, 238, 190, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.location-maps-link:hover {
+  background: rgba(10, 10, 10, 0.95);
+  border-color: rgb(251, 238, 190);
+  transform: translateY(-1px);
+}
+
+.card-title-link {
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.card-title-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .leaflet-map-container {
@@ -269,6 +329,11 @@
   padding: 14px;
   max-width: 240px;
   width: 240px;
+  /* Safety net: never taller than the map, and scroll internally if it is,
+     so the card content (incl. "Get Directions") is never clipped. */
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   backdrop-filter: blur(10px);
   z-index: 20;
   will-change: transform, opacity;
@@ -366,6 +431,31 @@
   margin: 0;
 }
 
+.card-directions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 7px 14px;
+  border: 1px solid rgba(251, 238, 190, 0.4);
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.card-directions:hover {
+  background: rgb(251, 238, 190);
+  border-color: rgb(251, 238, 190);
+  color: #0a0a0a;
+}
+
 
 /* ── Responsive: Tablet ── */
 @media (max-width: 1024px) {
@@ -422,6 +512,7 @@
   .location-left-column {
     flex: 1 1 auto;
     width: 100%;
+    align-items: center;
   }
 
   .location-right-column {
@@ -432,6 +523,15 @@
   .location-title {
     font-size: 32px;
     margin-bottom: 30px;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    text-align: center;
+  }
+
+  .title-line {
+    text-align: center;
+    white-space: normal;
   }
 
   .location-list {
@@ -513,6 +613,14 @@
 
   .location-container {
     padding: 0 16px;
+  }
+
+  .location-maps-link {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
   }
 
   .location-content-wrapper {

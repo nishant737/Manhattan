@@ -1,33 +1,34 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
+import Observer from 'gsap/Observer'
 import './AmenitiesSection.css'
 import IconicArchitectureImg from './assets/more.jpeg'
 import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
 import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, Observer)
 
 const AMENITIES = [
   {
     id: 2,
     index: '01',
     title: 'Iconic Architecture',
-    description: 'A striking silhouette that redefines Mangalore’s skyline — sculpted balconies and a facade designed to be as unforgettable by night as it is by day.',
+    description: 'A striking silhouette that redefines Mangalore’s skyline, with sculpted balconies and a facade designed to be as unforgettable by night as it is by day.',
     backgroundImage: IconicArchitectureImg,
-    // This shot is portrait (a full tower elevation), unlike the other two
-    // panels' landscape photography — forcing it into the shared 16:10
-    // landscape box crops most of the building away. See the
-    // `--portrait` modifier in AmenitiesSection.css for the per-breakpoint
-    // sizing that replaces it.
+    // This render is portrait (1280×1600). Its box is set to the exact 4:5
+    // ratio so object-fit: cover shows the whole tower with no cropping, and
+    // it's kept narrow so it never crowds the heading on the left.
     imageBoxClassName: 'amenity-image-background--portrait'
   },
   {
     id: 3,
     index: '02',
     title: 'Spacious Living',
-    description: 'Soaring double-height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing — designed for those who live without compromise on space.',
+    description: 'Soaring double-height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing, designed for those who live without compromise on space.',
     backgroundImage: SpaciousLivingImg
+    // Uses the default landscape box — same size and position as the
+    // "Elevated Experience" panel.
   },
   {
     id: 1,
@@ -52,6 +53,8 @@ export default function AmenitiesSection() {
   // replays or fights with the pinned crossfade storytelling timeline.
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current || !imagesContainerRef.current) return
+    // Desktop only — mobile runs its own pinned stacked-crossfade below.
+    if (window.matchMedia('(max-width: 768px)').matches) return
 
     const section = sectionRef.current
 
@@ -263,6 +266,184 @@ export default function AmenitiesSection() {
             tl.scrollTrigger.kill()
           }
           tl.kill()
+        }
+      })
+
+      // ── Mobile: gesture-stepped 3-card stack ──
+      //    The wrapper is CSS-sticky so it's visually fixed the moment the
+      //    section reaches the top; while "locked" an Observer swallows every
+      //    wheel/touch gesture (preventDefault) and a scroll listener snaps any
+      //    slippage back — zero page movement. ONE swipe = exactly ONE card,
+      //    whatever the flick speed. The three images are always stacked one
+      //    behind the other (front fully opaque, two dimmer/smaller peeking
+      //    above). At the first / last card a swipe past the end does nothing
+      //    the first time (dwell — time to read it); a SECOND swipe releases
+      //    the section to the previous / next one.
+      mm.add('(max-width: 768px)', () => {
+        const section = sectionRef.current
+        const imageSets = imagesRef.current.filter(Boolean)
+        const textItems = itemsRef.current.filter(Boolean)
+        const num = imageSets.length
+        if (num < 2) return
+
+        ScrollTrigger.config({ ignoreMobileResize: true })
+
+        const mod = (n, m) => ((n % m) + m) % m
+        // depth 0 = front (ALWAYS opaque, covers the rest); deeper = smaller,
+        // lifted, tilted, dimmer: clear → less → even less.
+        const DEPTH = [
+          { opacity: 1, scale: 1, y: 0, rotationX: 0 },
+          { opacity: 0.5, scale: 0.9, y: -26, rotationX: 4 },
+          { opacity: 0.24, scale: 0.8, y: -48, rotationX: 8 }
+        ]
+        const ZI = [3, 2, 1]
+        const dLast = DEPTH.length - 1
+        const dState = (d) => DEPTH[Math.min(d, dLast)]
+        const dZ = (d) => ZI[Math.min(d, dLast)]
+
+        let index = 0
+        let animating = false
+        let locked = false
+        let lockedY = 0
+        let edgePush = 0 // consecutive "push past the end card" gestures
+
+        const place = (front) => {
+          imageSets.forEach((el, i) => {
+            const d = mod(i - front, num)
+            gsap.set(el, { ...dState(d), zIndex: dZ(d), transformOrigin: '50% 0%' })
+          })
+          textItems.forEach((el, i) => {
+            gsap.set(el, { opacity: i === front ? 1 : 0, y: i === front ? 0 : 18 })
+          })
+        }
+        place(0)
+
+        // One fixed-duration eased step (dir +1 next, -1 prev). false at the end.
+        // Works identically both ways: the card COMING to the front rides on
+        // top (zIndex 4) for the whole move so it's always visible travelling
+        // in; the card LEAVING the front sits just under it (zIndex 3) and
+        // recedes; everyone else stays at the back. zIndex settles to its
+        // resting value at the end for the next step.
+        const step = (dir) => {
+          const next = index + dir
+          if (animating || next < 0 || next >= num) return false
+          animating = true
+          const prev = index
+          index = next
+
+          const tl = gsap.timeline({
+            defaults: { ease: 'power2.inOut' },
+            onComplete: () => { animating = false }
+          })
+          imageSets.forEach((el, i) => {
+            const dFrom = mod(i - prev, num)
+            const dTo = mod(i - next, num)
+            if (dFrom === dTo) return
+            const to = dState(dTo)
+            const incoming = dTo === 0
+            const leaving = dFrom === 0
+
+            gsap.set(el, { zIndex: incoming ? 4 : leaving ? 3 : 1 })
+
+            tl.to(el, {
+              scale: to.scale, y: to.y, rotationX: to.rotationX, duration: 0.62
+            }, 0)
+
+            if (incoming) {
+              tl.to(el, { opacity: 1, duration: 0.32 }, 0)          // brighten in fast, stays on top
+            } else if (leaving) {
+              tl.to(el, { opacity: to.opacity, duration: 0.32 }, 0.3) // hold opaque, then dim as it clears
+            } else {
+              tl.to(el, { opacity: to.opacity, duration: 0.62 }, 0)
+            }
+
+            tl.set(el, { zIndex: dZ(dTo) }, 0.62)
+          })
+
+          tl.to(textItems[prev], { opacity: 0, y: dir > 0 ? -16 : 16, duration: 0.28, ease: 'power1.in' }, 0)
+            .fromTo(
+              textItems[next],
+              { opacity: 0, y: dir > 0 ? 16 : -16 },
+              { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+              0.22
+            )
+          return true
+        }
+
+        const hold = () => {
+          if (locked && Math.abs(window.pageYOffset - lockedY) > 1) {
+            window.scrollTo(0, lockedY)
+          }
+        }
+
+        const lock = (fromDir) => {
+          if (locked) return
+          locked = true
+          lockedY = Math.round(window.pageYOffset + section.getBoundingClientRect().top)
+          window.scrollTo(0, lockedY)
+          index = fromDir > 0 ? 0 : num - 1
+          animating = false
+          edgePush = 0
+          place(index)
+          window.addEventListener('scroll', hold, { passive: true })
+          observer.enable()
+        }
+
+        const release = (dir) => {
+          if (!locked) return
+          locked = false
+          edgePush = 0
+          window.removeEventListener('scroll', hold)
+          observer.disable()
+          const maxPast = section.offsetHeight - window.innerHeight
+          window.scrollTo(0, dir > 0 ? lockedY + maxPast + 4 : Math.max(0, lockedY - 4))
+        }
+
+        // At an end card: 1st push past the edge is absorbed (dwell), 2nd frees it.
+        const tryEdge = (dir) => {
+          edgePush += 1
+          if (edgePush >= 2) release(dir)
+        }
+
+        const observer = Observer.create({
+          target: window,
+          type: 'wheel,touch',
+          wheelSpeed: -1,
+          tolerance: 12,
+          dragMinimum: 6,
+          preventDefault: true,
+          onUp: () => { // swipe up = forward / next
+            if (animating) return
+            if (step(1)) edgePush = 0
+            else tryEdge(1)
+          },
+          onDown: () => { // swipe down = back / prev
+            if (animating) return
+            if (step(-1)) edgePush = 0
+            else tryEdge(-1)
+          }
+        })
+        observer.disable()
+
+        const gate = ScrollTrigger.create({
+          trigger: section,
+          start: 'top top',
+          end: 'bottom bottom',
+          onEnter: () => lock(1),
+          onEnterBack: () => lock(-1),
+          onLeave: () => release(1),
+          onLeaveBack: () => release(-1)
+        })
+
+        requestAnimationFrame(() => ScrollTrigger.refresh())
+
+        return () => {
+          observer.kill()
+          gate.kill()
+          window.removeEventListener('scroll', hold)
+          gsap.set([...imageSets, ...textItems], {
+            clearProps: 'opacity,transform,zIndex'
+          })
         }
       })
 

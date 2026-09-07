@@ -1,21 +1,37 @@
 import LowerDuplexLayout from './assets/lower-duplex-layout.jpeg'
 import UpperDuplexLayout from './assets/upper-duplex-layout.jpeg'
 
+// ── Room / floor-plan data structure ──
 // Shared across the Layout selection modal (ApartmentShowcase) and the
-// "Luxury Residences Designed For You" accordion (TailoredSolutions) so
-// both surfaces always offer the exact same apartment types.
+// "Luxury Residences Designed For You" accordion (TailoredSolutions) so both
+// surfaces always offer the exact same unit types.
+//
+// Each type separates two kinds of imagery:
+//   • floorPlan — the architectural layout drawing (or null if none yet).
+//     REPLACE the placeholders below with the final plan images when provided;
+//     3 BHK / 4 BHK currently have no plan asset, so they're left as null and
+//     the UI simply hides the "View Floor Plan" control for them.
+//   • gallery   — normal property/lifestyle photos, navigable with arrows.
+//
+// `images` (floorPlan first, then gallery) is kept as a flat list so existing
+// consumers that only need "some representative image" keep working.
+const withImages = (type) => ({
+  ...type,
+  hasFloorPlan: Boolean(type.floorPlan),
+  images: [type.floorPlan, ...type.gallery].filter(Boolean)
+})
+
 export const LAYOUT_TYPES = [
   {
     id: '3bhk',
     brand: 'MANHATTAN',
+    category: 'Residences',
     title: '3 BHK',
-    description: 'Elegant urban residences designed for contemporary living. Featuring premium finishes, open floor plans, and stunning city views.',
+    description:
+      'Elegant urban residences designed for contemporary living. Featuring premium finishes, open floor plans, and stunning city views.',
     cta: 'BOOK A VISIT',
-    images: [
-      '/INDOOR GAME.jpg',
-      '/SKY LOUNGE CAFE.jpg',
-      '/STREET VIEW_ 02.jpg'
-    ],
+    floorPlan: null, // TODO: add the provided 3 BHK floor-plan image
+    gallery: ['/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg'],
     specs: [
       { label: 'Bedroom', value: '3' },
       { label: 'Size', value: '2,915 sq. ft. (Odd Floor) / 2,970 sq. ft. (Even Floor)' },
@@ -26,14 +42,13 @@ export const LAYOUT_TYPES = [
   {
     id: '4bhk',
     brand: 'MANHATTAN',
+    category: 'Residences',
     title: '4 BHK',
-    description: 'Serene sanctuaries with premium amenities and exclusive layouts. Perfect for those seeking tranquility and luxury.',
+    description:
+      'Serene sanctuaries with premium amenities and exclusive layouts. Perfect for those seeking tranquility and luxury.',
     cta: 'BOOK A VISIT',
-    images: [
-      '/SKY LOUNGE CAFE.jpg',
-      '/STREET VIEW_ 02.jpg',
-      '/INDOOR GAME.jpg'
-    ],
+    floorPlan: null, // TODO: add the provided 4 BHK floor-plan image
+    gallery: ['/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg'],
     specs: [
       { label: 'Bedroom', value: '4' },
       { label: 'Size', value: '3,915 sq. ft. (Even Floor) / 4,015 sq. ft. (Odd Floor)' },
@@ -44,15 +59,13 @@ export const LAYOUT_TYPES = [
   {
     id: '4bhk-duplex-sky',
     brand: 'MANHATTAN',
+    category: 'Sky Villas',
     title: '4 BHK Duplex Sky Villa',
-    description: 'Spacious two-level sky residences with private outdoor spaces. An exceptional living experience with premium amenities.',
+    description:
+      'Spacious two-level sky residences with private outdoor spaces. An exceptional living experience with premium amenities.',
     cta: 'BOOK A VISIT',
-    images: [
-      LowerDuplexLayout,
-      '/STREET VIEW_ 02.jpg',
-      '/INDOOR GAME.jpg',
-      '/SKY LOUNGE CAFE.jpg'
-    ],
+    floorPlan: LowerDuplexLayout, // TODO: swap for the final drawing when provided
+    gallery: ['/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg'],
     specs: [
       { label: 'Bedroom', value: '4' },
       { label: 'Size', value: '5,170 sq. ft.' },
@@ -64,15 +77,13 @@ export const LAYOUT_TYPES = [
   {
     id: '5bhk-duplex-sky',
     brand: 'MANHATTAN',
+    category: 'Sky Villas',
     title: '5 BHK Duplex Sky Villa',
-    description: 'Premium sky penthouses with panoramic views and luxury finishes. The pinnacle of luxury living in Manhattan.',
+    description:
+      'Premium sky penthouses with panoramic views and luxury finishes. The pinnacle of luxury living in Manhattan.',
     cta: 'BOOK A VISIT',
-    images: [
-      UpperDuplexLayout,
-      '/INDOOR GAME.jpg',
-      '/STREET VIEW_ 02.jpg',
-      '/SKY LOUNGE CAFE.jpg'
-    ],
+    floorPlan: UpperDuplexLayout, // TODO: swap for the final drawing when provided
+    gallery: ['/INDOOR GAME.jpg', '/STREET VIEW_ 02.jpg', '/SKY LOUNGE CAFE.jpg'],
     specs: [
       { label: 'Bedroom', value: '5' },
       { label: 'Size', value: '6,915 sq. ft.' },
@@ -81,4 +92,14 @@ export const LAYOUT_TYPES = [
       { label: 'Type', value: 'Elite Sky Residence' }
     ]
   }
-]
+].map(withImages)
+
+// Unit types grouped by category, in display order — used by both surfaces to
+// render the types under clear headings ("Residences", "Sky Villas") instead
+// of one flat list.
+export const LAYOUT_CATEGORIES = LAYOUT_TYPES.reduce((acc, type) => {
+  const bucket = acc.find((c) => c.category === type.category)
+  if (bucket) bucket.types.push(type)
+  else acc.push({ category: type.category, types: [type] })
+  return acc
+}, [])
