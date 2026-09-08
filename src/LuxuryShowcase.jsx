@@ -6,6 +6,7 @@ import LuxuryAmenitiesImg from './assets/communityhall.jpg'
 import IndoorPoolImg from './assets/Indoor Pool.jpeg'
 import CinemaLoungeImg from './assets/cinema.jpeg'
 import SpaImg from './assets/Spa.jpeg'
+import SquashCourtImg from './assets/Squash_clean.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
 import SkyLoungeImg from './assets/finalloauge.jpg'
 // Lobby gets its own interior image, deliberately NOT one of the ENTRANCE
@@ -60,6 +61,12 @@ const AMENITIES = [
     title: 'Sky Lounge',
     image: SkyLoungeImg,
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
+  },
+  {
+    id: 8,
+    title: 'Squash Court',
+    image: SquashCourtImg,
+    description: 'A dedicated indoor squash court with professional-grade flooring and lighting for residents.'
   },
   {
     id: 9,

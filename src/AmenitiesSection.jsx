@@ -3,7 +3,7 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import Observer from 'gsap/Observer'
 import './AmenitiesSection.css'
-import IconicArchitectureImg from './assets/more.jpeg'
+import IconicArchitectureImg from './assets/potrait .jpeg'
 import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
 import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 

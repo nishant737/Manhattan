@@ -4,7 +4,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { GOOGLE_MAPS_URL, MANHATTAN_MAPS_LABEL } from './siteContact'
+import { GOOGLE_MAPS_URL } from './siteContact'
 import './LocationConnectivity.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -147,9 +147,18 @@ const MAP_BOUNDS = L.latLngBounds([
     .map((loc) => [loc.coordinates.lat, loc.coordinates.lng])
 ])
 
-// Google Maps "directions to" link for a point — opens the Maps app on mobile.
-const directionsUrl = (loc) =>
-  `https://www.google.com/maps/dir/?api=1&destination=${loc.coordinates.lat},${loc.coordinates.lng}`
+// Google Maps directions FROM Manhattan TO the given landmark (opens the Maps
+// app on mobile).
+const directionsUrl = (loc) => {
+  const o = MANHATTAN_LOCATION.coordinates
+  const d = loc.coordinates
+  return `https://www.google.com/maps/dir/?api=1&origin=${o.lat},${o.lng}&destination=${d.lat},${d.lng}&travelmode=driving`
+}
+
+// Fraction of the map size the selected marker is offset from centre, so the
+// info card fits beside it. Used by both the recentre and the card placement.
+const MARKER_OFFSET_X = 0.16
+const MARKER_OFFSET_Y = -0.02
 
 export default function LocationConnectivity() {
   const [selectedLocation, setSelectedLocation] = useState(null)
@@ -250,35 +259,42 @@ export default function LocationConnectivity() {
     const map = mapInstanceRef.current
     if (!map) return
 
-    // Recentre the map on the clicked point so its marker is always in view —
-    // the card (positioned in the layout effect below) then sits right beside
-    // it instead of off in a corner.
+    // Recentre so the marker lands a little RIGHT of centre — the info card
+    // then sits just to its LEFT (see the layout effect), close by but never
+    // on top of it.
     const latLng = L.latLng(location.coordinates.lat, location.coordinates.lng)
-    map.setView(latLng, Math.max(map.getZoom(), 14), { animate: true, duration: 0.5 })
+    const zoom = Math.max(map.getZoom(), 14)
+    const size = map.getSize()
+    const markerPt = map.project(latLng, zoom)
+    const centerPt = markerPt.subtract([size.x * MARKER_OFFSET_X, size.y * MARKER_OFFSET_Y])
+    map.setView(map.unproject(centerPt, zoom), zoom, { animate: true, duration: 0.5 })
   }
 
-  // Position the card next to the (now centred) marker using its REAL measured
-  // size, and clamp it fully inside the map so nothing is ever clipped.
+  // Place the info card just to the LEFT of the (recentred) marker, level with
+  // it, using its real measured size and clamped fully inside the map — near
+  // the point, never covering it.
   useLayoutEffect(() => {
     const map = mapInstanceRef.current
     const card = cardRef.current
     if (!selectedLocation || !map || !card) return
 
     const place = () => {
-      const size = map.getSize() // Leaflet Point: { x: width, y: height }
+      const size = map.getSize()
+      const M = 14
       const cw = card.offsetWidth
       const ch = card.offsetHeight
-      const M = 12
-      let x = size.x / 2 - cw / 2
-      let y = size.y / 2 - ch - 18 // above the centred marker …
-      if (y < M) y = size.y / 2 + 18 // … or below it when there's no headroom
+      // Where the marker ends up after the offset recentre.
+      const mx = size.x / 2 + size.x * MARKER_OFFSET_X
+      const my = size.y / 2 + size.y * MARKER_OFFSET_Y
+      let x = mx - cw - 22 // card sits to the marker's left with a gap
+      let y = my - ch * 0.42
       x = Math.max(M, Math.min(x, size.x - cw - M))
       y = Math.max(M, Math.min(y, size.y - ch - M))
       setCardPosition({ x, y })
     }
 
     place()
-    map.once('moveend', place) // re-clamp once the recentre pan settles
+    map.once('moveend', place)
     return () => map.off('moveend', place)
   }, [selectedLocation])
 
@@ -311,33 +327,29 @@ export default function LocationConnectivity() {
           {/* Right Column: Interactive Map */}
           <div className="location-right-column" ref={mapRef}>
             <div className="location-map-wrapper">
-              <a
-                className="location-maps-link"
-                href={GOOGLE_MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`Open ${MANHATTAN_MAPS_LABEL} in Google Maps`}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                  <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                Open in Google Maps
-              </a>
-
               <MapContainer
                 ref={mapInstanceRef}
                 bounds={MAP_BOUNDS}
                 boundsOptions={{ padding: [24, 24], maxZoom: 16 }}
+                maxZoom={16}
+                minZoom={10}
                 scrollWheelZoom={false}
                 className="leaflet-map-container"
               >
+                {/* Esri "World Dark Gray" — a genuine dark basemap that needs
+                    no API key and carries no "API KEY REQUIRED" watermark.
+                    Base + Reference (labels) as two layers. */}
                 <TileLayer
-                  attribution={false}
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
-                  maxZoom={19}
+                  attribution=""
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                  maxZoom={16}
                   minZoom={1}
-                  crossOrigin="anonymous"
+                />
+                <TileLayer
+                  attribution=""
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                  maxZoom={16}
+                  minZoom={1}
                 />
 
                 {/* Main Manhattan Location Marker (checkpoint) */}
@@ -404,17 +416,19 @@ export default function LocationConnectivity() {
 
                     <p className="card-description">{selectedLocation.description}</p>
 
-                    <a
-                      className="card-directions"
-                      href={directionsUrl(selectedLocation)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <polygon points="3 11 22 2 13 21 11 13 3 11" />
-                      </svg>
-                      Get Directions
-                    </a>
+                    {selectedLocation.id !== MANHATTAN_LOCATION.id && (
+                      <a
+                        className="card-directions"
+                        href={directionsUrl(selectedLocation)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                          <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                        </svg>
+                        Get Directions
+                      </a>
+                    )}
                   </div>
                 </div>
               )}

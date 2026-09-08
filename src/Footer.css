@@ -6,13 +6,16 @@
 }
 
 .site-footer-inner {
-  max-width: 1120px;
+  /* Match the Contact section above so the left edge lines up down the page. */
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 60px 60px 44px;
+  padding: 52px 60px 40px;
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1.2fr;
-  column-gap: 72px;
+  /* Brand takes the slack on the left; the two link columns sit tight
+     together on the right instead of drifting apart. */
+  grid-template-columns: 1fr auto auto;
+  column-gap: 56px;
   row-gap: 40px;
   align-items: start;
 }
