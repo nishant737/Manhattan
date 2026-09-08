@@ -206,26 +206,78 @@
   }
 }
 
-/* ── Responsive: Mobile ── */
+/* ── Responsive: Mobile ──
+   Brand centred and full-width on top; Explore and Contact sit side by side
+   (not stacked) and everything is tightened so the footer isn't an over-long
+   single column. */
 @media (max-width: 560px) {
   .site-footer-inner {
-    grid-template-columns: 1fr;
-    gap: 34px;
-    padding: 44px 24px 28px;
-    justify-items: center;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 20px;
+    padding: 34px 22px 22px;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .site-footer-brand {
+    grid-column: 1 / -1;
+    /* Fill the row — justify-items:start would otherwise shrink-wrap it to the
+       left, so align-items/text-align:center couldn't centre it. */
+    justify-self: stretch;
+    align-items: center;
     text-align: center;
   }
 
-  .site-footer-brand,
-  .site-footer-col {
-    align-items: center;
+  .site-footer-logo {
+    height: 40px;
+    margin-bottom: 12px;
   }
 
   .site-footer-tagline {
-    max-width: 320px;
+    max-width: 300px;
+    font-size: 14.5px;
+    margin-bottom: 16px;
   }
 
   .site-footer-project-by {
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .site-footer-col {
+    gap: 9px;
+  }
+
+  .site-footer-col ul {
+    gap: 7px;
+  }
+
+  .site-footer-col-title {
+    margin-bottom: 3px;
+  }
+
+  .site-footer-link,
+  .site-footer-address {
+    font-size: 12px;
+    text-align: left;
+  }
+
+  .site-footer-bottom {
+    padding: 16px 22px;
+  }
+}
+
+/* ── Responsive: very narrow ── */
+@media (max-width: 360px) {
+  .site-footer-inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 22px;
+  }
+
+  .site-footer-col {
     align-items: center;
   }
 
@@ -233,9 +285,5 @@
   .site-footer-address {
     text-align: center;
     align-items: center;
-  }
-
-  .site-footer-bottom {
-    padding: 20px 24px;
   }
 }
