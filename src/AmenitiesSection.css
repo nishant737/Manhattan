@@ -234,9 +234,11 @@
     display: none;
   }
 
-  /* Native CSS sticky — visually fixed to the top the moment the section
-     reaches it. The JS lock (Observer + scroll snap-back) freezes the page on
-     top of this, so there's zero movement while stepping cards. */
+  /* Native CSS sticky — the section fills the viewport and locks the instant
+     it's reached, so the card deck plays centred on screen, then releases.
+     Native scroll drives it (no JS lock), so the page never fights the finger.
+     Plain `vh` (not `dvh`) here and on the spacer so the address bar
+     showing/hiding can't resize the scroll range mid-swipe. */
   .amenities-sticky-wrapper {
     display: flex;
     flex-direction: column;
@@ -245,19 +247,17 @@
     position: sticky;
     top: 0;
     height: 100vh;
-    height: 100dvh;
     min-height: 0;
     overflow: hidden;
-    padding: 64px 14px 14px;
+    padding: 16px 14px;
     box-sizing: border-box;
-    gap: 14px;
   }
 
-  /* Short tail so the enter/leave gate ScrollTrigger has a range to fire on.
-     The lock keeps the page from actually travelling through it. */
+  /* Scroll room while the wrapper is stuck — ~1 viewport per transition
+     (2 transitions for 3 cards), in either direction. */
   .amenities-spacer {
     display: block;
-    height: 40vh;
+    height: 200vh;
     background-color: #0a0a0a;
   }
 
@@ -277,27 +277,26 @@
     overflow: visible;
   }
 
-  /* ── Image stack ── */
+  /* ── Image stack — the only in-flow child, so flex `justify-content:center`
+     parks it in the exact middle of the viewport. ── */
   .amenities-image-column {
     order: 1;
     position: relative;
     width: 100%;
-    max-width: 470px;
-    /* Tall portrait, capped so the two fanned-back cards still have a bit of
+    max-width: 460px;
+    /* Tall portrait, capped so the cards pushed back in the deck still have
        headroom to peek above the front one. */
-    height: min(calc((100vw - 28px) * 1.55), 66vh);
-    height: min(calc((100vw - 28px) * 1.55), 66dvh);
+    height: min(calc((100vw - 28px) * 1.5), 56vh);
   }
 
   .amenities-images-container {
     position: relative;
     height: 100%;
     width: 100%;
-    /* mild perspective just so the small rotationX on the back cards reads as
-       a 3D tilt. Stacking order is plain zIndex (see the JS) — no preserve-3d,
-       which fights zIndex and was causing the triple-exposure. */
-    perspective: 1300px;
-    perspective-origin: 50% 40%;
+    /* Short perspective distance = a pronounced 3D recession as each card is
+       pushed back in Z. */
+    perspective: 1000px;
+    perspective-origin: 50% 42%;
   }
 
   .amenity-image-set {
@@ -305,6 +304,9 @@
     inset: 0;
     opacity: 0;
     display: block;
+    /* Top-anchored so pushing a card back keeps its top edge put and the
+       y-rise makes deeper cards peek an even amount above the front one. */
+    transform-origin: 50% 0%;
     will-change: transform, opacity;
   }
 
@@ -336,12 +338,17 @@
     object-fit: cover;
   }
 
-  /* ── Text ── */
+  /* ── Text — pinned to the bottom of the sticky viewport (out of flow) so it
+     never pushes the image stack off-centre. ── */
   .amenities-content-column {
     order: 2;
-    position: relative;
-    width: 100%;
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 20px;
+    width: auto;
     max-width: 460px;
+    margin: 0 auto;
   }
 
   .amenities-content-inner {
@@ -388,14 +395,18 @@
 /* ── Responsive: Small Mobile ── */
 @media (max-width: 480px) {
   .amenities-sticky-wrapper {
-    padding: 54px 12px 12px;
-    gap: 12px;
+    padding: 14px 12px;
   }
 
   .amenities-image-column {
     max-width: 410px;
-    height: min(calc((100vw - 24px) * 1.55), 62vh);
-    height: min(calc((100vw - 24px) * 1.55), 62dvh);
+    height: min(calc((100vw - 24px) * 1.5), 54vh);
+  }
+
+  .amenities-content-column {
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
   }
 
   .amenities-content-inner {

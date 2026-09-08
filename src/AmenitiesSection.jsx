@@ -1,13 +1,12 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import Observer from 'gsap/Observer'
 import './AmenitiesSection.css'
 import IconicArchitectureImg from './assets/potrait .jpeg'
 import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
 import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 
-gsap.registerPlugin(ScrollTrigger, Observer)
+gsap.registerPlugin(ScrollTrigger)
 
 const AMENITIES = [
   {
@@ -269,178 +268,89 @@ export default function AmenitiesSection() {
         }
       })
 
-      // ── Mobile: gesture-stepped 3-card stack ──
-      //    The wrapper is CSS-sticky so it's visually fixed the moment the
-      //    section reaches the top; while "locked" an Observer swallows every
-      //    wheel/touch gesture (preventDefault) and a scroll listener snaps any
-      //    slippage back — zero page movement. ONE swipe = exactly ONE card,
-      //    whatever the flick speed. The three images are always stacked one
-      //    behind the other (front fully opaque, two dimmer/smaller peeking
-      //    above). At the first / last card a swipe past the end does nothing
-      //    the first time (dwell — time to read it); a SECOND swipe releases
-      //    the section to the previous / next one.
+      // ── Mobile: a 3D card deck driven by NATIVE scroll ──
+      //    No Observer, no preventDefault, no scroll snap-back — that
+      //    scroll-jacking is what made the section fight the visitor's finger.
+      //    The wrapper is CSS `position: sticky`, so the section simply locks
+      //    to the viewport while the deck plays, then releases. Progress is
+      //    read from the section's own scroll position every animation frame
+      //    and rAF-lerped, so scroll up == scroll down reversed and fast
+      //    flicks stay in sync.
       mm.add('(max-width: 768px)', () => {
         const section = sectionRef.current
         const imageSets = imagesRef.current.filter(Boolean)
         const textItems = itemsRef.current.filter(Boolean)
-        const num = imageSets.length
-        if (num < 2) return
+        const N = imageSets.length
+        if (N < 2) return
 
-        ScrollTrigger.config({ ignoreMobileResize: true })
+        const smooth = (x) => x * x * (3 - 2 * x)
 
-        const mod = (n, m) => ((n % m) + m) % m
-        // depth 0 = front (ALWAYS opaque, covers the rest); deeper = smaller,
-        // lifted, tilted, dimmer: clear → less → even less.
-        const DEPTH = [
-          { opacity: 1, scale: 1, y: 0, rotationX: 0 },
-          { opacity: 0.5, scale: 0.9, y: -26, rotationX: 4 },
-          { opacity: 0.24, scale: 0.8, y: -48, rotationX: 8 }
-        ]
-        const ZI = [3, 2, 1]
-        const dLast = DEPTH.length - 1
-        const dState = (d) => DEPTH[Math.min(d, dLast)]
-        const dZ = (d) => ZI[Math.min(d, dLast)]
+        const render = (p) => {
+          const pos = p * (N - 1) // 0 → N-1, index of the card in front
+          for (let i = 0; i < N; i++) {
+            const d = i - pos // 0 = front, >0 = stacked behind, <0 = peeled off
+            const ad = Math.abs(d)
+            const k = Math.min(ad, 2)
 
-        let index = 0
-        let animating = false
-        let locked = false
-        let lockedY = 0
-        let edgePush = 0 // consecutive "push past the end card" gestures
-
-        const place = (front) => {
-          imageSets.forEach((el, i) => {
-            const d = mod(i - front, num)
-            gsap.set(el, { ...dState(d), zIndex: dZ(d), transformOrigin: '50% 0%' })
-          })
-          textItems.forEach((el, i) => {
-            gsap.set(el, { opacity: i === front ? 1 : 0, y: i === front ? 0 : 18 })
-          })
-        }
-        place(0)
-
-        // One fixed-duration eased step (dir +1 next, -1 prev). false at the end.
-        // Works identically both ways: the card COMING to the front rides on
-        // top (zIndex 4) for the whole move so it's always visible travelling
-        // in; the card LEAVING the front sits just under it (zIndex 3) and
-        // recedes; everyone else stays at the back. zIndex settles to its
-        // resting value at the end for the next step.
-        const step = (dir) => {
-          const next = index + dir
-          if (animating || next < 0 || next >= num) return false
-          animating = true
-          const prev = index
-          index = next
-
-          const tl = gsap.timeline({
-            defaults: { ease: 'power2.inOut' },
-            onComplete: () => { animating = false }
-          })
-          imageSets.forEach((el, i) => {
-            const dFrom = mod(i - prev, num)
-            const dTo = mod(i - next, num)
-            if (dFrom === dTo) return
-            const to = dState(dTo)
-            const incoming = dTo === 0
-            const leaving = dFrom === 0
-
-            gsap.set(el, { zIndex: incoming ? 4 : leaving ? 3 : 1 })
-
-            tl.to(el, {
-              scale: to.scale, y: to.y, rotationX: to.rotationX, duration: 0.62
-            }, 0)
-
-            if (incoming) {
-              tl.to(el, { opacity: 1, duration: 0.32 }, 0)          // brighten in fast, stays on top
-            } else if (leaving) {
-              tl.to(el, { opacity: to.opacity, duration: 0.32 }, 0.3) // hold opaque, then dim as it clears
+            if (d >= 0) {
+              // Front card + the ones waiting behind it: pushed back in real Z,
+              // risen so the top edge peeks over the card in front, leaned back.
+              gsap.set(imageSets[i], {
+                z: -160 * k,
+                y: -24 * k,
+                rotationX: 7 * k,
+                opacity: Math.max(0, 1 - 0.34 * d),
+                zIndex: Math.round(50 - d * 10)
+              })
             } else {
-              tl.to(el, { opacity: to.opacity, duration: 0.62 }, 0)
+              // The front card leaving: pulls back and down into the depth,
+              // tilts away and fades, revealing the next card stepping forward.
+              const f = smooth(Math.min(ad, 1))
+              gsap.set(imageSets[i], {
+                z: -160 * ad - 280 * f,
+                y: 26 * ad,
+                rotationX: -13 * f,
+                opacity: 1 - f,
+                zIndex: 0
+              })
             }
 
-            tl.set(el, { zIndex: dZ(dTo) }, 0.62)
-          })
-
-          tl.to(textItems[prev], { opacity: 0, y: dir > 0 ? -16 : 16, duration: 0.28, ease: 'power1.in' }, 0)
-            .fromTo(
-              textItems[next],
-              { opacity: 0, y: dir > 0 ? 16 : -16 },
-              { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
-              0.22
-            )
-          return true
-        }
-
-        const hold = () => {
-          if (locked && Math.abs(window.pageYOffset - lockedY) > 1) {
-            window.scrollTo(0, lockedY)
+            const te = smooth(Math.max(0, 1 - ad))
+            gsap.set(textItems[i], { opacity: te, y: 18 * d })
           }
         }
 
-        const lock = (fromDir) => {
-          if (locked) return
-          locked = true
-          lockedY = Math.round(window.pageYOffset + section.getBoundingClientRect().top)
-          window.scrollTo(0, lockedY)
-          index = fromDir > 0 ? 0 : num - 1
-          animating = false
-          edgePush = 0
-          place(index)
-          window.addEventListener('scroll', hold, { passive: true })
-          observer.enable()
+        // True scroll progress across the sticky range (section height minus
+        // one viewport). Read fresh each frame so momentum scrolling and the
+        // mobile address bar can't desync it.
+        const progress = () => {
+          const r = section.getBoundingClientRect()
+          const total = r.height - window.innerHeight
+          if (total <= 0) return 0
+          return Math.max(0, Math.min(1, -r.top / total))
         }
 
-        const release = (dir) => {
-          if (!locked) return
-          locked = false
-          edgePush = 0
-          window.removeEventListener('scroll', hold)
-          observer.disable()
-          const maxPast = section.offsetHeight - window.innerHeight
-          window.scrollTo(0, dir > 0 ? lockedY + maxPast + 4 : Math.max(0, lockedY - 4))
+        let currentP = progress()
+        let rafId = null
+        const tick = () => {
+          const targetP = progress()
+          currentP += (targetP - currentP) * 0.17
+          if (Math.abs(targetP - currentP) < 0.0005) currentP = targetP
+          render(currentP)
+          rafId = currentP === targetP ? null : requestAnimationFrame(tick)
+        }
+        const kick = () => {
+          if (rafId === null) rafId = requestAnimationFrame(tick)
         }
 
-        // At an end card: 1st push past the edge is absorbed (dwell), 2nd frees it.
-        const tryEdge = (dir) => {
-          edgePush += 1
-          if (edgePush >= 2) release(dir)
-        }
-
-        const observer = Observer.create({
-          target: window,
-          type: 'wheel,touch',
-          wheelSpeed: -1,
-          tolerance: 12,
-          dragMinimum: 6,
-          preventDefault: true,
-          onUp: () => { // swipe up = forward / next
-            if (animating) return
-            if (step(1)) edgePush = 0
-            else tryEdge(1)
-          },
-          onDown: () => { // swipe down = back / prev
-            if (animating) return
-            if (step(-1)) edgePush = 0
-            else tryEdge(-1)
-          }
-        })
-        observer.disable()
-
-        const gate = ScrollTrigger.create({
-          trigger: section,
-          start: 'top top',
-          end: 'bottom bottom',
-          onEnter: () => lock(1),
-          onEnterBack: () => lock(-1),
-          onLeave: () => release(1),
-          onLeaveBack: () => release(-1)
-        })
-
-        requestAnimationFrame(() => ScrollTrigger.refresh())
+        render(currentP)
+        window.addEventListener('scroll', kick, { passive: true })
+        window.addEventListener('resize', kick)
 
         return () => {
-          observer.kill()
-          gate.kill()
-          window.removeEventListener('scroll', hold)
+          if (rafId !== null) cancelAnimationFrame(rafId)
+          window.removeEventListener('scroll', kick)
+          window.removeEventListener('resize', kick)
           gsap.set([...imageSets, ...textItems], {
             clearProps: 'opacity,transform,zIndex'
           })
