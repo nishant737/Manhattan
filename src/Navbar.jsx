@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import './Navbar.css'
 import logoImg from './assets/Manhattan_Logo.png'
 import { WHATSAPP_HREF } from './siteContact'
+import { beginNavScroll } from './navScroll'
 
 // TODO: replace with the real Instagram handle
 const INSTAGRAM_URL = 'https://www.instagram.com/'
@@ -48,6 +49,8 @@ export default function Navbar({ onNavClick }) {
   }
 
   const handleLogoClick = () => {
+    // Suppress scroll-jacking sections while jumping to the top.
+    beginNavScroll()
     const hero = document.querySelector('.hero-section')
     if (hero) {
       hero.scrollIntoView({ behavior: 'smooth', block: 'start' })

@@ -84,7 +84,17 @@ const AMENITIES = [
 // is a thin wrapper kept only so the carousel and grid views share one
 // consistent image element.
 function AmenityMedia({ amenity, className }) {
-  return <img src={amenity.image} alt={amenity.title} className={className} />
+  // lazy + async decode so the off-screen carousel/grid tiles don't download or
+  // block the main thread while the visitor is scrolling elsewhere.
+  return (
+    <img
+      src={amenity.image}
+      alt={amenity.title}
+      className={className}
+      loading="lazy"
+      decoding="async"
+    />
+  )
 }
 
 // The track renders the amenity list twice back-to-back so the continuous

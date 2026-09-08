@@ -28,6 +28,22 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
     }
   }, [])
 
+  // Whenever the view switches (selection grid ↔ a specific layout), snap every
+  // scroll container back to the top. On mobile the whole modal scrolls inside
+  // the fixed backdrop, so picking a layout while scrolled down would otherwise
+  // leave you looking at the middle of the new view with the image/title above.
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      const el = containerRef.current
+      if (!el) return
+      el.parentElement?.scrollTo?.({ top: 0 })
+      el.scrollTop = 0
+      el.querySelectorAll('.apartment-selection-screen, .apartment-info-panel')
+        .forEach((n) => { n.scrollTop = 0 })
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [selectedTypeId])
+
   const handleSelectType = (id) => {
     setSelectedTypeId(id)
     setActiveImageIndex(0)

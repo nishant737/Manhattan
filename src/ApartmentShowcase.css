@@ -6,9 +6,11 @@
   right: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   z-index: 999;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   overflow-y: auto;
   display: flex;
   align-items: flex-start;
@@ -20,6 +22,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   background-color: #0a0a0a;
   display: flex;
   overflow: hidden;
@@ -593,6 +596,14 @@
 
 /* ── Responsive: Mobile ── */
 @media (max-width: 768px) {
+  /* The showcase panel is opaque and fills the screen, so the backdrop blur is
+     barely visible yet still repaints on every scroll/animation frame. Drop it. */
+  .apartment-showcase-backdrop {
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
   .apartment-showcase {
     flex-direction: column;
     height: auto;

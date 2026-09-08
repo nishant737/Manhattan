@@ -32,9 +32,11 @@ export async function submitLead(payload) {
   })
 
   if (!ENDPOINT) {
-    // No endpoint configured yet (e.g. local dev before the sheet is wired up).
-    // Don't hard-fail the form UX — just log what would have been sent.
-    console.warn('[submitLead] VITE_LEADS_ENDPOINT is not set; submission not sent.', JSON.parse(body))
+    // No endpoint configured (e.g. local dev before the sheet is wired up).
+    // Don't hard-fail the form UX; note it in dev only.
+    if (import.meta.env.DEV) {
+      console.warn('[submitLead] VITE_LEADS_ENDPOINT is not set; submission not sent.', JSON.parse(body))
+    }
     return
   }
 

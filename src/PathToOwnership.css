@@ -119,6 +119,7 @@
   background: rgba(10, 10, 10, 0.6);
   border: 1px solid rgba(251, 238, 190, 0.55);
   backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   transition: transform 0.3s ease, background 0.3s ease;
 }
 

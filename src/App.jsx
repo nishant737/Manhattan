@@ -15,6 +15,7 @@ import ContactSection from './ContactSection'
 import LeadCaptureModal from './LeadCaptureModal'
 import Footer from './Footer'
 import { submitLead } from './leadSubmit'
+import { beginNavScroll } from './navScroll'
 import './App.css'
 
 const BROCHURE_FILE = '/Manhattan-Brochure.pdf'
@@ -31,16 +32,9 @@ const SCROLL_TARGETS = {
   contact: '.contact-section'
 }
 
+// Only the brochure flow uses the lead modal now — "Contact Us" scrolls to the
+// inline ContactSection (see SCROLL_TARGETS), so there's no 'contact' entry.
 const LEAD_MODAL_COPY = {
-  contact: {
-    eyebrow: 'Get In Touch',
-    title: 'Contact Us',
-    subtitle: "Share your details and our team will reach out to help with anything you need.",
-    submitLabel: 'Send Message',
-    loadingLabel: 'Sending…',
-    successTitle: 'Message Sent',
-    successMessage: "Thank you. We've received your details and will be in touch shortly."
-  },
   brochure: {
     eyebrow: 'Manhattan Luxury Residences',
     title: 'Download the Brochure',
@@ -80,7 +74,12 @@ function App() {
 
     const target = SCROLL_TARGETS[id]
     const el = target && document.querySelector(target)
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    if (el) {
+      // Let scroll-jacking sections (the mobile Amenities card lock) stand down
+      // for the duration of this programmatic scroll so it can't trap the nav.
+      beginNavScroll()
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   const triggerBrochureDownload = () => {

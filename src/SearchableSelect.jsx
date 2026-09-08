@@ -74,15 +74,16 @@ export default function SearchableSelect({
 
     document.addEventListener('mousedown', handleOutside)
     window.addEventListener('resize', closeOnScrollOrResize)
-    // capture:true so this also catches scroll on the modal card's own
-    // internal scroll container, not just the window.
-    document.addEventListener('scroll', closeOnScrollOrResize, true)
+    // capture:true so this also catches scroll on the modal card's own internal
+    // scroll container, not just the window; passive so it never delays scroll.
+    const scrollOpts = { capture: true, passive: true }
+    document.addEventListener('scroll', closeOnScrollOrResize, scrollOpts)
 
     return () => {
       clearTimeout(focusTimer)
       document.removeEventListener('mousedown', handleOutside)
       window.removeEventListener('resize', closeOnScrollOrResize)
-      document.removeEventListener('scroll', closeOnScrollOrResize, true)
+      document.removeEventListener('scroll', closeOnScrollOrResize, scrollOpts)
     }
   }, [isOpen])
 
