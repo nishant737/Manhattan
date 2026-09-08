@@ -167,15 +167,20 @@ export default function LeadCaptureModal({
 
             <form className="lead-modal-form" onSubmit={handleSubmit} noValidate>
               <div className="lead-modal-field">
-                <label htmlFor="lead-name">Full Name</label>
+                <label htmlFor="lead-name">
+                  Full Name <span className="required-mark">*</span>
+                </label>
                 <input
                   id="lead-name"
                   type="text"
                   value={form.name}
                   onChange={handleChange('name')}
+                  className={errors.name ? 'has-error' : ''}
                   placeholder="Your full name"
                   disabled={isSubmitting}
+                  aria-required="true"
                 />
+                {errors.name && <span className="lead-modal-error">{errors.name}</span>}
               </div>
 
               <div className="lead-modal-field">
@@ -193,7 +198,9 @@ export default function LeadCaptureModal({
               </div>
 
               <div className="lead-modal-field">
-                <label htmlFor="lead-phone">Mobile Number</label>
+                <label htmlFor="lead-phone">
+                  Mobile Number <span className="required-mark">*</span>
+                </label>
                 <div className="lead-modal-phone-row">
                   <SearchableSelect
                     id="lead-phone-country"
@@ -214,10 +221,13 @@ export default function LeadCaptureModal({
                     className={errors.phone ? 'has-error' : ''}
                     placeholder="98765 43210"
                     disabled={isSubmitting}
+                    aria-required="true"
                   />
                 </div>
                 {errors.phone && <span className="lead-modal-error">{errors.phone}</span>}
-                <span className="lead-modal-hint">Please provide either your email or mobile number.</span>
+                <span className="lead-modal-hint">
+                  <span className="required-mark">*</span> Required. Email is optional.
+                </span>
               </div>
 
               <div className="lead-modal-field">

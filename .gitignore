@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Local env — set VITE_LEADS_ENDPOINT in the Vercel project settings instead
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

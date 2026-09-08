@@ -14,6 +14,7 @@ import StatsSection from './StatsSection'
 import ContactSection from './ContactSection'
 import LeadCaptureModal from './LeadCaptureModal'
 import Footer from './Footer'
+import { submitLead } from './leadSubmit'
 import './App.css'
 
 const BROCHURE_FILE = '/Manhattan-Brochure.pdf'
@@ -95,10 +96,15 @@ function App() {
   // submission is in flight and a success/error state once it settles. The
   // brochure download only fires after the "unlock" resolves successfully.
   const handleLeadModalSubmit = async (formData) => {
-    // TODO: replace this stub with the real CRM/lead-capture API call. Throw
-    // (or reject) on failure and the modal will surface its error state.
-    console.log(`Lead captured (${leadModalMode}):`, formData)
-    await new Promise((resolve) => setTimeout(resolve, 600))
+    // Append a row to the Google Sheet. A network failure rejects here and the
+    // modal surfaces its error state; the brochure download only runs on success.
+    await submitLead({
+      source: leadModalMode === 'brochure' ? 'Brochure download' : 'Layout enquiry',
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.requirement
+    })
 
     if (leadModalMode === 'brochure') {
       triggerBrochureDownload()

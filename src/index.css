@@ -112,3 +112,10 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Red asterisk marking a required field on every data-collection form. */
+.required-mark {
+  color: #ff4d4d;
+  font-weight: 700;
+  margin-left: 2px;
+}

@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
 import SearchableSelect from './SearchableSelect'
 import { PHONE_CODE_OPTIONS, validateContactFields, formatPhoneForSubmit } from './leadFormShared'
+import { submitLead } from './leadSubmit'
 import { CONTACT_DETAILS, SOCIAL_LINKS } from './siteContact'
 import './ContactSection.css'
 
@@ -36,6 +37,8 @@ export default function ContactSection() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [isSending, setIsSending] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const sectionRef = useRef(null)
   const contentRef = useRef(null)
 
@@ -74,23 +77,34 @@ export default function ContactSection() {
     setForm((prev) => ({ ...prev, phoneCountry: nextCountry }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    if (isSending) return
+
     const nextErrors = validateContactFields(form)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
-    // TODO: wire this up to the real CRM/lead-capture endpoint once available.
-    console.log('Contact form submitted:', {
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: formatPhoneForSubmit(form.phone, form.phoneCountry),
-      message: form.message.trim()
-    })
+    setIsSending(true)
+    setSubmitError('')
 
-    setIsSubmitted(true)
-    setForm(EMPTY_FORM)
-    setErrors({})
+    try {
+      // Appends a row to the Google Sheet via the Apps Script web app.
+      await submitLead({
+        source: 'Contact section',
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: formatPhoneForSubmit(form.phone, form.phoneCountry),
+        message: form.message.trim()
+      })
+      setIsSubmitted(true)
+      setForm(EMPTY_FORM)
+      setErrors({})
+    } catch {
+      setSubmitError('Something went wrong sending your message. Please try again.')
+    } finally {
+      setIsSending(false)
+    }
   }
 
   return (
@@ -193,14 +207,19 @@ export default function ContactSection() {
           ) : (
             <form className="contact-form" onSubmit={handleSubmit} noValidate>
               <div className="contact-field">
-                <label htmlFor="contact-name">Full Name</label>
+                <label htmlFor="contact-name">
+                  Full Name <span className="required-mark">*</span>
+                </label>
                 <input
                   id="contact-name"
                   type="text"
                   value={form.name}
                   onChange={handleChange('name')}
+                  className={errors.name ? 'has-error' : ''}
                   placeholder="Your full name"
+                  aria-required="true"
                 />
+                {errors.name && <span className="contact-error">{errors.name}</span>}
               </div>
 
               <div className="contact-field">
@@ -217,7 +236,9 @@ export default function ContactSection() {
               </div>
 
               <div className="contact-field">
-                <label htmlFor="contact-phone">Mobile Number</label>
+                <label htmlFor="contact-phone">
+                  Mobile Number <span className="required-mark">*</span>
+                </label>
                 <div className="contact-phone-row">
                   <SearchableSelect
                     id="contact-phone-country"
@@ -236,10 +257,13 @@ export default function ContactSection() {
                     onChange={handleChange('phone')}
                     className={errors.phone ? 'has-error' : ''}
                     placeholder="98765 43210"
+                    aria-required="true"
                   />
                 </div>
                 {errors.phone && <span className="contact-error">{errors.phone}</span>}
-                <span className="contact-hint">Please provide either your email or mobile number.</span>
+                <span className="contact-hint">
+                  <span className="required-mark">*</span> Required. Email is optional.
+                </span>
               </div>
 
               <div className="contact-field">
@@ -253,9 +277,12 @@ export default function ContactSection() {
                 />
               </div>
 
-              <button type="submit" className="contact-submit">
-                Send Message
+              <button type="submit" className="contact-submit" disabled={isSending}>
+                {isSending ? 'Sending…' : 'Send Message'}
               </button>
+              {submitError && (
+                <p className="contact-error" role="alert">{submitError}</p>
+              )}
             </form>
           )}
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import LeadCaptureModal from './LeadCaptureModal'
+import { submitLead } from './leadSubmit'
 import { LAYOUT_TYPES, LAYOUT_CATEGORIES } from './apartmentLayouts'
 import './ApartmentShowcase.css'
 
@@ -73,10 +74,17 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
     }
   }
 
-  const handleLeadSubmit = (formData) => {
-    // TODO: wire this up to the real CRM/lead-capture endpoint once available.
-    console.log('Lead captured from Layout selection:', { ...formData, apartmentType: data?.title })
-    setIsLeadModalOpen(false)
+  const handleLeadSubmit = async (formData) => {
+    // Append a "Book a Visit" row to the Google Sheet. Throwing here lets the
+    // modal show its error state; on success the modal shows its own success
+    // screen (closed by the visitor via "Done").
+    await submitLead({
+      source: data?.title ? `Book a Visit — ${data.title}` : 'Book a Visit',
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      message: formData.requirement
+    })
   }
 
   const showingFloorPlan = viewMode === 'floorplan' && data?.hasFloorPlan

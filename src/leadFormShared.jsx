@@ -1,9 +1,10 @@
 import { Country } from 'country-state-city'
 import { isValidPhoneNumber } from 'libphonenumber-js'
 
-// Shared by every "email or mobile" lead form on the site (the LeadCaptureModal
-// popup and the inline ContactSection) so the validation rules, country data,
-// and phone-code options never drift apart between the two.
+// Shared by every lead form on the site (the LeadCaptureModal popup and the
+// inline ContactSection) so the validation rules, country data, and phone-code
+// options never drift apart between the two. Full Name and Mobile Number are
+// REQUIRED on every form; email is optional but must be valid if given.
 
 // A stricter, practical email pattern (close to the WHATWG HTML5 spec used
 // for <input type="email">, plus a mandatory 2+ letter TLD). A looser
@@ -35,18 +36,21 @@ export const PHONE_CODE_OPTIONS = ALL_COUNTRIES.map((c) => ({
   searchText: `${c.name} ${c.isoCode} +${c.dialCode} ${c.dialCode}`
 }))
 
-// Validates the shared "at least one of email or phone" rule. Returns an
-// errors object with `email`/`phone` keys set only where something's wrong
-// (empty object = valid).
-export function validateContactFields({ email, phone, phoneCountry }) {
+// Validates every lead form: Full Name and Mobile Number are REQUIRED; email
+// is optional but must be valid if provided. Returns an errors object with
+// `name`/`email`/`phone` keys set only where something's wrong (empty = valid).
+export function validateContactFields({ name = '', email = '', phone = '', phoneCountry }) {
   const errors = {}
+  const trimmedName = name.trim()
   const trimmedEmail = email.trim()
   const trimmedPhone = phone.trim()
 
-  if (!trimmedEmail && !trimmedPhone) {
-    errors.email = 'Please provide your email or mobile number.'
-    errors.phone = 'Please provide your email or mobile number.'
-    return errors
+  if (!trimmedName) {
+    errors.name = 'Please enter your full name.'
+  }
+
+  if (!trimmedPhone) {
+    errors.phone = 'Please enter your mobile number.'
   }
 
   if (trimmedEmail && !EMAIL_PATTERN.test(trimmedEmail)) {

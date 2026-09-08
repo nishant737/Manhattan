@@ -9,10 +9,8 @@ import SpaImg from './assets/Spa.jpeg'
 import SquashCourtImg from './assets/Squash_clean.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
 import SkyLoungeImg from './assets/finalloauge.jpg'
-// Lobby gets its own interior image, deliberately NOT one of the ENTRANCE
-// photos used in the intro (AboutSection), so the Lobby and Entrance never
-// share the same picture. TODO: swap for the final Lobby render when provided.
-import LobbyImg from './assets/aboutus.jpeg'
+// Lobby gets its own dedicated entrance render.
+import LobbyImg from './assets/ENTRANCE/ENTRANCE01.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
