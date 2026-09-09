@@ -4,7 +4,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import Observer from 'gsap/Observer'
 import { navScroll } from './navScroll'
 import './AmenitiesSection.css'
-import IconicArchitectureImg from './assets/potrait .jpeg'
+import IconicArchitectureImg from './assets/potrait.jpeg'
 import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
 import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 
@@ -16,11 +16,8 @@ const AMENITIES = [
     index: '01',
     title: 'Iconic Architecture',
     description: 'A striking silhouette that redefines Mangalore’s skyline, with sculpted balconies and a facade designed to be as unforgettable by night as it is by day.',
-    backgroundImage: IconicArchitectureImg,
-    // This render is portrait (1280×1600). Its box is set to the exact 4:5
-    // ratio so object-fit: cover shows the whole tower with no cropping, and
-    // it's kept narrow so it never crowds the heading on the left.
-    imageBoxClassName: 'amenity-image-background--portrait'
+    backgroundImage: IconicArchitectureImg
+    // Landscape render — uses the default 16:10 box, same as the other panels.
   },
   {
     id: 3,

@@ -32,6 +32,9 @@ export const LAYOUT_TYPES = [
     cta: 'BOOK A VISIT',
     floorPlan: null, // TODO: add the provided 3 BHK floor-plan image
     gallery: ['/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg'],
+    // Carpet area differs by floor parity — the Size spec renders Odd/Even
+    // toggle buttons in the modal when this is present.
+    floorSizes: { odd: '2,915 sq. ft.', even: '2,970 sq. ft.' },
     specs: [
       { label: 'Bedroom', value: '3' },
       { label: 'Size', value: '2,915 sq. ft. (Odd Floor) / 2,970 sq. ft. (Even Floor)' },
@@ -49,6 +52,7 @@ export const LAYOUT_TYPES = [
     cta: 'BOOK A VISIT',
     floorPlan: null, // TODO: add the provided 4 BHK floor-plan image
     gallery: ['/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg'],
+    floorSizes: { odd: '4,015 sq. ft.', even: '3,915 sq. ft.' },
     specs: [
       { label: 'Bedroom', value: '4' },
       { label: 'Size', value: '3,915 sq. ft. (Even Floor) / 4,015 sq. ft. (Odd Floor)' },

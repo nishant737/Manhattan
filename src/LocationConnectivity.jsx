@@ -26,13 +26,14 @@ const createLuxuryMarker = (isActive) => {
   })
 }
 
-// Custom Manhattan checkpoint marker (same style as other locations but slightly larger)
+// Custom Manhattan checkpoint marker — a glowing "M" glyph (the brand mark)
+// instead of a plain dot, so the main site is unmistakable on the map.
 const createManhattanMarker = (isActive) => {
   return L.divIcon({
     className: `custom-marker manhattan-checkpoint ${isActive ? 'active' : ''}`,
     html: `
       <div class="marker-pin">
-        <div class="marker-dot"></div>
+        <div class="marker-m">M</div>
         <div class="marker-pulse"></div>
       </div>
     `,

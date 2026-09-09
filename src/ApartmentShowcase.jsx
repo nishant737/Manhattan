@@ -9,6 +9,7 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
   const [selectedTypeId, setSelectedTypeId] = useState(initialTypeId)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [viewMode, setViewMode] = useState('gallery') // 'gallery' | 'floorplan'
+  const [floorParity, setFloorParity] = useState('odd') // 'odd' | 'even' — drives the Size spec
   const [isAnimating, setIsAnimating] = useState(false)
   const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
   const containerRef = useRef(null)
@@ -48,6 +49,7 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
     setSelectedTypeId(id)
     setActiveImageIndex(0)
     setViewMode('gallery')
+    setFloorParity('odd')
   }
 
   const handleBackToSelection = () => {
@@ -242,12 +244,41 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
 
                 {/* Specs */}
                 <div className="apartment-specs">
-                  {data.specs.map((spec, index) => (
-                    <div key={index} className="apartment-spec">
-                      <div className="spec-label">{spec.label}</div>
-                      <div className="spec-value">{spec.value}</div>
-                    </div>
-                  ))}
+                  {data.specs.map((spec, index) => {
+                    const isSize = spec.label.trim().toLowerCase() === 'size'
+
+                    // When this layout has floor-parity-dependent sizes, the
+                    // Size row shows Odd/Even toggle buttons and the size for
+                    // the selected floor instead of one combined string.
+                    if (isSize && data.floorSizes) {
+                      return (
+                        <div key={index} className="apartment-spec">
+                          <div className="spec-label">{spec.label}</div>
+                          <div className="spec-value">{data.floorSizes[floorParity]}</div>
+                          <div className="apartment-floor-toggle" role="group" aria-label="Floor type">
+                            {['odd', 'even'].map((parity) => (
+                              <button
+                                key={parity}
+                                type="button"
+                                className={`apartment-floor-toggle-btn ${floorParity === parity ? 'is-active' : ''}`}
+                                aria-pressed={floorParity === parity}
+                                onClick={() => setFloorParity(parity)}
+                              >
+                                {parity === 'odd' ? 'Odd Floor' : 'Even Floor'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div key={index} className="apartment-spec">
+                        <div className="spec-label">{spec.label}</div>
+                        <div className="spec-value">{spec.value}</div>
+                      </div>
+                    )
+                  })}
                 </div>
 
                 {/* CTA Button */}

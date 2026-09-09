@@ -693,23 +693,48 @@
 }
 
 /* ── Manhattan Checkpoint Marker ──
-   Slightly larger and noticeably more luminous than the other location
-   markers, plus a soft breathing halo, so the main site reads as the
-   anchor point on the map at a glance. */
-.custom-marker.manhattan-checkpoint .marker-dot {
-  width: 11px;
-  height: 11px;
-  box-shadow: 0 0 22px rgba(251, 238, 190, 0.9), 0 0 8px rgba(255, 255, 255, 0.5);
+   The brand "M" glyph rather than a dot, with a continuously breathing gold
+   glow plus a soft expanding halo, so the main site is unmistakable and
+   visibly pulses as the anchor point on the map. */
+.custom-marker.manhattan-checkpoint .marker-m {
+  position: relative;
+  z-index: 2;
+  font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgb(255, 248, 216);
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.6),
+    0 0 16px rgba(251, 238, 190, 0.95),
+    0 0 30px rgba(251, 238, 190, 0.7);
+  animation: manhattanGlow 2.2s ease-in-out infinite;
 }
 
-.custom-marker.manhattan-checkpoint.active .marker-dot {
-  width: 16px;
-  height: 16px;
-  background-color: #ff3b30;
-  box-shadow: 0 0 30px rgba(255, 59, 48, 1), 0 0 12px rgba(255, 255, 255, 0.6);
+@keyframes manhattanGlow {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 6px rgba(255, 255, 255, 0.55),
+      0 0 14px rgba(251, 238, 190, 0.85),
+      0 0 26px rgba(251, 238, 190, 0.5);
+  }
+  50% {
+    transform: scale(1.14);
+    text-shadow:
+      0 0 10px rgba(255, 255, 255, 0.85),
+      0 0 26px rgba(251, 238, 190, 1),
+      0 0 48px rgba(251, 238, 190, 0.8);
+  }
+}
+
+.custom-marker.manhattan-checkpoint.active .marker-m {
+  color: #ff3b30;
+  text-shadow: 0 0 24px rgba(255, 59, 48, 1), 0 0 10px rgba(255, 255, 255, 0.6);
+  animation: none;
 }
 
 .custom-marker.manhattan-checkpoint .marker-pulse {
-  background-color: rgba(251, 238, 190, 0.18);
+  background-color: rgba(251, 238, 190, 0.22);
   animation: markerPulse 2.2s ease-out infinite;
 }
