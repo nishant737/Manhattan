@@ -23,7 +23,7 @@ const AMENITIES = [
     id: 3,
     index: '02',
     title: 'Spacious Living',
-    description: 'Soaring double-height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing, designed for those who live without compromise on space.',
+    description: 'Soaring double height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing, designed for those who live without compromise on space.',
     backgroundImage: SpaciousLivingImg
     // Uses the default landscape box — same size and position as the
     // "Elevated Experience" panel.
