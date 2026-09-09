@@ -17,7 +17,7 @@ const SOLUTION_GROUPS = LAYOUT_CATEGORIES.map((group) => ({
   items: group.types.map((type) => ({
     id: type.id,
     label: type.title,
-    thumbnail: type.images[0],
+    thumbnail: type.cardImage,
     flatIndex: runningIndex++
   }))
 }))

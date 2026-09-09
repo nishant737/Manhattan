@@ -18,7 +18,11 @@ import UpperDuplexLayout from './assets/upper-duplex-layout.jpeg'
 const withImages = (type) => ({
   ...type,
   hasFloorPlan: Boolean(type.floorPlan),
-  images: [type.floorPlan, ...type.gallery].filter(Boolean)
+  images: [type.floorPlan, ...type.gallery].filter(Boolean),
+  // Thumbnail used by the "Designed For You" accordion. Prefer an explicit
+  // `cardImage`, else the first photo — never the floor-plan drawing, which
+  // reads as a schematic in a small circle (was the case for the Sky Villas).
+  cardImage: type.cardImage || type.gallery[0] || type.floorPlan
 })
 
 export const LAYOUT_TYPES = [
@@ -69,6 +73,7 @@ export const LAYOUT_TYPES = [
       'Spacious two-level sky residences with private outdoor spaces. An exceptional living experience with premium amenities.',
     cta: 'BOOK A VISIT',
     floorPlan: LowerDuplexLayout, // TODO: swap for the final drawing when provided
+    cardImage: '/SKY LOUNGE CAFE.jpg',
     gallery: ['/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg'],
     specs: [
       { label: 'Bedroom', value: '4' },
@@ -87,6 +92,7 @@ export const LAYOUT_TYPES = [
       'Premium sky penthouses with panoramic views and luxury finishes. The pinnacle of luxury living in Manhattan.',
     cta: 'BOOK A VISIT',
     floorPlan: UpperDuplexLayout, // TODO: swap for the final drawing when provided
+    cardImage: '/Sky Lounge-Game Room.jpeg',
     gallery: ['/INDOOR GAME.jpg', '/STREET VIEW_ 02.jpg', '/SKY LOUNGE CAFE.jpg'],
     specs: [
       { label: 'Bedroom', value: '5' },
