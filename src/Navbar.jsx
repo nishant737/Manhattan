@@ -85,6 +85,15 @@ export default function Navbar({ onNavClick }) {
     onNavClick(id)
   }
 
+  // From the full-screen menu: close it FIRST, then run the action on the next
+  // tick. While the menu is open <body> is position:fixed for the scroll lock,
+  // and its cleanup also restores the pre-menu scroll position — so a
+  // scrollIntoView fired before the menu closes does nothing / gets undone.
+  const closeMenuThen = (fn) => {
+    setOpen(false)
+    window.setTimeout(fn, 90)
+  }
+
   const handleLogoClick = () => {
     // Suppress scroll-jacking sections while jumping to the top.
     beginNavScroll()
@@ -144,7 +153,7 @@ export default function Navbar({ onNavClick }) {
             src={logoImg}
             alt="Manhattan Logo"
             className="mobile-menu-logo"
-            onClick={() => { setOpen(false); handleLogoClick() }}
+            onClick={() => closeMenuThen(handleLogoClick)}
           />
 
           <button
@@ -167,8 +176,7 @@ export default function Navbar({ onNavClick }) {
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
-                    handleNavClick(item.id)
-                    setOpen(false)
+                    closeMenuThen(() => handleNavClick(item.id))
                   }}
                 >
                   {item.label}
