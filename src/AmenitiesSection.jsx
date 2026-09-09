@@ -1,14 +1,12 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import ScrollTrigger from 'gsap/ScrollTrigger'
-import Observer from 'gsap/Observer'
-import { navScroll } from './navScroll'
 import './AmenitiesSection.css'
 import IconicArchitectureImg from './assets/potrait.jpeg'
 import SpaciousLivingImg from './assets/Spaiousliving.jpeg'
 import ElevatedLivingImg from './assets/ElevatedExperinces.jpeg'
 
-gsap.registerPlugin(ScrollTrigger, Observer)
+gsap.registerPlugin(ScrollTrigger)
 
 const AMENITIES = [
   {
@@ -51,8 +49,9 @@ export default function AmenitiesSection() {
   // replays or fights with the pinned crossfade storytelling timeline.
   useEffect(() => {
     if (!sectionRef.current || !contentRef.current || !imagesContainerRef.current) return
-    // Desktop only — mobile runs its own pinned stacked-crossfade below.
-    if (window.matchMedia('(max-width: 768px)').matches) return
+    // Desktop only. Portrait phones run their own pinned card-stack below;
+    // landscape phones get a plain scrolling list (CSS) with no GSAP at all.
+    if (window.matchMedia('(max-width: 768px), (orientation: landscape) and (max-height: 600px)').matches) return
 
     const section = sectionRef.current
 
@@ -99,7 +98,10 @@ export default function AmenitiesSection() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia()
 
-      mm.add('(min-width: 1025px)', () => {
+      // `min-height: 601px` keeps the pinned two-column crossfade off landscape
+      // phones (wide enough to hit 1025px on a few large devices, but far too
+      // short) — those get the plain scrolling list (CSS) instead.
+      mm.add('(min-width: 1025px) and (min-height: 601px)', () => {
         const section = sectionRef.current
         const imageSets = imagesRef.current
         const textItems = itemsRef.current
@@ -267,28 +269,29 @@ export default function AmenitiesSection() {
         }
       })
 
-      // ── Mobile: gesture-stepped 3-card stack ──
-      //    The wrapper is CSS-sticky so it's visually fixed the moment the
-      //    section reaches the top; while "locked" an Observer swallows every
-      //    wheel/touch gesture (preventDefault) and a scroll listener snaps any
-      //    slippage back — zero page movement. ONE swipe = exactly ONE card,
-      //    whatever the flick speed. The three images are always stacked one
-      //    behind the other (front fully opaque, two dimmer/smaller peeking
-      //    above). At the first / last card a swipe past the end does nothing
-      //    the first time (dwell — time to read it); a SECOND swipe releases
-      //    the section to the previous / next one.
-      mm.add('(max-width: 768px)', () => {
+      // ── Mobile: pinned, scroll-scrubbed card stack ──
+      //    A plain ScrollTrigger pin + scrub — NO wheel/touch hijacking, no
+      //    scrollTo "snap-back", no Observer. The page keeps scrolling with the
+      //    browser's own momentum, which is what makes it smooth on iOS/Android.
+      //    The section is exactly 100dvh, so the instant its top meets the
+      //    viewport top it pins dead-centre; from there scroll progress drives
+      //    one handoff at a time — the front card recedes to the back of the
+      //    fan as the next rises to the front, the heading crossfading with it.
+      //    After the last card forms, the pin releases and the page carries on.
+      //    Portrait phones only — `min-height: 601px` excludes landscape phones,
+      //    which get the plain CSS scrolling list (no pin, native-smooth).
+      mm.add('(max-width: 768px) and (min-height: 601px)', () => {
         const section = sectionRef.current
         const imageSets = imagesRef.current.filter(Boolean)
         const textItems = itemsRef.current.filter(Boolean)
-        const num = imageSets.length
+        const num = Math.min(imageSets.length, textItems.length)
         if (num < 2) return
 
         ScrollTrigger.config({ ignoreMobileResize: true })
 
         const mod = (n, m) => ((n % m) + m) % m
-        // depth 0 = front (ALWAYS opaque, covers the rest); deeper = smaller,
-        // lifted, tilted, dimmer: clear → less → even less.
+        // depth 0 = front (opaque, covers the rest); deeper = smaller, lifted,
+        // tilted, dimmer so the stack reads as a fanned deck of cards.
         const DEPTH = [
           { opacity: 1, scale: 1, y: 0, rotationX: 0 },
           { opacity: 0.5, scale: 0.9, y: -26, rotationX: 4 },
@@ -299,14 +302,8 @@ export default function AmenitiesSection() {
         const dState = (d) => DEPTH[Math.min(d, dLast)]
         const dZ = (d) => ZI[Math.min(d, dLast)]
 
-        let index = 0
-        let animating = false
-        let locked = false
-        let lockedY = 0
-        let edgePush = 0 // consecutive "push past the end card" gestures
-        let queued = 0 // a swipe that arrived mid-animation, run when it finishes
-
-        const place = (front) => {
+        // Resting fan with `front` as the front card.
+        const placeAt = (front) => {
           imageSets.forEach((el, i) => {
             const d = mod(i - front, num)
             gsap.set(el, { ...dState(d), zIndex: dZ(d), transformOrigin: '50% 0%' })
@@ -315,166 +312,111 @@ export default function AmenitiesSection() {
             gsap.set(el, { opacity: i === front ? 1 : 0, y: i === front ? 0 : 18 })
           })
         }
-        place(0)
+        placeAt(0)
 
-        // One fixed-duration eased step (dir +1 next, -1 prev). false at the end.
-        // Works identically both ways: the card COMING to the front rides on
-        // top (zIndex 4) for the whole move so it's always visible travelling
-        // in; the card LEAVING the front sits just under it (zIndex 3) and
-        // recedes; everyone else stays at the back. zIndex settles to its
-        // resting value at the end for the next step.
-        const step = (dir) => {
-          const next = index + dir
-          if (animating || next < 0 || next >= num) return false
-          animating = true
-          const prev = index
-          index = next
+        const HANDOFF = 1     // scroll-time units for one card swap
+        const HOLD = 0.34     // dwell before / between / after the swaps
 
-          const tl = gsap.timeline({
-            defaults: { ease: 'power2.inOut' },
-            onComplete: () => {
-              animating = false
-              // Flush a swipe that came in while this step was playing, so
-              // fast repeated swipes flow card-to-card instead of being dropped.
-              if (queued !== 0) {
-                const d = queued
-                queued = 0
-                if (!step(d)) tryEdge(d)
+        // One snap stop per "card fully formed" state (plus the two ends). The
+        // custom snapTo below only ever moves ONE stop per settle, so however
+        // hard the visitor flicks in from the hero they can't blow past — the
+        // section catches them and they step through every card before the pin
+        // finally releases on the next scroll.
+        const stops = num === 3
+          ? [0, 0.45, 0.9, 1]
+          : Array.from({ length: num }, (_, i) => i / (num - 1))
+        const nearestIdx = (p) => {
+          let ni = 0, best = Infinity
+          stops.forEach((s, i) => {
+            const d = Math.abs(s - p)
+            if (d < best) { best = d; ni = i }
+          })
+          return ni
+        }
+        let settledIdx = 0
+
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: {
+            id: 'amenitiesMobile',
+            trigger: section,
+            start: 'top top',
+            // A long pin so a single hard flick can't clear it, and the snap
+            // below always has range to catch the visitor. invalidateOnRefresh
+            // re-measures cleanly on URL-bar resize.
+            end: () => '+=' + Math.round(window.innerHeight * (num - 1) * 1.9),
+            pin: true,
+            pinSpacing: true,
+            anticipatePin: 1,
+            scrub: 0.8, // eased catch-up — the crossfade glides toward the
+            // scroll position instead of snapping 1:1, so flicks read smooth.
+            invalidateOnRefresh: true,
+            fastScrollEnd: false,
+            onEnter: () => { settledIdx = 0 },
+            onEnterBack: () => { settledIdx = stops.length - 1 },
+            snap: {
+              // Snap toward the card nearest where momentum would land, but
+              // never more than one stop from the last settled card — that's
+              // what makes the section "sticky": one gesture = one card.
+              snapTo: (value) => {
+                let ni = nearestIdx(value)
+                ni = Math.max(settledIdx - 1, Math.min(settledIdx + 1, ni))
+                return stops[ni]
+              },
+              duration: { min: 0.18, max: 0.5 },
+              delay: 0.05,
+              ease: 'power2.inOut',
+              directional: false,
+              onComplete: () => {
+                const st = ScrollTrigger.getById('amenitiesMobile')
+                if (st) settledIdx = nearestIdx(st.progress)
               }
             }
-          })
-          imageSets.forEach((el, i) => {
-            const dFrom = mod(i - prev, num)
-            const dTo = mod(i - next, num)
-            if (dFrom === dTo) return
-            const to = dState(dTo)
-            const incoming = dTo === 0
-            const leaving = dFrom === 0
-
-            gsap.set(el, { zIndex: incoming ? 4 : leaving ? 3 : 1 })
-
-            tl.to(el, {
-              scale: to.scale, y: to.y, rotationX: to.rotationX, duration: 0.62
-            }, 0)
-
-            if (incoming) {
-              tl.to(el, { opacity: 1, duration: 0.32 }, 0)          // brighten in fast, stays on top
-            } else if (leaving) {
-              tl.to(el, { opacity: to.opacity, duration: 0.32 }, 0.3) // hold opaque, then dim as it clears
-            } else {
-              tl.to(el, { opacity: to.opacity, duration: 0.62 }, 0)
-            }
-
-            tl.set(el, { zIndex: dZ(dTo) }, 0.62)
-          })
-
-          tl.to(textItems[prev], { opacity: 0, y: dir > 0 ? -16 : 16, duration: 0.28, ease: 'power1.in' }, 0)
-            .fromTo(
-              textItems[next],
-              { opacity: 0, y: dir > 0 ? 16 : -16 },
-              { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
-              0.22
-            )
-          return true
-        }
-
-        // Fully unlock WITHOUT any corrective scroll — used when a navbar/footer
-        // "jump to section" scroll is in flight, so this section never fights or
-        // traps it.
-        const standDown = () => {
-          if (!locked) return
-          locked = false
-          edgePush = 0
-          queued = 0
-          window.removeEventListener('scroll', hold)
-          observer.disable()
-        }
-
-        // rAF-throttled snap-back so a stray scroll during the lock is corrected
-        // on the next frame instead of every scroll event (which read as a fight).
-        let holdRaf = null
-        const hold = () => {
-          if (navScroll.active) { standDown(); return }
-          if (holdRaf !== null) return
-          holdRaf = requestAnimationFrame(() => {
-            holdRaf = null
-            if (locked && Math.abs(window.pageYOffset - lockedY) > 1) {
-              window.scrollTo(0, lockedY)
-            }
-          })
-        }
-
-        const lock = (fromDir) => {
-          if (locked) return
-          locked = true
-          lockedY = Math.round(window.pageYOffset + section.getBoundingClientRect().top)
-          window.scrollTo(0, lockedY)
-          index = fromDir > 0 ? 0 : num - 1
-          animating = false
-          edgePush = 0
-          queued = 0
-          place(index)
-          window.addEventListener('scroll', hold, { passive: true })
-          observer.enable()
-        }
-
-        const release = (dir) => {
-          if (!locked) return
-          locked = false
-          edgePush = 0
-          queued = 0
-          window.removeEventListener('scroll', hold)
-          observer.disable()
-          const maxPast = section.offsetHeight - window.innerHeight
-          window.scrollTo(0, dir > 0 ? lockedY + maxPast + 4 : Math.max(0, lockedY - 4))
-        }
-
-        // At an end card, one more scroll past the edge frees the section —
-        // no "swipe twice" dwell, so it never feels stuck.
-        const tryEdge = (dir) => {
-          edgePush += 1
-          if (edgePush >= 1) release(dir)
-        }
-
-        const observer = Observer.create({
-          target: window,
-          type: 'wheel,touch',
-          wheelSpeed: -1,
-          tolerance: 8,
-          dragMinimum: 4,
-          preventDefault: true,
-          onUp: () => { // swipe up = forward / next
-            if (animating) { queued = 1; return }
-            if (step(1)) edgePush = 0
-            else tryEdge(1)
-          },
-          onDown: () => { // swipe down = back / prev
-            if (animating) { queued = -1; return }
-            if (step(-1)) edgePush = 0
-            else tryEdge(-1)
           }
         })
-        observer.disable()
 
-        const gate = ScrollTrigger.create({
-          trigger: section,
-          start: 'top top',
-          end: 'bottom bottom',
-          // Don't engage the card lock while a navbar/footer scroll is passing
-          // through — that's what was trapping the page in this section.
-          onEnter: () => { if (!navScroll.active) lock(1) },
-          onEnterBack: () => { if (!navScroll.active) lock(-1) },
-          onLeave: () => release(1),
-          onLeaveBack: () => release(-1)
-        })
+        let t = HOLD // lead-in: the first card holds a beat before anything moves
+        for (let k = 0; k < num - 1; k++) {
+          const from = k
+          const to = k + 1
 
-        requestAnimationFrame(() => ScrollTrigger.refresh())
+          imageSets.forEach((el, i) => {
+            const dFrom = mod(i - from, num)
+            const dTo = mod(i - to, num)
+            if (dFrom === dTo) return
+            const s = dState(dTo)
+            const incoming = dTo === 0
+            const leaving = dFrom === 0
+            // The card travelling to the front rides on top (zIndex 4) for the
+            // whole move; the one leaving the front sits just under it. The
+            // outgoing card recedes noticeably faster (shorter duration, ease
+            // that starts quick) so the back of the deck clears briskly while
+            // the new front glides in.
+            const dur = leaving ? HANDOFF * 0.6 : incoming ? HANDOFF : HANDOFF * 0.8
+            const ease = leaving ? 'power2.out' : incoming ? 'power3.out' : 'power1.inOut'
+            tl.set(el, { zIndex: incoming ? 4 : leaving ? 3 : 1 }, t)
+            tl.to(el, {
+              opacity: s.opacity, scale: s.scale, y: s.y, rotationX: s.rotationX,
+              duration: dur, ease
+            }, t)
+            tl.set(el, { zIndex: dZ(dTo) }, t + HANDOFF)
+          })
+
+          tl.to(textItems[from],
+            { opacity: 0, y: -16, duration: HANDOFF * 0.34, ease: 'power1.in' }, t)
+          tl.fromTo(textItems[to],
+            { opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: HANDOFF * 0.55, ease: 'power2.out' },
+            t + HANDOFF * 0.3)
+
+          t += HANDOFF + HOLD
+        }
+        // trailing dwell so the final card is fully settled before the release
+        tl.to({}, { duration: HOLD }, t)
 
         return () => {
-          observer.kill()
-          gate.kill()
-          if (holdRaf !== null) cancelAnimationFrame(holdRaf)
-          window.removeEventListener('scroll', hold)
+          if (tl.scrollTrigger) tl.scrollTrigger.kill()
+          tl.kill()
           gsap.set([...imageSets, ...textItems], {
             clearProps: 'opacity,transform,zIndex'
           })
@@ -522,7 +464,7 @@ export default function AmenitiesSection() {
                 className={`amenity-image-set ${index === 0 ? 'active' : ''}`}
               >
                 <div className={`amenity-image-background ${amenity.imageBoxClassName || ''}`}>
-                  <img src={amenity.backgroundImage} alt={amenity.title} />
+                  <img src={amenity.backgroundImage} alt={amenity.title} decoding="async" />
                 </div>
               </div>
             ))}

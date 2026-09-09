@@ -400,3 +400,86 @@
     font-size: 12px;
   }
 }
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   At >768px wide this section had NO top padding (the mobile block that adds it
+   only applies ≤768px), so it butted straight up against the Amenities section
+   above. Restore real padding, and — since landscape is wide — put the heading
+   and the accordion back side by side, compact enough to read without a huge
+   full-width heading. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .tailored-solutions-section {
+    padding: 76px 0 56px 0;
+  }
+
+  .tailored-solutions-pin {
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+
+  .tailored-solutions-container {
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+    padding: 0 32px;
+    max-width: none;
+  }
+
+  .tailored-solutions-left {
+    flex: 0 0 34%;
+  }
+
+  .tailored-solutions-right {
+    flex: 1 1 auto;
+  }
+
+  .tailored-solutions-heading {
+    font-size: 26px;
+    margin: 0;
+  }
+
+  .solutions-accordion {
+    gap: 10px;
+  }
+
+  .solutions-group {
+    gap: 10px;
+  }
+
+  .solutions-group + .solutions-group {
+    margin-top: 14px;
+  }
+
+  .solutions-group-title {
+    font-size: 10.5px;
+  }
+
+  .accordion-trigger {
+    padding: 11px 26px 11px 12px;
+    gap: 14px;
+    font-size: 13px;
+  }
+
+  .accordion-thumbnail {
+    width: 40px;
+    height: 40px;
+  }
+
+  .accordion-label {
+    font-size: 13px;
+  }
+
+  .accordion-open {
+    font-size: 9px;
+  }
+
+  .solutions-ticker {
+    margin-top: 28px;
+    padding: 18px 0;
+  }
+
+  .ticker-content {
+    font-size: 14px;
+  }
+}

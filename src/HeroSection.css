@@ -183,6 +183,59 @@
   }
 }
 
+/* ── Landscape phones (rotate-to-landscape) ──
+   The block above keys off max-WIDTH, which a landscape phone — wide but very
+   short — sails straight past, so the hero was falling back to the desktop
+   sizes and the tall centred stack collided with the fixed navbar. Key off
+   height + orientation instead and keep the stack compact so it always sits
+   clear of the navbar and fits the short viewport. Placed after the
+   max-width block so it wins on small phones that match both. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .hero-content {
+    padding: 64px 24px 20px;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .hero-subheading {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    margin: 0 0 6px 0;
+  }
+
+  .hero-heading {
+    font-size: clamp(30px, 7vw, 58px);
+    letter-spacing: 0.2em;
+    text-indent: 0.2em;
+    margin: 0 0 8px 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+  }
+
+  .hero-tagline {
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    margin: 6px 0 0 0;
+  }
+
+  .hero-logos {
+    gap: 18px;
+    margin: 14px 0 0 0;
+  }
+
+  .hero-logo {
+    height: 38px;
+  }
+
+  .hero-logo-divider {
+    height: 26px;
+  }
+}
+
 @keyframes videoFadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }

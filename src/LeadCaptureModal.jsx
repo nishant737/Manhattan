@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import gsap from 'gsap'
 import SearchableSelect from './SearchableSelect'
 import { PHONE_CODE_OPTIONS, validateContactFields, formatPhoneForSubmit } from './leadFormShared'
@@ -130,7 +131,12 @@ export default function LeadCaptureModal({
     if (e.target === overlayRef.current && !isSubmitting) onClose()
   }
 
-  return (
+  // Portal to <body> so the fixed overlay is positioned against the viewport,
+  // not against an ancestor that establishes a containing block for fixed
+  // elements (e.g. the layout showcase uses `contain: paint` + a GSAP
+  // transform, which was making the modal open at that panel's top rather than
+  // centred on screen — forcing the visitor to scroll up to reach it).
+  return createPortal(
     <div className="lead-modal-overlay" ref={overlayRef} onMouseDown={handleOverlayMouseDown}>
       <div className="lead-modal-card" ref={cardRef}>
         <button
@@ -275,6 +281,7 @@ export default function LeadCaptureModal({
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

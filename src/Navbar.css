@@ -208,12 +208,15 @@
    the close animation finishes, so it never vanishes mid-transition. */
 .mobile-menu {
   position: fixed;
-  top: 0;
-  left: 0;
+  /* inset:0 pins all four edges to the viewport, so the overlay always covers
+     the full visible area — no dependence on 100vh/100dvh, which can leave a
+     gap at the bottom mid-scroll on mobile and let the page show through. */
+  inset: 0;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: auto;
   background: #0a0a0a;
+  /* Keep any scroll gesture inside the overlay from chaining to the page. */
+  overscroll-behavior: contain;
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -606,6 +609,123 @@
 
   .mobile-menu-social {
     padding: 26px 20px calc(20px + env(safe-area-inset-bottom));
+    gap: 18px;
+  }
+}
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   A landscape phone is wide (often > 768px) but very short, so the desktop
+   rule kept the full horizontal link row — which is too tall/cramped for the
+   short viewport and collided with the hero text. Collapse to the hamburger
+   here (same as the phone-portrait treatment). Placed last so it wins over
+   both the `min-width: 769px` and `max-width: 768px` blocks on devices that
+   match more than one. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .navbar,
+  .navbar--scrolled {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    padding: 6px 16px;
+    min-height: 0;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .navbar--scrolled {
+    background-color: rgba(10, 10, 10, 0.94);
+  }
+
+  .navbar-logo,
+  .navbar-logo.navbar-logo-animate {
+    position: relative;
+    left: 0;
+    display: block;
+    height: 46px;
+    width: auto;
+    margin-left: 0;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    animation: none;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .hamburger,
+  .navbar--scrolled .hamburger {
+    display: flex;
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    width: 26px;
+    height: 26px;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .hamburger--open {
+    display: none;
+  }
+
+  /* ── Full-screen menu overlay ──
+     The default link size (up to 60px) with a single vertical column runs far
+     past a ~400px-tall landscape viewport, so the list was clipped. Shrink the
+     links and lay them out in two columns so all six sit on screen at once,
+     with a compact header and social row. */
+  .mobile-menu-header {
+    padding: 10px 24px;
+  }
+
+  .mobile-menu-logo {
+    height: 34px;
+  }
+
+  .mobile-menu-close {
+    width: 32px;
+    height: 32px;
+  }
+
+  .mobile-menu-close svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mobile-menu-primary {
+    align-items: center;
+    justify-content: center;
+    padding: 8px 24px;
+  }
+
+  /* Two content-width columns, centred as a block — otherwise `1fr 1fr` left
+     the links bunched on the left with the whole right half empty. */
+  .mobile-menu-primary ul {
+    display: grid;
+    grid-template-columns: auto auto;
+    column-gap: clamp(40px, 12vw, 120px);
+    row-gap: 14px;
+    width: auto;
+    justify-content: center;
+    align-items: start;
+  }
+
+  .mobile-menu-primary li {
+    width: auto;
+  }
+
+  .mobile-menu-primary a {
+    font-size: clamp(15px, 4.2vh, 22px);
+    line-height: 1.1;
+  }
+
+  .mobile-menu-social {
+    justify-content: center;
+    padding: 8px 24px calc(10px + env(safe-area-inset-bottom));
     gap: 18px;
   }
 }

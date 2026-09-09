@@ -73,6 +73,26 @@ export default function ContactSection() {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
   }
 
+  // When a field is focused the on-screen keyboard can cover it (very visible
+  // in landscape, where the space above the keyboard is tiny). ONLY act when
+  // the keyboard has actually shrunk the visible area AND the field's bottom
+  // is hidden under it — then pull the page up just enough to reveal it. Never
+  // scroll the other way, so tapping an already-visible field doesn't move it.
+  const keepFocusedFieldVisible = (e) => {
+    const el = e.target
+    if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return
+    window.setTimeout(() => {
+      const vv = window.visualViewport
+      const vh = vv ? vv.height : window.innerHeight
+      // No meaningful keyboard resize → leave the scroll position alone.
+      if (vh >= window.innerHeight - 40) return
+      const overshoot = el.getBoundingClientRect().bottom - (vh - 16)
+      if (overshoot > 0) {
+        window.scrollBy({ top: overshoot + 24, behavior: 'smooth' })
+      }
+    }, 350)
+  }
+
   const handlePhoneCountryChange = (nextCountry) => {
     setForm((prev) => ({ ...prev, phoneCountry: nextCountry }))
   }
@@ -205,7 +225,12 @@ export default function ContactSection() {
               </button>
             </div>
           ) : (
-            <form className="contact-form" onSubmit={handleSubmit} noValidate>
+            <form
+              className="contact-form"
+              onSubmit={handleSubmit}
+              onFocusCapture={keepFocusedFieldVisible}
+              noValidate
+            >
               <div className="contact-field">
                 <label htmlFor="contact-name">
                   Full Name <span className="required-mark">*</span>

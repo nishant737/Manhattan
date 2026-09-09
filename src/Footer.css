@@ -287,3 +287,75 @@
     align-items: center;
   }
 }
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   Wide but short. The ≤960px rules dropped to a 2-column grid with the brand
+   spanning the full width, which left half the screen empty and stacked the
+   link columns awkwardly. Landscape is wide enough for the full three-column
+   row (brand · Explore · Contact), just compact. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .site-footer-inner {
+    grid-template-columns: 1.5fr auto auto;
+    column-gap: 44px;
+    row-gap: 20px;
+    padding: 36px 32px 22px;
+    max-width: none;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .site-footer-brand {
+    grid-column: auto;
+    justify-self: start;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .site-footer-logo {
+    height: 32px;
+    margin-bottom: 10px;
+  }
+
+  .site-footer-tagline {
+    font-size: 12px;
+    max-width: 260px;
+    margin-bottom: 12px;
+  }
+
+  .site-footer-project-by {
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .site-footer-partner-logos img {
+    height: 24px;
+  }
+
+  .site-footer-social a {
+    width: 32px;
+    height: 32px;
+  }
+
+  .site-footer-col {
+    gap: 8px;
+  }
+
+  .site-footer-col ul {
+    gap: 6px;
+  }
+
+  .site-footer-col-title {
+    margin-bottom: 2px;
+  }
+
+  .site-footer-link,
+  .site-footer-address {
+    font-size: 11.5px;
+    text-align: left;
+  }
+
+  .site-footer-bottom {
+    padding: 14px 32px;
+  }
+}

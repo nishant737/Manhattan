@@ -160,6 +160,10 @@ a.contact-detail-value:hover {
   flex-direction: column;
   gap: 7px;
   min-width: 0;
+  /* Clear the fixed navbar when a field is scrolled into view on focus (the
+     JS in ContactSection.jsx handles the keyboard-overlap case explicitly). */
+  scroll-margin-top: 88px;
+  scroll-margin-bottom: 24px;
 }
 
 .contact-field label {
@@ -412,5 +416,59 @@ a.contact-detail-value:hover {
 
   .contact-submit {
     padding: 14px 18px;
+  }
+}
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   The ≤1024px rule collapses to a single column, which on a wide landscape
+   phone left the intro with the whole right half empty and pushed the form
+   into a long full-width scroll. Landscape is wide — put the intro and the
+   form back side by side, compact. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .contact-section {
+    padding: 74px 0 52px;
+  }
+
+  .contact-container {
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 40px;
+    padding: 0 32px;
+    max-width: none;
+    align-items: start;
+  }
+
+  .contact-intro {
+    position: static;
+    text-align: left;
+  }
+
+  .contact-title {
+    font-size: 26px;
+  }
+
+  .contact-subtitle {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 12.5px;
+  }
+
+  .contact-details,
+  .contact-detail,
+  .contact-detail-address {
+    align-items: flex-start;
+  }
+
+  .contact-social {
+    align-items: flex-start;
+  }
+
+  .contact-social-icons {
+    justify-content: flex-start;
+  }
+
+  .contact-form-card {
+    padding: 22px;
+    border-radius: 14px;
   }
 }

@@ -49,8 +49,10 @@ export default function TailoredSolutions({ onSelectLayout }) {
 
       mm.add(
         {
-          isDesktop: '(min-width: 1025px)',
-          isCompact: '(max-width: 1024px)'
+          // Short viewports (landscape phones) never get the pin, even if they
+          // happen to be ≥1025px wide — the compact non-pinned reveal instead.
+          isDesktop: '(min-width: 1025px) and (min-height: 601px)',
+          isCompact: '(max-width: 1024px), (max-height: 600px)'
         },
         (context) => {
           const { isDesktop } = context.conditions

@@ -318,3 +318,68 @@
     letter-spacing: 0.12em;
   }
 }
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   A landscape phone is wide (often > 768px) but very short, so it was picking
+   up the tablet rules — the animated "We …" tagline stayed on and its
+   absolutely-positioned lines overlapped in the short viewport. Give it the
+   same clean single-column treatment as portrait mobile (tagline hidden,
+   image over the two paragraphs). Placed last so it wins on any device that
+   matches more than one query. The matching JS branch guard lives in
+   AboutSection.jsx (min-height: 601px on the desktop/tablet scrubs). */
+/* ── Landscape phones (rotate-to-landscape) ──
+   A landscape phone is wide (often > 768px) but very short, so it was picking
+   up the tablet rules — the animated "We …" tagline stayed on and its
+   absolutely-positioned lines overlapped in the short viewport. Give it the
+   same clean single-column treatment as portrait mobile (tagline hidden,
+   image over the two paragraphs). Placed last so it wins on any device that
+   matches more than one query. The matching JS branch guard lives in
+   AboutSection.jsx (min-height: 601px on the desktop/tablet scrubs). */
+@media (orientation: landscape) and (max-height: 600px) {
+  .about-section {
+    padding: 78px 0 48px;
+  }
+
+  .about-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 0 40px;
+    max-width: 1000px;
+  }
+
+  .about-left,
+  .about-right {
+    display: contents;
+  }
+
+  .about-tagline-wrapper {
+    display: none;
+  }
+
+  .about-image-wrapper {
+    order: 1;
+    width: 100%;
+    max-width: 560px;
+    max-height: none;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .about-description {
+    order: 2;
+  }
+
+  .about-description-secondary {
+    order: 3;
+  }
+
+  .about-description,
+  .about-description-secondary {
+    font-size: clamp(12px, 1.7vw, 15px);
+    line-height: 1.7;
+    text-align: center;
+    width: 100%;
+  }
+}

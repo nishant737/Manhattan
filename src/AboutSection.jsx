@@ -162,8 +162,10 @@ export default function AboutSection() {
 
       // ── Desktop (two-column): PIN the section on arrival, scrub the whole
       //    "We" travel + finale across a set distance, then release to the
-      //    next section. pinSpacing keeps page flow intact afterwards. ──
-      mm.add('(min-width: 1025px)', () => {
+      //    next section. pinSpacing keeps page flow intact afterwards. The
+      //    `min-height: 601px` keeps this off landscape phones (wide but very
+      //    short — CSS gives those the clean stacked layout with no tagline). ──
+      mm.add('(min-width: 1025px) and (min-height: 601px)', () => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
@@ -181,8 +183,10 @@ export default function AboutSection() {
       })
 
       // ── Tablet (stacked layout, taller than a viewport): NO pin — the "We"
-      //    travels as the tagline block scrolls up through the viewport. ──
-      mm.add('(min-width: 769px) and (max-width: 1024px)', () => {
+      //    travels as the tagline block scrolls up through the viewport. The
+      //    `min-height: 601px` excludes landscape phones in the 769–1024px
+      //    width band, which get the clean stacked layout instead. ──
+      mm.add('(min-width: 769px) and (max-width: 1024px) and (min-height: 601px)', () => {
         if (!taglineWrap) return
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -197,8 +201,8 @@ export default function AboutSection() {
         return () => tl.kill()
       })
 
-      // ── Mobile (≤768): CSS hides the tagline block; the entrance reveal
-      //    above is the whole animation. ──
+      // ── Mobile (≤768) and any landscape phone (≤600px tall): CSS hides the
+      //    tagline block; the entrance reveal above is the whole animation. ──
 
       return () => mm.revert()
     }, section)

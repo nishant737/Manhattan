@@ -181,11 +181,13 @@ export default function LocationConnectivity() {
 
     const section = sectionRef.current
 
-    // On mobile the section wraps a Leaflet map — scrubbing a transform on it
-    // every scroll frame forces the map's layer to repaint and reads as
-    // friction. There it plays once on entry instead; desktop keeps the
-    // scrubbed rise-and-settle.
-    const isMobile = window.matchMedia('(max-width: 768px)').matches
+    // On mobile (and any landscape phone) the section wraps a Leaflet map —
+    // scrubbing a transform on it every scroll frame forces the map's layer to
+    // repaint and reads as friction. There it plays once on entry instead;
+    // desktop keeps the scrubbed rise-and-settle.
+    const isMobile = window.matchMedia(
+      '(max-width: 768px), (orientation: landscape) and (max-height: 600px)'
+    ).matches
 
     gsap.set(contentWrapperRef.current, { opacity: 0, y: isMobile ? 40 : 90 })
     if (leftColumnRef.current) gsap.set(leftColumnRef.current, { x: isMobile ? 0 : -30 })
@@ -219,6 +221,38 @@ export default function LocationConnectivity() {
     return () => {
       if (tl.scrollTrigger) tl.scrollTrigger.kill()
       tl.kill()
+    }
+  }, [])
+
+  // Leaflet caches its container's pixel size, so after the viewport changes —
+  // most visibly an orientation flip — the map renders offset or grey until
+  // it's told to re-measure. Re-fit the bounds on a flip too so the pins stay
+  // framed in the new aspect ratio.
+  useEffect(() => {
+    let debounce
+    const invalidate = () => {
+      const map = mapInstanceRef.current
+      if (map) map.invalidateSize()
+    }
+    const onResize = () => {
+      clearTimeout(debounce)
+      debounce = setTimeout(invalidate, 150)
+    }
+    const onOrientationChange = () => {
+      const map = mapInstanceRef.current
+      if (!map) return
+      // Wait a beat for the layout to settle after the rotation.
+      setTimeout(() => {
+        map.invalidateSize()
+        map.fitBounds(MAP_BOUNDS, { padding: [24, 24], maxZoom: 16 })
+      }, 300)
+    }
+    window.addEventListener('resize', onResize)
+    window.addEventListener('orientationchange', onOrientationChange)
+    return () => {
+      clearTimeout(debounce)
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('orientationchange', onOrientationChange)
     }
   }, [])
 

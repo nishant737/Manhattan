@@ -209,11 +209,13 @@
   }
 }
 
-/* ── Responsive: Mobile ──
+/* ── Responsive: Mobile (portrait phones) ──
    Pinned stacked-card storytelling (see AmenitiesSection.jsx): image over
    text, centred in the pinned viewport. The three images are stacked absolute
    (identical box) and GSAP fans them with opacity + scale + a small y offset
-   + an X-tilt for depth; the front one arcs up and over on each step. */
+   + an X-tilt for depth as scroll scrubs each handoff. Landscape phones get a
+   plain scrolling list instead (see the orientation block lower down) — the
+   short pinned box squished the images and the 3D fan was heavy on-device. */
 @media (max-width: 768px) {
   .amenities-section {
     background-color: #0a0a0a;
@@ -228,16 +230,17 @@
     display: none;
   }
 
-  /* Native CSS sticky — visually fixed to the top the moment the section
-     reaches it. The JS lock (Observer + scroll snap-back) freezes the page on
-     top of this, so there's zero movement while stepping cards. */
+  /* Exactly one viewport tall and centred — ScrollTrigger pins this (see
+     AmenitiesSection.jsx), NOT CSS `position: sticky`, which fights the JS
+     pin. So the section locks dead-centre the moment its top reaches the top
+     of the screen, and scroll from there scrubs the card handoffs. */
   .amenities-sticky-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: sticky;
-    top: 0;
+    position: relative;
+    top: auto;
     height: 100vh;
     height: 100dvh;
     min-height: 0;
@@ -247,12 +250,10 @@
     gap: 14px;
   }
 
-  /* Short tail so the enter/leave gate ScrollTrigger has a range to fire on.
-     The lock keeps the page from actually travelling through it. */
+  /* ScrollTrigger's pinSpacing reserves the scroll room for the pin, so no
+     manual spacer tail is needed on mobile. */
   .amenities-spacer {
-    display: block;
-    height: 40vh;
-    background-color: #0a0a0a;
+    display: none;
   }
 
   /* Undo the display:contents wrappers so the areas can be sized/positioned. */
@@ -403,5 +404,132 @@
   .amenity-body {
     font-size: 12.5px;
     line-height: 1.55;
+  }
+}
+
+/* ── Landscape phones (rotate-to-landscape) ──
+   A wide but very short viewport. Neither the pinned two-column crossfade nor
+   the pinned card stack fit here, so drop the pinning/animation entirely and
+   render the three panels as a plain vertical list — image, then its caption,
+   repeated — that scrolls with the browser's own (buttery) momentum. The
+   matching JS guards (min-height: 601px) keep every GSAP branch off this
+   viewport. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .amenities-section {
+    overflow: visible;
+    contain: none;
+    position: relative;
+  }
+
+  .amenity-index {
+    display: none;
+  }
+
+  .amenities-sticky-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    top: auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 84px 16px 56px;
+    box-sizing: border-box;
+    gap: 0;
+  }
+
+  .amenities-spacer {
+    display: none;
+  }
+
+  /* Collapse the two column wrappers so the individual panels become direct
+     flex children of the sticky wrapper and can be interleaved with `order`. */
+  .amenities-content-column,
+  .amenities-content-inner,
+  .amenities-image-column,
+  .amenities-images-container {
+    display: contents;
+  }
+
+  .amenity-image-set {
+    position: relative !important;
+    inset: auto;
+    opacity: 1 !important;
+    transform: none !important;
+    /* No animation here — drop the compositor-layer hint, otherwise the phone
+       keeps three big images on their own layers and the FIRST scroll pays the
+       rasterisation cost, which reads as initial stutter. */
+    will-change: auto;
+    width: 100%;
+    max-width: 560px;
+    aspect-ratio: 16 / 10;
+    margin: 0 auto;
+  }
+
+  .amenity-image-set:nth-child(1) { order: 1; }
+  .amenity-image-set:nth-child(2) { order: 3; }
+  .amenity-image-set:nth-child(3) { order: 5; }
+
+  .amenity-image-background {
+    position: absolute !important;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: auto;
+    margin: 0;
+    transform: none !important;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid rgba(251, 238, 190, 0.22);
+  }
+
+  .amenity-image-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .amenity-item {
+    position: relative !important;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto;
+    width: 100%;
+    max-width: 620px;
+    margin: 16px auto 40px;
+    padding: 0;
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .amenity-item:nth-child(1) { order: 2; }
+  .amenity-item:nth-child(2) { order: 4; }
+  .amenity-item:nth-child(3) { order: 6; }
+
+  .amenity-item:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .amenity-title {
+    font-size: 22px;
+    margin: 0 0 8px 0;
+    line-height: 1.15;
+  }
+
+  .amenity-body {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0;
   }
 }

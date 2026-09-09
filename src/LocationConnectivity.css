@@ -661,6 +661,88 @@
   }
 }
 
+/* ── Landscape phones (rotate-to-landscape) ──
+   The stacked column layout pushed the map far below the tall 7-item list, so
+   it sat off-screen. Landscape is wide, so put the list and the map back side
+   by side (as on desktop) with a compact list, and vertically centre the whole
+   block in a full-height section so it clears the navbar and isn't jammed to
+   the top. The JS calls map.invalidateSize() on orientationchange so Leaflet
+   re-measures its resized container. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .location-connectivity-section {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 70px 0 28px;
+    box-sizing: border-box;
+  }
+
+  .location-container {
+    width: 100%;
+    padding: 0 32px;
+    max-width: none;
+  }
+
+  .location-content-wrapper {
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .location-left-column {
+    flex: 0 0 40%;
+    width: auto;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .location-right-column {
+    flex: 1 1 auto;
+    width: auto;
+  }
+
+  .location-title {
+    font-size: 20px;
+    margin-bottom: 8px;
+    width: auto;
+    min-width: 0;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .title-line {
+    text-align: left;
+    white-space: normal;
+  }
+
+  .location-list {
+    gap: 1px;
+    width: 100%;
+  }
+
+  .location-list-item {
+    padding: 5px 0;
+  }
+
+  .location-list-item .time {
+    font-size: 10.5px;
+  }
+
+  .location-list-item .name {
+    font-size: 11px;
+  }
+
+  .location-map-wrapper {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    max-height: 78vh;
+    border-radius: 14px;
+  }
+}
+
 /* Leaflet Controls Styling */
 .leaflet-control-zoom {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
