@@ -19,7 +19,15 @@
 /* ── Left: Intro ── */
 .contact-intro {
   position: sticky;
-  top: 140px;
+  /* This column's own content (heading, contact details, then "Connect With
+     Us") runs ~600px tall. A large top offset here leaves less room below it
+     before the viewport's bottom edge, so on any window shorter than
+     top + that content height, "Connect With Us" — the last thing in the
+     column — gets stuck pinned partway off-screen while its sticky position
+     holds it up near the top. Keeping the offset small gives the column
+     room to fit on ordinary browser-window heights, not just a maximized
+     tall display. */
+  top: 32px;
 }
 
 .contact-eyebrow {

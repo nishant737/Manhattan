@@ -28,8 +28,12 @@ const SCROLL_TARGETS = {
   // the actual amenities gallery (Community Hall, Gym, Pool, …) — not the
   // separate "Iconic Architecture / Spacious Living" pinned section.
   amenities: '.luxury-showcase',
-  '3d-walkthrough': '.arvr-section',
-  'vr-experience': '.arvr-section',
+  // Target the cards themselves, not the section's top (which includes the
+  // eyebrow/title/subtitle intro above them) — that intro plus the cards
+  // together are taller than one screen, so landing on the section's top
+  // left the cards cut off at the bottom of the viewport.
+  '3d-walkthrough': '.arvr-cards',
+  'vr-experience': '.arvr-cards',
   // "Contact Us" scrolls to the inline "Get In Touch" section (not a modal).
   contact: '.contact-section'
 }
@@ -89,15 +93,36 @@ function App() {
       // Let scroll-jacking sections (the mobile Amenities card lock) stand down
       // for the duration of this programmatic scroll so it can't trap the nav.
       beginNavScroll()
+
       // Plain scrollIntoView(block:'start') lands the target's top edge at
       // viewport y=0 — right underneath the fixed navbar, which then paints
       // over (and visually "cuts off the top of") whatever sits there, e.g.
       // a section heading. Offset by the navbar's own current height (plus a
       // little breathing room) instead of a hardcoded pixel value, since it
       // animates between ~82px and ~62px as the page scrolls.
-      const navbarHeight = document.querySelector('.navbar')?.getBoundingClientRect().height || 0
-      const top = el.getBoundingClientRect().top + window.scrollY - navbarHeight - 16
-      window.scrollTo({ top, behavior: 'smooth' })
+      const scrollToTarget = (behavior) => {
+        const navbarHeight = document.querySelector('.navbar')?.getBoundingClientRect().height || 0
+        const top = el.getBoundingClientRect().top + window.scrollY - navbarHeight - 16
+        window.scrollTo({ top, behavior })
+      }
+
+      // A click that lands before the page's fonts/images/video have finished
+      // loading computes this offset against layout that's about to shift —
+      // sections above the target grow as their content settles in, so the
+      // target's real position moves out from under an already-in-flight
+      // scroll. Wait for both before the very first scroll, then do one more
+      // corrective (instant) scroll shortly after in case anything above the
+      // target still reflowed during the animation itself.
+      const fontsReady = document.fonts?.ready ?? Promise.resolve()
+      const pageLoaded =
+        document.readyState === 'complete'
+          ? Promise.resolve()
+          : new Promise((resolve) => window.addEventListener('load', resolve, { once: true }))
+
+      Promise.all([fontsReady, pageLoaded]).then(() => {
+        scrollToTarget('smooth')
+        setTimeout(() => scrollToTarget('auto'), 700)
+      })
     }
   }
 
