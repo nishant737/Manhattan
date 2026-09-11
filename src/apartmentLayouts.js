@@ -139,12 +139,17 @@ export const LAYOUT_TYPES = [
   }
 ].map(withImages)
 
-// Unit types grouped by category, in display order — used by both surfaces to
-// render the types under clear headings ("Residences", "Sky Villas") instead
-// of one flat list.
+// Unit types grouped by category — used by both surfaces to render the types
+// under clear headings ("Sky Villas", "Residences") instead of one flat list.
+// Sky Villas lead, Residences follow; any category not listed here keeps
+// whatever order it fell in.
+const CATEGORY_DISPLAY_ORDER = ['Sky Villas', 'Residences']
+
 export const LAYOUT_CATEGORIES = LAYOUT_TYPES.reduce((acc, type) => {
   const bucket = acc.find((c) => c.category === type.category)
   if (bucket) bucket.types.push(type)
   else acc.push({ category: type.category, types: [type] })
   return acc
-}, [])
+}, []).sort(
+  (a, b) => CATEGORY_DISPLAY_ORDER.indexOf(a.category) - CATEGORY_DISPLAY_ORDER.indexOf(b.category)
+)

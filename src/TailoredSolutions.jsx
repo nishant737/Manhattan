@@ -7,22 +7,15 @@ import './TailoredSolutions.css'
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
-// Sky Villas lead, Residences follow — the opposite of LAYOUT_CATEGORIES'
-// natural order (which the Layout modal still uses as-is). Any category not
-// listed here keeps whatever order it fell in originally.
-const CATEGORY_ORDER = ['Sky Villas', 'Residences']
-const ORDERED_CATEGORIES = [...LAYOUT_CATEGORIES].sort(
-  (a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category)
-)
-
 const getSpecValue = (type, label) => type.specs.find((spec) => spec.label === label)?.value
 
 // The same unit types the Layout modal offers, grouped under their category
-// headings for display. A flat running index is assigned so the staggered
-// entrance animation (which keys off accordionItemsRef order) still lines up
-// across groups.
+// headings for display (Sky Villas lead, Residences follow — see
+// LAYOUT_CATEGORIES' own ordering in apartmentLayouts.js). A flat running
+// index is assigned so the staggered entrance animation (which keys off
+// accordionItemsRef order) still lines up across groups.
 let runningIndex = 0
-const SOLUTION_GROUPS = ORDERED_CATEGORIES.map((group) => ({
+const SOLUTION_GROUPS = LAYOUT_CATEGORIES.map((group) => ({
   category: group.category,
   items: group.types.map((type) => {
     const bedrooms = getSpecValue(type, 'Bedroom')
