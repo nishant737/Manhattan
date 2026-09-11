@@ -7,19 +7,33 @@ import './TailoredSolutions.css'
 gsap.registerPlugin(ScrollTrigger)
 ScrollTrigger.config({ ignoreMobileResize: true })
 
+// Sky Villas lead, Residences follow — the opposite of LAYOUT_CATEGORIES'
+// natural order (which the Layout modal still uses as-is). Any category not
+// listed here keeps whatever order it fell in originally.
+const CATEGORY_ORDER = ['Sky Villas', 'Residences']
+const ORDERED_CATEGORIES = [...LAYOUT_CATEGORIES].sort(
+  (a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category)
+)
+
+const getSpecValue = (type, label) => type.specs.find((spec) => spec.label === label)?.value
+
 // The same unit types the Layout modal offers, grouped under their category
 // headings for display. A flat running index is assigned so the staggered
 // entrance animation (which keys off accordionItemsRef order) still lines up
 // across groups.
 let runningIndex = 0
-const SOLUTION_GROUPS = LAYOUT_CATEGORIES.map((group) => ({
+const SOLUTION_GROUPS = ORDERED_CATEGORIES.map((group) => ({
   category: group.category,
-  items: group.types.map((type) => ({
-    id: type.id,
-    label: type.title,
-    thumbnail: type.cardImage,
-    flatIndex: runningIndex++
-  }))
+  items: group.types.map((type) => {
+    const bedrooms = getSpecValue(type, 'Bedroom')
+    return {
+      id: type.id,
+      label: type.title,
+      thumbnail: type.cardImage,
+      meta: bedrooms ? `${bedrooms} Bedroom${bedrooms === '1' ? '' : 's'}` : null,
+      flatIndex: runningIndex++
+    }
+  })
 }))
 
 export default function TailoredSolutions({ onSelectLayout }) {
@@ -30,9 +44,9 @@ export default function TailoredSolutions({ onSelectLayout }) {
   const accordionItemsRef = useRef([])
   const groupTitlesRef = useRef([])
 
-  // Clicking a unit type opens the shared Layout modal straight to that
-  // type's detail view — no interstitial. Lead capture now lives on the
-  // "Book a Visit" CTA inside that modal instead of gating the whole view.
+  // "View Layout" triggers the brochure lead-capture flow rather than
+  // opening the Layout modal directly — the modal is still reachable from
+  // the navbar/footer's "Layout" link.
   const handleSelectSolution = (id) => {
     onSelectLayout?.(id)
   }
@@ -146,11 +160,16 @@ export default function TailoredSolutions({ onSelectLayout }) {
         <div className="tailored-solutions-container">
           {/* Left Column */}
           <div className="tailored-solutions-left" ref={leftColumnRef}>
+            <span className="tailored-solutions-eyebrow">Our Collections</span>
             <h2 className="tailored-solutions-heading">
               Luxury Residences
               <br />
               Designed for You
             </h2>
+            <p className="tailored-solutions-copy">
+              From sky villas above the skyline to elegant residence floors below —
+              every layout is a study in space, light, and craftsmanship.
+            </p>
           </div>
 
           {/* Right Column — unit types grouped by category */}
@@ -158,15 +177,18 @@ export default function TailoredSolutions({ onSelectLayout }) {
             <div className="solutions-accordion">
               {SOLUTION_GROUPS.map((group, gi) => (
                 <div className="solutions-group" key={group.category}>
-                  <h3
+                  <div
                     className="solutions-group-title"
                     ref={(el) => {
                       if (el) groupTitlesRef.current[gi] = el
                     }}
                   >
-                    {group.category}
-                  </h3>
-                  {group.items.map((solution) => (
+                    <h3>{group.category}</h3>
+                    <span className="solutions-group-count">
+                      {String(group.items.length).padStart(2, '0')}
+                    </span>
+                  </div>
+                  {group.items.map((solution, ii) => (
                     <div
                       key={solution.id}
                       ref={(el) => {
@@ -177,28 +199,23 @@ export default function TailoredSolutions({ onSelectLayout }) {
                       <button
                         className="accordion-trigger"
                         onClick={() => handleSelectSolution(solution.id)}
-                        aria-label={`Open ${solution.label} layout`}
+                        aria-label={`Download brochure for ${solution.label}`}
                       >
-                        <img
-                          src={solution.thumbnail}
-                          alt={solution.label}
-                          className="accordion-thumbnail"
-                        />
-                        <span className="accordion-label">{solution.label}</span>
-                        <span className="accordion-open">
-                          Open Layout
-                          <svg
-                            className="accordion-arrow"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polyline points="9 6 15 12 9 18"></polyline>
-                          </svg>
+                        <span className="accordion-index">{String(ii + 1).padStart(2, '0')}</span>
+                        <span className="accordion-thumbnail-wrap">
+                          <img
+                            src={solution.thumbnail}
+                            alt={solution.label}
+                            className="accordion-thumbnail"
+                          />
                         </span>
+                        <span className="accordion-text">
+                          <span className="accordion-label">{solution.label}</span>
+                          {solution.meta && (
+                            <span className="accordion-meta">{solution.meta}</span>
+                          )}
+                        </span>
+                        <span className="accordion-open">View Layout</span>
                       </button>
                     </div>
                   ))}

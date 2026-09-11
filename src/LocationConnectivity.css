@@ -17,7 +17,11 @@
 .location-content-wrapper {
   display: flex;
   gap: 60px;
-  align-items: flex-start;
+  /* The map (fixed 4:3 aspect ratio) is shorter than the landmark list next
+     to it, so top-aligning left it looking stuck to the top of the section
+     with empty space below. Centering it against the list keeps it balanced
+     regardless of how many landmarks the list ends up with. */
+  align-items: center;
   will-change: opacity, transform;
 }
 
@@ -116,6 +120,22 @@
   color: rgb(251, 238, 190);
 }
 
+/* The "Your Location" entry — pinned above the landmark list as the one
+   persistent way back to Manhattan after selecting a landmark elsewhere in
+   the list or on the map. A heavier gold divider (instead of the hairline
+   the landmark rows use) marks it as the anchor the rest are measured from,
+   not just one more row in the list. */
+.location-list-item--home {
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+  border-bottom: 2px solid rgba(251, 238, 190, 0.35);
+}
+
+.location-list-item--home .name {
+  color: rgb(251, 238, 190);
+  font-weight: 600;
+}
+
 /* ── Right Column: Map ── */
 .location-right-column {
   display: flex;
@@ -143,6 +163,33 @@
 .card-title-link:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Persistent "Take Me There" CTA below the map — always visible, no need to
+   select Manhattan from the list/map first to get a directions link. */
+.location-map-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: center;
+  margin-top: 20px;
+  padding: 12px 28px;
+  border: 1px solid rgba(251, 238, 190, 0.4);
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(251, 238, 190);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.location-map-cta:hover {
+  background: rgb(251, 238, 190);
+  border-color: rgb(251, 238, 190);
+  color: #0a0a0a;
 }
 
 .leaflet-map-container {
@@ -439,6 +486,12 @@
   .location-content-wrapper {
     flex-direction: column;
     gap: 60px;
+    /* The centered alignment above is a row-layout (desktop) fix for the
+       map's height vs. the list's; in this stacked column layout neither
+       column has an explicit width, so centering here would shrink both to
+       their content width and center that — restore the original edge-to-edge
+       stacking instead. */
+    align-items: stretch;
   }
 
   .location-left-column {

@@ -4,7 +4,11 @@
   box-sizing: border-box;
   width: 100%;
   position: relative;
-  contain: layout style paint;
+  /* `paint` containment clips rendering to this box's padding edge — with
+     zero buffer above the heading, that clipped off the top sliver of its
+     glyphs (large text commonly paints a hair above its own line-height
+     box). `layout style` keeps most of the isolation without clipping. */
+  contain: layout style;
 }
 
 /* ── Section Header ── */
@@ -356,21 +360,32 @@
 }
 
 /* ── Grid Layout ──
-   Single column: one large LANDSCAPE image per row, one image at a time as
-   the visitor scrolls the list. object-fit: cover keeps each render's real
-   aspect ratio — never stretched. */
+   A real multi-column mosaic — the point of "grid view" is seeing every
+   amenity at a glance, which one full-width image at a time down a long
+   single column never delivered (that read as just the carousel's cards
+   restacked vertically, with a much longer scroll to get through all 11).
+   Three columns on desktop, tapering down at each breakpoint below.
+
+   Flexbox + wrap, not CSS grid: 11 items into 3 columns leaves a 2-item
+   last row, and a strict grid holds that row's cards to the *grid's* column
+   tracks — the third slot stays empty and the two cards read as stuck to
+   the left with a dead gap beside them. Flex-wrap has no fixed tracks, so
+   `justify-content: center` centers a short last row as a group instead. */
 .amenities-grid {
-  max-width: 1040px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 60px;
   box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
 }
 
 .grid-item {
-  aspect-ratio: 16 / 9;
+  /* Three equal columns accounting for the two 24px gaps between them. */
+  flex: 0 1 calc((100% - 48px) / 3);
+  aspect-ratio: 4 / 3;
 }
 
 .grid-card {
@@ -528,8 +543,11 @@
 
   .amenities-grid {
     padding: 0 48px;
-    grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 20px;
+  }
+
+  .grid-item {
+    flex-basis: calc((100% - 20px) / 2);
   }
 
   .grid-label h3 {
@@ -613,11 +631,11 @@
 
   .amenities-grid {
     padding: 0 32px;
-    grid-template-columns: 1fr;
     gap: 18px;
   }
 
   .grid-item {
+    flex-basis: 100%;
     aspect-ratio: 16 / 10;
   }
 
@@ -695,11 +713,11 @@
 
   .amenities-grid {
     padding: 0 20px;
-    grid-template-columns: 1fr;
     gap: 12px;
   }
 
   .grid-item {
+    flex-basis: 100%;
     aspect-ratio: 16 / 10;
   }
 

@@ -4,7 +4,7 @@ import ScrollTrigger from 'gsap/ScrollTrigger'
 import SearchableSelect from './SearchableSelect'
 import { PHONE_CODE_OPTIONS, validateContactFields, formatPhoneForSubmit } from './leadFormShared'
 import { submitLead } from './leadSubmit'
-import { CONTACT_DETAILS, SOCIAL_LINKS } from './siteContact'
+import { CONTACT_DETAILS, SOCIAL_LINKS, OFFICE_MAPS_URL } from './siteContact'
 import './ContactSection.css'
 
 // Static copy for the contact-details block — real values come from
@@ -159,11 +159,16 @@ export default function ContactSection() {
 
             <li className="contact-detail">
               <span className="contact-detail-label">{CONTACT_COPY.addressLabel}</span>
-              <span className="contact-detail-value contact-detail-address">
+              <a
+                className="contact-detail-value contact-detail-address"
+                href={OFFICE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {CONTACT_DETAILS.address.map((line, i) => (
                   <span key={i}>{line}</span>
                 ))}
-              </span>
+              </a>
             </li>
           </ul>
 

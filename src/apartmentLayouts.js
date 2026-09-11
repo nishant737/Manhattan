@@ -1,6 +1,3 @@
-import LowerDuplexLayout from './assets/lower-duplex-layout.jpeg'
-import UpperDuplexLayout from './assets/upper-duplex-layout.jpeg'
-
 // ── Room / floor-plan data structure ──
 // Shared across the Layout selection modal (ApartmentShowcase) and the
 // "Luxury Residences Designed For You" accordion (TailoredSolutions) so both
@@ -34,8 +31,17 @@ export const LAYOUT_TYPES = [
     description:
       'Elegant urban residences designed for contemporary living. Featuring premium finishes, open floor plans, and stunning city views.',
     cta: 'BOOK A VISIT',
-    floorPlan: null, // TODO: add the provided 3 BHK floor-plan image
-    gallery: ['/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg'],
+    floorPlan: '/3bhk/floor-plan.png',
+    gallery: [
+      '/3bhk/gallery-03.jpg',
+      '/3bhk/gallery-04.jpg',
+      '/3bhk/gallery-05.jpg',
+      '/3bhk/gallery-06.jpg',
+      '/3bhk/gallery-07.jpg',
+      '/3bhk/gallery-08.jpg',
+      '/3bhk/gallery-09.jpg',
+      '/3bhk/gallery-10.jpg'
+    ],
     // Carpet area differs by floor parity — the Size spec renders Odd/Even
     // toggle buttons in the modal when this is present.
     floorSizes: { odd: '2,915 sq. ft.', even: '2,970 sq. ft.' },
@@ -54,8 +60,17 @@ export const LAYOUT_TYPES = [
     description:
       'Serene sanctuaries with premium amenities and exclusive layouts. Perfect for those seeking tranquility and luxury.',
     cta: 'BOOK A VISIT',
-    floorPlan: null, // TODO: add the provided 4 BHK floor-plan image
-    gallery: ['/SKY LOUNGE CAFE.jpg', '/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg'],
+    floorPlan: '/4bhk/floor-plan.png',
+    gallery: [
+      '/4bhk/gallery-03.jpg',
+      '/4bhk/gallery-04.jpg',
+      '/4bhk/gallery-05.jpg',
+      '/4bhk/gallery-06.jpg',
+      '/4bhk/gallery-07.jpg',
+      '/4bhk/gallery-08.jpg',
+      '/4bhk/gallery-09.jpg',
+      '/4bhk/gallery-10.jpg'
+    ],
     floorSizes: { odd: '4,015 sq. ft.', even: '3,915 sq. ft.' },
     specs: [
       { label: 'Bedroom', value: '4' },
@@ -72,9 +87,19 @@ export const LAYOUT_TYPES = [
     description:
       'Spacious two-level sky residences with private outdoor spaces. An exceptional living experience with premium amenities.',
     cta: 'BOOK A VISIT',
-    floorPlan: LowerDuplexLayout, // TODO: swap for the final drawing when provided
-    cardImage: '/SKY LOUNGE CAFE.jpg',
-    gallery: ['/STREET VIEW_ 02.jpg', '/INDOOR GAME.jpg', '/SKY LOUNGE CAFE.jpg'],
+    floorPlan: '/4bhk-duplex-sky/floor-plan.png',
+    gallery: [
+      '/4bhk-duplex-sky/gallery-03.jpg',
+      '/4bhk-duplex-sky/gallery-04.jpg',
+      '/4bhk-duplex-sky/gallery-05.jpg',
+      '/4bhk-duplex-sky/gallery-06.jpg',
+      '/4bhk-duplex-sky/gallery-07.jpg',
+      '/4bhk-duplex-sky/gallery-08.jpg',
+      '/4bhk-duplex-sky/gallery-09.jpg',
+      '/4bhk-duplex-sky/gallery-10.jpg',
+      '/4bhk-duplex-sky/gallery-11.jpg',
+      '/4bhk-duplex-sky/gallery-12.jpg'
+    ],
     specs: [
       { label: 'Bedroom', value: '4' },
       { label: 'Size', value: '5,170 sq. ft.' },
@@ -91,9 +116,19 @@ export const LAYOUT_TYPES = [
     description:
       'Premium sky penthouses with panoramic views and luxury finishes. The pinnacle of luxury living in Manhattan.',
     cta: 'BOOK A VISIT',
-    floorPlan: UpperDuplexLayout, // TODO: swap for the final drawing when provided
-    cardImage: '/Sky Lounge-Game Room.jpeg',
-    gallery: ['/INDOOR GAME.jpg', '/STREET VIEW_ 02.jpg', '/SKY LOUNGE CAFE.jpg'],
+    floorPlan: '/5bhk-duplex-sky/floor-plan.png',
+    gallery: [
+      '/5bhk-duplex-sky/gallery-03.jpg',
+      '/5bhk-duplex-sky/gallery-04.jpg',
+      '/5bhk-duplex-sky/gallery-05.jpg',
+      '/5bhk-duplex-sky/gallery-06.jpg',
+      '/5bhk-duplex-sky/gallery-07.jpg',
+      '/5bhk-duplex-sky/gallery-08.jpg',
+      '/5bhk-duplex-sky/gallery-09.jpg',
+      '/5bhk-duplex-sky/gallery-10.jpg',
+      '/5bhk-duplex-sky/gallery-11.jpg',
+      '/5bhk-duplex-sky/gallery-12.jpg'
+    ],
     specs: [
       { label: 'Bedroom', value: '5' },
       { label: 'Size', value: '6,915 sq. ft.' },

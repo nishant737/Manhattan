@@ -9,8 +9,8 @@ import SpaImg from './assets/Spa.jpeg'
 import SquashCourtImg from './assets/Squash_clean.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
 import SkyLoungeImg from './assets/finalloauge.jpg'
-// Lobby gets its own dedicated entrance render.
-import LobbyImg from './assets/ENTRANCE/ENTRANCE01.jpeg'
+import LobbyImg from './assets/lobbyfinal.png'
+import EntranceImg from './assets/ENTRANCE/ENTRANCE01.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -44,36 +44,42 @@ const AMENITIES = [
   },
   {
     id: 5,
+    title: 'Entrance',
+    image: EntranceImg,
+    description: 'A striking arrival experience with sophisticated architecture and refined landscaping that sets the tone for Manhattan living.'
+  },
+  {
+    id: 6,
     title: 'Pool',
     image: IndoorPoolImg,
     description: 'Heated indoor swimming pool with panoramic glazing, loungers, and dedicated relaxation zones.'
   },
   {
-    id: 6,
+    id: 7,
     title: 'Cinema Lounge',
     image: CinemaLoungeImg,
     description: 'Private screening room with premium audio-visual systems, comfortable seating, and curated entertainment experiences.'
   },
   {
-    id: 7,
+    id: 8,
     title: 'Sky Lounge',
     image: SkyLoungeImg,
     description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
   },
   {
-    id: 8,
+    id: 9,
     title: 'Squash Court',
     image: SquashCourtImg,
     description: 'A dedicated indoor squash court with professional-grade flooring and lighting for residents.'
   },
   {
-    id: 9,
+    id: 10,
     title: 'Spa',
     image: SpaImg,
     description: 'A tranquil steam and sauna retreat finished in warm stone, designed for quiet recovery and relaxation.'
   },
   {
-    id: 10,
+    id: 11,
     title: "Kids' Play Area",
     image: KidsPlayImg,
     description: 'A vibrant, imaginative play space designed for the youngest residents to explore and unwind.'
@@ -190,6 +196,17 @@ export default function LuxuryShowcase() {
     const measure = () => { halfWidth = track.scrollWidth / 2 }
     window.addEventListener('resize', measure)
 
+    // The animation's own source of truth for the scroll offset — a plain
+    // float, never read back from `track.scrollLeft`. Both Chrome and Safari
+    // round the DOM's scrollLeft to whole device pixels, and this loop's
+    // per-frame step (~26px/s ÷ 60fps ≈ 0.4px) is smaller than that: reading
+    // the rounded value back and adding to it throws away the fractional
+    // progress every single frame, so the track appeared to freeze after
+    // creeping a couple of pixels. Keeping the position in JS sidesteps the
+    // rounding entirely; only the write to the DOM gets rounded, and that
+    // sub-pixel rounding is imperceptible frame to frame.
+    let pos = track.scrollLeft
+
     const pause = () => {
       paused = true
       if (resumeTimer) clearTimeout(resumeTimer)
@@ -197,6 +214,9 @@ export default function LuxuryShowcase() {
     const scheduleResume = (delay = RESUME_DELAY_MS) => {
       if (resumeTimer) clearTimeout(resumeTimer)
       resumeTimer = setTimeout(() => {
+        // Resync to wherever manual scrolling (drag/swipe/wheel) actually
+        // left the track before the loop starts writing to it again.
+        pos = track.scrollLeft
         paused = false
         lastTime = null
       }, delay)
@@ -212,9 +232,9 @@ export default function LuxuryShowcase() {
       lastTime = time
 
       if (!paused && halfWidth > 0) {
-        let x = track.scrollLeft + SPEED_PX_PER_SEC * dt
-        if (x >= halfWidth) x -= halfWidth
-        track.scrollLeft = x
+        pos += SPEED_PX_PER_SEC * dt
+        if (pos >= halfWidth) pos -= halfWidth
+        track.scrollLeft = pos
       }
       rafId = requestAnimationFrame(step)
     }

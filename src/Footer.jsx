@@ -2,7 +2,7 @@ import './Footer.css'
 import logoImg from './assets/Manhattan_Logo.png'
 import AllegroLogo from './assets/Allegro-Logo-2-cream.png'
 import MohtishamLogo from './assets/mohtisham-logo-cream.png'
-import { CONTACT_DETAILS, SOCIAL_LINKS, GOOGLE_MAPS_URL } from './siteContact'
+import { CONTACT_DETAILS, SOCIAL_LINKS, OFFICE_MAPS_URL } from './siteContact'
 
 // Copy lives here so the client's final wording can drop in without touching
 // the layout.
@@ -94,7 +94,7 @@ export default function Footer({ onNavClick }) {
 
           <a
             className="site-footer-address"
-            href={GOOGLE_MAPS_URL}
+            href={OFFICE_MAPS_URL}
             target="_blank"
             rel="noopener noreferrer"
           >

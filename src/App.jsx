@@ -10,7 +10,6 @@ import AmenitiesSection from './AmenitiesSection'
 import TailoredSolutions from './TailoredSolutions'
 import LocationConnectivity from './LocationConnectivity'
 import PathToOwnership from './PathToOwnership'
-import StatsSection from './StatsSection'
 import ContactSection from './ContactSection'
 import LeadCaptureModal from './LeadCaptureModal'
 import Footer from './Footer'
@@ -25,7 +24,10 @@ const BROCHURE_FILE = '/Manhattan-Brochure.pdf'
 // "VR Experience" both lead to the AR/VR section, which holds the YouTube
 // walkthrough card and the AR/VR experience link.
 const SCROLL_TARGETS = {
-  amenities: '.amenities-section',
+  // "Amenities" in the nav points at the Luxury Showcase carousel/grid —
+  // the actual amenities gallery (Community Hall, Gym, Pool, …) — not the
+  // separate "Iconic Architecture / Spacious Living" pinned section.
+  amenities: '.luxury-showcase',
   '3d-walkthrough': '.arvr-section',
   'vr-experience': '.arvr-section',
   // "Contact Us" scrolls to the inline "Get In Touch" section (not a modal).
@@ -51,6 +53,10 @@ function App() {
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false)
   const [layoutModalTypeId, setLayoutModalTypeId] = useState(null)
   const [leadModalMode, setLeadModalMode] = useState(null) // 'brochure' | null
+  // Which unit type (if any) the brochure modal was opened from — e.g.
+  // clicking "3 BHK" in Our Collections — so "Skip to View Layout" lands on
+  // that exact type instead of the generic "choose your layout" grid.
+  const [pendingLayoutTypeId, setPendingLayoutTypeId] = useState(null)
 
   // Opens the shared Layout modal — either to the "choose your layout" grid
   // (typeId omitted, e.g. from the navbar) or straight to one specific
@@ -61,6 +67,11 @@ function App() {
     setIsLayoutModalOpen(true)
   }
 
+  const openBrochureModal = (typeId = null) => {
+    setPendingLayoutTypeId(typeId)
+    setLeadModalMode('brochure')
+  }
+
   const handleNavClick = (id) => {
     if (id === 'layout') {
       openLayoutModal(null)
@@ -68,7 +79,7 @@ function App() {
     }
 
     if (id === 'brochure') {
-      setLeadModalMode('brochure')
+      openBrochureModal(null)
       return
     }
 
@@ -78,7 +89,15 @@ function App() {
       // Let scroll-jacking sections (the mobile Amenities card lock) stand down
       // for the duration of this programmatic scroll so it can't trap the nav.
       beginNavScroll()
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // Plain scrollIntoView(block:'start') lands the target's top edge at
+      // viewport y=0 — right underneath the fixed navbar, which then paints
+      // over (and visually "cuts off the top of") whatever sits there, e.g.
+      // a section heading. Offset by the navbar's own current height (plus a
+      // little breathing room) instead of a hardcoded pixel value, since it
+      // animates between ~82px and ~62px as the page scrolls.
+      const navbarHeight = document.querySelector('.navbar')?.getBoundingClientRect().height || 0
+      const top = el.getBoundingClientRect().top + window.scrollY - navbarHeight - 16
+      window.scrollTo({ top, behavior: 'smooth' })
     }
   }
 
@@ -124,16 +143,15 @@ function App() {
         />
       )}
       {/* Section order: Hero → Intro → Amenities/Showcase → Layouts → AR/VR →
-          Summary ("Manhattan, At a Glance") → Map ("Location") → Contact.
-          Every section is an independent sibling with its own ScrollTrigger,
-          so the order changes nothing about how each one animates. */}
+          Map ("Location") → Contact. Every section is an independent sibling
+          with its own ScrollTrigger, so the order changes nothing about how
+          each one animates. */}
       <HeroSection />
       <AboutSection />
       <LuxuryShowcase />
       <AmenitiesSection />
-      <TailoredSolutions onSelectLayout={openLayoutModal} />
+      <TailoredSolutions onSelectLayout={openBrochureModal} />
       <PathToOwnership />
-      <StatsSection onCtaClick={() => handleNavClick('brochure')} />
       <LocationConnectivity />
       <ContactSection />
       <Footer onNavClick={handleNavClick} />
@@ -149,7 +167,7 @@ function App() {
                 label: 'Skip to View Layout',
                 onClick: () => {
                   setLeadModalMode(null)
-                  openLayoutModal(null)
+                  openLayoutModal(pendingLayoutTypeId)
                 }
               }
             : null

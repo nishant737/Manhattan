@@ -1,11 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import './Navbar.css'
 import logoImg from './assets/Manhattan_Logo.png'
-import { WHATSAPP_HREF } from './siteContact'
+import { SOCIAL_LINKS, WHATSAPP_HREF } from './siteContact'
 import { beginNavScroll } from './navScroll'
 
-// TODO: replace with the real Instagram handle
-const INSTAGRAM_URL = 'https://www.instagram.com/'
 const WHATSAPP_URL = WHATSAPP_HREF
 
 export default function Navbar({ onNavClick }) {
@@ -188,7 +186,7 @@ export default function Navbar({ onNavClick }) {
 
         <div className="mobile-menu-social">
           <a
-            href={INSTAGRAM_URL}
+            href={SOCIAL_LINKS.instagram}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Follow us on Instagram"

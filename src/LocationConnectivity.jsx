@@ -50,7 +50,9 @@ const MANHATTAN_LOCATION = {
   time: 'Your Location',
   category: 'Residential',
   description: 'Premium luxury residential development in Mangalore',
-  coordinates: { lat: 12.8700, lng: 74.8450 },
+  // Exact coordinates from Manhattan's Google Maps place listing
+  // ("Mohtisham Manhattan") — kept in sync with MANHATTAN_GEO in siteContact.js.
+  coordinates: { lat: 12.8688368, lng: 74.8446712 },
   images: ['/STREET VIEW_ 02.jpg'],
   highlights: ['Luxury Living', 'Prime Location', 'World-class Amenities']
 }
@@ -346,6 +348,16 @@ export default function LocationConnectivity() {
             </div>
 
             <div className="location-list">
+              {/* Pinned above the "minutes away" landmarks — the only way back
+                  to Manhattan itself once a visitor has selected one of them. */}
+              <button
+                className={`location-list-item location-list-item--home ${selectedLocation?.id === MANHATTAN_LOCATION.id ? 'active' : ''}`}
+                onClick={() => handleLocationClick(MANHATTAN_LOCATION)}
+              >
+                <span className="time">{MANHATTAN_LOCATION.time}</span>
+                <span className="name">{MANHATTAN_LOCATION.name}</span>
+              </button>
+
               {LOCATIONS.map((location) => (
                 <button
                   key={location.id}
@@ -468,6 +480,21 @@ export default function LocationConnectivity() {
                 </div>
               )}
             </div>
+
+            {/* Persistent CTA below the map — a one-click way to Manhattan
+                itself that doesn't require selecting it from the list or
+                the map first. */}
+            <a
+              className="location-map-cta"
+              href={GOOGLE_MAPS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+              </svg>
+              Take Me There
+            </a>
           </div>
         </div>
       </div>
