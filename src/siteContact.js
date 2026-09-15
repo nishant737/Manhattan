@@ -5,7 +5,7 @@
 
 // WhatsApp — digits only, including country code, NO leading "+", "00",
 // spaces or dashes. e.g. +91 98765 43210 → '919876543210'.
-export const WHATSAPP_NUMBER = '919880022211'
+export const WHATSAPP_NUMBER = '919902244411'
 
 // Pre-fills the chat's first message; the visitor can still edit it. '' opens
 // the chat blank.
