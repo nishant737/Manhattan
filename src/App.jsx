@@ -7,7 +7,6 @@ import AboutSection from './AboutSection'
 import LuxuryShowcase from './LuxuryShowcase'
 import ApartmentShowcase from './ApartmentShowcase'
 import AmenitiesSection from './AmenitiesSection'
-import TailoredSolutions from './TailoredSolutions'
 import LocationConnectivity from './LocationConnectivity'
 import PathToOwnership from './PathToOwnership'
 import ContactSection from './ContactSection'
@@ -57,22 +56,15 @@ function App() {
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false)
   const [layoutModalTypeId, setLayoutModalTypeId] = useState(null)
   const [leadModalMode, setLeadModalMode] = useState(null) // 'brochure' | null
-  // Which unit type (if any) the brochure modal was opened from — e.g.
-  // clicking "3 BHK" in Our Collections — so "Skip to View Layout" lands on
-  // that exact type instead of the generic "choose your layout" grid.
-  const [pendingLayoutTypeId, setPendingLayoutTypeId] = useState(null)
 
-  // Opens the shared Layout modal — either to the "choose your layout" grid
-  // (typeId omitted, e.g. from the navbar) or straight to one specific
-  // apartment type's detail view (e.g. after a visitor picks "3 BHK" and
-  // submits their details in the Luxury Residences section below).
+  // Opens the shared Layout modal, either to the "choose your layout" grid
+  // (typeId omitted) or straight to one specific apartment type's detail view.
   const openLayoutModal = (typeId = null) => {
     setLayoutModalTypeId(typeId)
     setIsLayoutModalOpen(true)
   }
 
-  const openBrochureModal = (typeId = null) => {
-    setPendingLayoutTypeId(typeId)
+  const openBrochureModal = () => {
     setLeadModalMode('brochure')
   }
 
@@ -83,7 +75,7 @@ function App() {
     }
 
     if (id === 'brochure') {
-      openBrochureModal(null)
+      openBrochureModal()
       return
     }
 
@@ -175,7 +167,6 @@ function App() {
       <AboutSection />
       <LuxuryShowcase />
       <AmenitiesSection />
-      <TailoredSolutions onSelectLayout={openBrochureModal} />
       <PathToOwnership />
       <LocationConnectivity />
       <ContactSection />
@@ -192,7 +183,7 @@ function App() {
                 label: 'Skip to View Layout',
                 onClick: () => {
                   setLeadModalMode(null)
-                  openLayoutModal(pendingLayoutTypeId)
+                  openLayoutModal(null)
                 }
               }
             : null

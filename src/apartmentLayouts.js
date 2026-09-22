@@ -1,7 +1,6 @@
 // ── Room / floor-plan data structure ──
-// Shared across the Layout selection modal (ApartmentShowcase) and the
-// "Luxury Residences Designed For You" accordion (TailoredSolutions) so both
-// surfaces always offer the exact same unit types.
+// Shared source of truth for the Layout selection modal (ApartmentShowcase),
+// keeping every surface that lists unit types in sync.
 //
 // Each type separates two kinds of imagery:
 //   • floorPlan — the architectural layout drawing (or null if none yet).
@@ -15,11 +14,7 @@
 const withImages = (type) => ({
   ...type,
   hasFloorPlan: Boolean(type.floorPlan),
-  images: [type.floorPlan, ...type.gallery].filter(Boolean),
-  // Thumbnail used by the "Designed For You" accordion. Prefer an explicit
-  // `cardImage`, else the first photo — never the floor-plan drawing, which
-  // reads as a schematic in a small circle (was the case for the Sky Villas).
-  cardImage: type.cardImage || type.gallery[0] || type.floorPlan
+  images: [type.floorPlan, ...type.gallery].filter(Boolean)
 })
 
 export const LAYOUT_TYPES = [
