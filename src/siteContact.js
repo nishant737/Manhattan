@@ -16,12 +16,11 @@ export const WHATSAPP_HREF =
   `https://wa.me/${WHATSAPP_NUMBER}` +
   (WHATSAPP_DEFAULT_MESSAGE ? `?text=${encodeURIComponent(WHATSAPP_DEFAULT_MESSAGE)}` : '')
 
-// Social links shown in the Contact section's "Connect With Us" row. Swap the
-// Instagram / Facebook URLs for the real handles.
+// Social links shown in the Contact section's "Connect With Us" row.
 export const SOCIAL_LINKS = {
   whatsapp: WHATSAPP_HREF,
   instagram: 'https://www.instagram.com/mohtisham_complexes/',
-  facebook: 'https://www.facebook.com/' // PLACEHOLDER — real page
+  facebook: 'https://www.facebook.com/people/Mohtisham-Complexes-Pvt-Ltd/61572891270156/'
 }
 
 // Shown in the Contact section. `emails` / `phones` each hold one or more
