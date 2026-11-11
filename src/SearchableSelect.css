@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
   color: rgb(251, 238, 190);
   background-color: rgba(255, 255, 255, 0.05);
@@ -69,7 +69,7 @@
 
 .searchable-select-search {
   flex-shrink: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 13px;
   color: rgb(251, 238, 190);
   background-color: rgba(255, 255, 255, 0.06);
@@ -93,7 +93,7 @@
   display: block;
   width: 100%;
   text-align: left;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 13.5px;
   color: rgba(255, 255, 255, 0.85);
   background: none;
@@ -124,7 +124,7 @@
 .searchable-select-empty {
   padding: 16px 14px;
   text-align: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12.5px;
   color: rgba(255, 255, 255, 0.4);
 }

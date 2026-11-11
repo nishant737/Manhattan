@@ -1,7 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
 import './HeroSection.css'
-import AllegroLogo from './assets/Allegro-Logo-2-cream.png'
-import MohtishamLogo from './assets/mohtisham-logo-cream.png'
 
 const MOBILE_QUERY = '(max-width: 768px)'
 
@@ -60,27 +58,27 @@ function HeroSection() {
 
       {/* Center content */}
       <div className="hero-content">
-        <p className="hero-subheading">A PROJECT BY ALLEGRO &amp; MOHTISHAM</p>
+        <p className="hero-subheading">A PROJECT BY MOHTISHAM &amp; ALLEGRO</p>
         <h1 className="hero-heading">MANHATTAN</h1>
         <p className="hero-tagline">Luxury Elevated in the Heart of Mangalore.</p>
 
         <div className="hero-logos">
-          <a
-            href="https://allegrobuildersindia.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit Allegro Builders website"
-          >
-            <img src={AllegroLogo} alt="Allegro" className="hero-logo" />
-          </a>
-          <span className="hero-logo-divider" />
           <a
             href="https://www.mohtisham.com/"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Visit Mohtisham website"
           >
-            <img src={MohtishamLogo} alt="Mohtisham" className="hero-logo" />
+            <img src="/motisham-logo.png" alt="Mohtisham" className="hero-logo" />
+          </a>
+          <span className="hero-logo-divider" />
+          <a
+            href="https://allegrobuildersindia.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Allegro Builders website"
+          >
+            <img src="/allegro-logo.png" alt="Allegro" className="hero-logo" />
           </a>
         </div>
       </div>

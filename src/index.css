@@ -11,11 +11,15 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --font: 'Cormorant Garamond', 'Times New Roman', serif;
+  --sans: var(--font);
+  --heading: var(--font);
+  --mono: var(--font);
 
   font: 18px/145% var(--sans);
+  /* Cormorant has a small x-height; scale it so small labels stay legible */
+  font-size-adjust: 0.46;
+  font-variant-numeric: lining-nums;
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
@@ -96,6 +100,13 @@ h2 {
 }
 p {
   margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
 }
 
 code,

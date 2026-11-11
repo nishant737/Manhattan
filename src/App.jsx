@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CustomCursor from './CustomCursor'
 import WhatsAppButton from './WhatsAppButton'
 import Navbar from './Navbar'
@@ -17,6 +17,10 @@ import { beginNavScroll } from './navScroll'
 import './App.css'
 
 const BROCHURE_FILE = '/Manhattan-Brochure.pdf'
+
+// Timed enquiry pop-up: opens this long after every page load, whether the
+// visitor is scrolling, idle or anywhere on the page.
+const ENQUIRY_POPUP_DELAY_MS = 15000
 
 // Nav items that resolve to an in-page scroll (via the existing
 // scrollIntoView flow) rather than opening a modal. "3D Walkthrough" and
@@ -40,6 +44,15 @@ const SCROLL_TARGETS = {
 // Only the brochure flow uses the lead modal now — "Contact Us" scrolls to the
 // inline ContactSection (see SCROLL_TARGETS), so there's no 'contact' entry.
 const LEAD_MODAL_COPY = {
+  enquiry: {
+    eyebrow: 'Manhattan Residences',
+    title: 'Arrange a Private Viewing',
+    subtitle: 'Leave your details and our team will call you to share prices, availability and a time to visit.',
+    submitLabel: 'Request a Call Back',
+    loadingLabel: 'Sending…',
+    successTitle: 'Thank You',
+    successMessage: 'Our team will be in touch with you shortly.'
+  },
   brochure: {
     eyebrow: 'Manhattan Luxury Residences',
     title: 'Download the Brochure',
@@ -55,7 +68,31 @@ const LEAD_MODAL_COPY = {
 function App() {
   const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false)
   const [layoutModalTypeId, setLayoutModalTypeId] = useState(null)
-  const [leadModalMode, setLeadModalMode] = useState(null) // 'brochure' | null
+  const [leadModalMode, setLeadModalMode] = useState(null) // 'brochure' | 'enquiry' | null
+  // Latest "is any modal open?" state, readable from the timer callback below.
+  const anyModalOpenRef = useRef(false)
+  useEffect(() => {
+    anyModalOpenRef.current = leadModalMode !== null || isLayoutModalOpen
+  }, [leadModalMode, isLayoutModalOpen])
+
+  // Timed enquiry pop-up: 15s after every page load. If the visitor is in
+  // another modal at that moment (brochure form, layout viewer), keep checking
+  // each second and open it as soon as they close that one.
+  useEffect(() => {
+    let retry = null
+    const tryOpen = () => {
+      if (anyModalOpenRef.current) {
+        retry = setTimeout(tryOpen, 1000)
+        return
+      }
+      setLeadModalMode('enquiry')
+    }
+    const timer = setTimeout(tryOpen, ENQUIRY_POPUP_DELAY_MS)
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(retry)
+    }
+  }, [])
 
   // Opens the shared Layout modal, either to the "choose your layout" grid
   // (typeId omitted) or straight to one specific apartment type's detail view.
@@ -134,7 +171,12 @@ function App() {
     // Append a row to the Google Sheet. A network failure rejects here and the
     // modal surfaces its error state; the brochure download only runs on success.
     await submitLead({
-      source: leadModalMode === 'brochure' ? 'Brochure download' : 'Layout enquiry',
+      source:
+        leadModalMode === 'brochure'
+          ? 'Brochure download'
+          : leadModalMode === 'enquiry'
+            ? 'Website pop-up'
+            : 'Layout enquiry',
       name: formData.name,
       email: formData.email,
       phone: formData.phone,

@@ -38,7 +38,7 @@
 /* Eyebrow — matches the AR/VR and Contact section intros so the redesigned
    sections share one hierarchy. */
 .location-eyebrow {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -55,7 +55,7 @@
 }
 
 .title-line {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 22px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -98,7 +98,7 @@
 }
 
 .location-list-item .time {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -107,7 +107,7 @@
 }
 
 .location-list-item .name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.01em;
@@ -176,7 +176,7 @@
   padding: 12px 28px;
   border: 1px solid rgba(251, 238, 190, 0.4);
   border-radius: 50px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -202,7 +202,7 @@
 /* Ensure Leaflet tiles display properly */
 .leaflet-container {
   background-color: #0a0a0a;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
 }
 
 .leaflet-tile-pane {
@@ -405,7 +405,7 @@
 }
 
 .card-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
   font-weight: 700;
   color: rgb(251, 238, 190);
@@ -420,7 +420,7 @@
 }
 
 .card-time {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -429,7 +429,7 @@
 }
 
 .card-category {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.06em;
@@ -438,7 +438,7 @@
 }
 
 .card-description {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11.5px;
   font-weight: 300;
   line-height: 1.4;
@@ -460,7 +460,7 @@
   padding: 6px 12px;
   border: 1px solid rgba(251, 238, 190, 0.4);
   border-radius: 50px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -834,7 +834,7 @@
 .custom-marker.manhattan-checkpoint .marker-m {
   position: relative;
   z-index: 2;
-  font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font);
   font-size: 15px;
   font-weight: 700;
   line-height: 1;

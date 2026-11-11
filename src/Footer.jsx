@@ -1,7 +1,6 @@
 import './Footer.css'
-import logoImg from './assets/Manhattan_Logo.png'
-import AllegroLogo from './assets/Allegro-Logo-2-cream.png'
-import MohtishamLogo from './assets/mohtisham-logo-cream.png'
+// Trimmed copy (no side padding) so the mark lines up flush-left with the text.
+import logoImg from './assets/Manhattan_Logo-trim.png'
 import { CONTACT_DETAILS, SOCIAL_LINKS, OFFICE_MAPS_URL } from './siteContact'
 
 // Copy lives here so the client's final wording can drop in without touching
@@ -10,7 +9,7 @@ const FOOTER_COPY = {
   tagline: 'Luxury Elevated in the Heart of Mangalore.',
   exploreLabel: 'Explore',
   contactLabel: 'Contact',
-  projectBy: 'A project by Allegro & Mohtisham',
+  projectBy: 'A project by Mohtisham & Allegro',
   copyright: `© ${new Date().getFullYear()} Manhattan Luxury Residences. All rights reserved.`
 }
 
@@ -39,12 +38,12 @@ export default function Footer({ onNavClick }) {
           <div className="site-footer-project-by">
             <span>{FOOTER_COPY.projectBy}</span>
             <div className="site-footer-partner-logos">
-              <a href="https://allegrobuildersindia.com/" target="_blank" rel="noopener noreferrer" aria-label="Allegro Builders">
-                <img src={AllegroLogo} alt="Allegro" />
+              <a href="https://www.mohtisham.com/" target="_blank" rel="noopener noreferrer" aria-label="Mohtisham">
+                <img src="/motisham-logo.png" alt="Mohtisham" />
               </a>
               <span className="site-footer-partner-divider" />
-              <a href="https://www.mohtisham.com/" target="_blank" rel="noopener noreferrer" aria-label="Mohtisham">
-                <img src={MohtishamLogo} alt="Mohtisham" />
+              <a href="https://allegrobuildersindia.com/" target="_blank" rel="noopener noreferrer" aria-label="Allegro Builders">
+                <img src="/allegro-logo.png" alt="Allegro" />
               </a>
             </div>
           </div>

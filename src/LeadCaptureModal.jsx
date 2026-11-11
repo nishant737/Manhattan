@@ -243,7 +243,7 @@ export default function LeadCaptureModal({
                   value={form.requirement}
                   onChange={handleChange('requirement')}
                   placeholder="e.g. Looking for a 3 BHK for investment"
-                  rows={3}
+                  rows={2}
                   disabled={isSubmitting}
                 />
               </div>

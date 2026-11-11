@@ -22,67 +22,67 @@ const AMENITIES = [
     id: 1,
     title: 'Community Hall',
     image: LuxuryAmenitiesImg,
-    description: 'Elegant multi-purpose space for gatherings, events, and celebrations with state-of-the-art facilities and customizable ambiance.'
+    description: 'An elegant space for gatherings and celebrations.'
   },
   {
     id: 2,
     title: 'Game Room',
     image: '/INDOOR GAME.jpg',
-    description: 'Premium entertainment space featuring billiards, gaming stations, and recreational facilities for leisure and social gatherings.'
+    description: 'Billiards, games and leisure under one roof.'
   },
   {
     id: 3,
     title: 'Gym',
     image: '/GYM.jpg',
-    description: 'State-of-the-art fitness center equipped with modern equipment, personal training services, and wellness programs.'
+    description: 'A modern fitness centre with premium equipment.'
   },
   {
     id: 4,
     title: 'Lobby',
     image: LobbyImg,
-    description: 'Grand entrance with sophisticated design, concierge services, and a welcoming atmosphere for residents and guests.'
+    description: 'A grand, welcoming arrival for residents and guests.'
   },
   {
     id: 5,
     title: 'Entrance',
     image: EntranceImg,
-    description: 'A striking arrival experience with sophisticated architecture and refined landscaping that sets the tone for Manhattan living.'
+    description: 'A striking arrival framed by refined landscaping.'
   },
   {
     id: 6,
     title: 'Pool',
     image: IndoorPoolImg,
-    description: 'Heated indoor swimming pool with panoramic glazing, loungers, and dedicated relaxation zones.'
+    description: 'A heated indoor pool with panoramic views.'
   },
   {
     id: 7,
-    title: 'Cinema Lounge',
+    title: 'Home Theatre',
     image: CinemaLoungeImg,
-    description: 'Private screening room with premium audio-visual systems, comfortable seating, and curated entertainment experiences.'
+    description: 'A private screening room with premium sound.'
   },
   {
     id: 8,
-    title: 'Sky Lounge',
+    title: 'Sky Lounge Café',
     image: SkyLoungeImg,
-    description: 'Elegant rooftop lounge with panoramic city views, premium dining areas, and exclusive entertainment facilities.'
+    description: 'A rooftop café with panoramic city views.'
   },
   {
     id: 9,
     title: 'Squash Court',
     image: SquashCourtImg,
-    description: 'A dedicated indoor squash court with professional-grade flooring and lighting for residents.'
+    description: 'A professional-grade indoor squash court.'
   },
   {
     id: 10,
     title: 'Spa',
     image: SpaImg,
-    description: 'A tranquil steam and sauna retreat finished in warm stone, designed for quiet recovery and relaxation.'
+    description: 'A tranquil steam and sauna retreat.'
   },
   {
     id: 11,
     title: "Kids' Play Area",
     image: KidsPlayImg,
-    description: 'A vibrant, imaginative play space designed for the youngest residents to explore and unwind.'
+    description: 'A vibrant play space for young residents.'
   }
 ]
 

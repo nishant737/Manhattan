@@ -12,16 +12,16 @@ const AMENITIES = [
   {
     id: 2,
     index: '01',
-    title: 'Iconic Architecture',
-    description: 'A striking silhouette that redefines Mangalore’s skyline, with sculpted balconies and a facade designed to be as unforgettable by night as it is by day.',
+    title: 'A Landmark Silhouette',
+    description: 'Conceived by a Dubai-based team of architects, Manhattan rises above Hampankatta with sculpted balconies and a facade that holds the eye by day and lights up the skyline by night.',
     backgroundImage: IconicArchitectureImg
     // Landscape render — uses the default 16:10 box, same as the other panels.
   },
   {
     id: 3,
     index: '02',
-    title: 'Spacious Living',
-    description: 'Soaring double height ceilings and sweeping open-plan interiors, finished in imported stone and bespoke detailing, designed for those who live without compromise on space.',
+    title: 'Generous Interiors',
+    description: 'Double-height ceilings and open-plan living, finished in imported stone and bespoke detailing, for those who will not compromise on space.',
     backgroundImage: SpaciousLivingImg
     // Uses the default landscape box — same size and position as the
     // "Elevated Experience" panel.
@@ -29,8 +29,8 @@ const AMENITIES = [
   {
     id: 1,
     index: '03',
-    title: 'Elevated Experience',
-    description: 'Rooftop lounges and sky terraces that place panoramic city views, curated greenery, and refined leisure just an elevator ride from home.',
+    title: 'Life Above the City',
+    description: 'Rooftop lounges and sky terraces bring panoramic views, curated greenery and quiet leisure within an elevator ride of home.',
     backgroundImage: ElevatedLivingImg
   }
 ]

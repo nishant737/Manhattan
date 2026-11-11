@@ -22,7 +22,7 @@
 
 .arvr-eyebrow {
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -32,7 +32,7 @@
 }
 
 .arvr-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: clamp(28px, 4vw, 44px);
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -42,7 +42,7 @@
 }
 
 .arvr-subtitle {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: clamp(13px, 1.1vw, 15px);
   font-weight: 300;
   line-height: 1.75;
@@ -141,7 +141,7 @@
 }
 
 .arvr-card-kicker {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.18em;
@@ -150,7 +150,7 @@
 }
 
 .arvr-card-heading {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: clamp(18px, 1.8vw, 22px);
   font-weight: 700;
   color: rgb(251, 238, 190);
@@ -159,7 +159,7 @@
 }
 
 .arvr-card-text {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 13px;
   font-weight: 300;
   line-height: 1.7;
@@ -178,7 +178,7 @@
   padding: 12px 26px;
   border: 1px solid rgba(251, 238, 190, 0.45);
   border-radius: 50px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;

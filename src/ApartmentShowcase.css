@@ -86,9 +86,9 @@
 }
 
 .apartment-selection-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(32px, 4vw, 48px);
-  font-weight: 400;
+  font-family: var(--font);
+  font-size: clamp(28px, 3.4vw, 42px);
+  font-weight: 300;
   letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.95);
   margin: 0 0 12px 0;
@@ -96,7 +96,7 @@
 }
 
 .apartment-selection-subtitle {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
   font-weight: 300;
   color: rgba(251, 238, 190, 0.6);
@@ -115,7 +115,7 @@
 }
 
 .apartment-selection-group-title {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.24em;
@@ -194,7 +194,7 @@
 }
 
 .apartment-selection-card-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -206,7 +206,7 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -227,7 +227,7 @@
   border: none;
   padding: 0;
   margin-bottom: 20px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -346,7 +346,7 @@
   top: 20px;
   left: 20px;
   z-index: 12;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -368,7 +368,7 @@
 }
 
 .apartment-category {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -442,7 +442,7 @@
 
 /* Brand */
 .apartment-brand {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.3em;
@@ -461,9 +461,9 @@
 
 /* Title */
 .apartment-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 36px;
-  font-weight: 400;
+  font-family: var(--font);
+  font-size: 32px;
+  font-weight: 300;
   letter-spacing: 0.02em;
   color: rgba(255, 255, 255, 0.95);
   margin: 0 0 24px 0;
@@ -473,7 +473,7 @@
 
 /* Description */
 .apartment-description {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
   font-weight: 300;
   letter-spacing: 0.01em;
@@ -502,7 +502,7 @@
 }
 
 .spec-label {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.15em;
@@ -511,8 +511,8 @@
 }
 
 .spec-value {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 20px;
+  font-family: var(--font);
+  font-size: 17px;
   font-weight: 400;
   letter-spacing: 0.01em;
   color: rgba(255, 255, 255, 0.9);
@@ -527,7 +527,7 @@
 }
 
 .apartment-floor-toggle-btn {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -559,7 +559,7 @@
   background: rgb(251, 238, 190);
   border: none;
   border-radius: 50px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.15em;
