@@ -20,7 +20,7 @@ gsap.registerPlugin(ScrollTrigger)
 const AMENITIES = [
   {
     id: 1,
-    title: 'Community Hall',
+    title: "Residents' Clubhouse",
     image: LuxuryAmenitiesImg,
     description: 'An elegant space for gatherings and celebrations.'
   },
