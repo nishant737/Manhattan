@@ -189,6 +189,8 @@ export default function LuxuryShowcase() {
     let lastTime = null
     let paused = false
     let resumeTimer = null
+    // Mouse is over the carousel: hold still until it leaves.
+    let hovered = false
 
     // Cache the loop width — reading scrollWidth every frame forces a layout
     // reflow, which is a big source of scroll jank.
@@ -231,7 +233,7 @@ export default function LuxuryShowcase() {
       const dt = Math.min((time - lastTime) / 1000, 0.05)
       lastTime = time
 
-      if (!paused && halfWidth > 0) {
+      if (!paused && !hovered && halfWidth > 0) {
         pos += SPEED_PX_PER_SEC * dt
         if (pos >= halfWidth) pos -= halfWidth
         track.scrollLeft = pos
@@ -244,12 +246,31 @@ export default function LuxuryShowcase() {
     const handleInteractionEnd = () => scheduleResume()
     const handleWheel = () => { pause(); scheduleResume() }
 
+    // Hover pause, mouse only. Touch screens fire a synthetic hover on tap
+    // that never "leaves", which would freeze the slide, so touch keeps the
+    // pause-and-resume behaviour above instead.
+    const handlePointerEnter = (e) => {
+      if (e.pointerType === 'mouse') hovered = true
+    }
+    const handlePointerLeave = (e) => {
+      if (e.pointerType !== 'mouse') return
+      hovered = false
+      // Pick up from wherever the visitor left it (they may have wheeled or
+      // dragged while hovering), and start sliding again straight away.
+      if (resumeTimer) clearTimeout(resumeTimer)
+      pos = track.scrollLeft
+      paused = false
+      lastTime = null
+    }
+
     track.addEventListener('pointerdown', handleInteractionStart)
     track.addEventListener('pointerup', handleInteractionEnd)
     track.addEventListener('pointercancel', handleInteractionEnd)
     track.addEventListener('touchstart', handleInteractionStart, { passive: true })
     track.addEventListener('touchend', handleInteractionEnd, { passive: true })
     track.addEventListener('wheel', handleWheel, { passive: true })
+    track.addEventListener('pointerenter', handlePointerEnter)
+    track.addEventListener('pointerleave', handlePointerLeave)
 
     return () => {
       cancelAnimationFrame(rafId)
@@ -261,6 +282,8 @@ export default function LuxuryShowcase() {
       track.removeEventListener('touchstart', handleInteractionStart)
       track.removeEventListener('touchend', handleInteractionEnd)
       track.removeEventListener('wheel', handleWheel)
+      track.removeEventListener('pointerenter', handlePointerEnter)
+      track.removeEventListener('pointerleave', handlePointerLeave)
     }
   }, [isGridView])
 
