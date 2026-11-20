@@ -215,7 +215,7 @@ export default function ApartmentShowcase({ onClose, initialTypeId = null }) {
                       onClick={() => handleImageClick(index)}
                       aria-label={`View image ${index + 1}`}
                     >
-                      <img src={image} alt={`Thumbnail ${index + 1}`} />
+                      <img src={image} alt={`${data.title} at Manhattan Residences, photo ${index + 1}`} />
                     </button>
                   ))}
                 </div>

@@ -32,18 +32,18 @@ export default function Footer({ onNavClick }) {
       <div className="site-footer-inner">
         {/* Brand */}
         <div className="site-footer-brand">
-          <img src={logoImg} alt="Manhattan" className="site-footer-logo" />
+          <img src={logoImg} alt="Manhattan Residences logo" className="site-footer-logo" />
           <p className="site-footer-tagline">{FOOTER_COPY.tagline}</p>
 
           <div className="site-footer-project-by">
             <span>{FOOTER_COPY.projectBy}</span>
             <div className="site-footer-partner-logos">
               <a href="https://www.mohtisham.com/" target="_blank" rel="noopener noreferrer" aria-label="Mohtisham">
-                <img src="/motisham-logo.png" alt="Mohtisham" />
+                <img src="/motisham-logo.png" alt="Mohtisham Complexes logo" />
               </a>
               <span className="site-footer-partner-divider" />
               <a href="https://allegrobuildersindia.com/" target="_blank" rel="noopener noreferrer" aria-label="Allegro Builders">
-                <img src="/allegro-logo.png" alt="Allegro" />
+                <img src="/allegro-logo.png" alt="Allegro Builders &amp; Developers logo" />
               </a>
             </div>
           </div>

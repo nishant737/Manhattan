@@ -9,7 +9,7 @@ import SpaImg from './assets/Spa.jpeg'
 import SquashCourtImg from './assets/Squash_clean.jpeg'
 import KidsPlayImg from './assets/kidsplay.jpeg'
 import SkyLoungeImg from './assets/finalloauge.jpg'
-import LobbyImg from './assets/lobbyfinal.png'
+import LobbyImg from './assets/lobbyfinal.jpg'
 import EntranceImg from './assets/ENTRANCE/ENTRANCE01.jpeg'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -95,7 +95,7 @@ function AmenityMedia({ amenity, className }) {
   return (
     <img
       src={amenity.image}
-      alt={amenity.title}
+      alt={`${amenity.title} at Manhattan Residences, Mangalore`}
       className={className}
       loading="lazy"
       decoding="async"

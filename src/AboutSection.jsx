@@ -220,7 +220,7 @@ export default function AboutSection() {
               <img
                 key={index}
                 src={img}
-                alt={`Design vision ${index + 1}`}
+                alt={`Manhattan Residences entrance and facade, Hampankatta, Mangalore (view ${index + 1})`}
                 className="about-image"
                 style={{
                   opacity: currentImageIndex === index ? 1 : 0,

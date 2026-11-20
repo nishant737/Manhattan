@@ -50,7 +50,7 @@ function HeroSection() {
         preload="auto"
       >
         <source
-          src={isMobile ? '/mobile001.mp4' : '/heroseection.mp4'}
+          src={isMobile ? '/mobile001.mp4' : '/hero-web.mp4'}
           type="video/mp4"
         />
       </video>
@@ -59,7 +59,10 @@ function HeroSection() {
       {/* Center content */}
       <div className="hero-content">
         <p className="hero-subheading">A PROJECT BY MOHTISHAM &amp; ALLEGRO</p>
-        <h1 className="hero-heading">MANHATTAN</h1>
+        <h1 className="hero-heading">
+          MANHATTAN
+          <span className="sr-only"> Residences: luxury 3 &amp; 4 BHK apartments and sky villas in Hampankatta, Mangalore</span>
+        </h1>
         <p className="hero-tagline">Luxury Elevated in the Heart of Mangalore.</p>
 
         <div className="hero-logos">
@@ -69,7 +72,7 @@ function HeroSection() {
             rel="noopener noreferrer"
             aria-label="Visit Mohtisham website"
           >
-            <img src="/motisham-logo.png" alt="Mohtisham" className="hero-logo" />
+            <img src="/motisham-logo.png" alt="Mohtisham Complexes logo" className="hero-logo" />
           </a>
           <span className="hero-logo-divider" />
           <a
@@ -78,7 +81,7 @@ function HeroSection() {
             rel="noopener noreferrer"
             aria-label="Visit Allegro Builders website"
           >
-            <img src="/allegro-logo.png" alt="Allegro" className="hero-logo" />
+            <img src="/allegro-logo.png" alt="Allegro Builders &amp; Developers logo" className="hero-logo" />
           </a>
         </div>
       </div>
