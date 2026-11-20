@@ -2,6 +2,9 @@
 <html lang="en-IN">
   <head>
     <meta charset="UTF-8" />
+    <!-- Runs before anything paints: marks JS-capable browsers so the
+         crawler-only text below (#seo-content) never flashes for visitors. -->
+    <script>document.documentElement.classList.add('js')</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- ── Primary SEO ── -->
@@ -184,6 +187,9 @@
       #seo-content h1, #seo-content h2 { font-weight: 500; }
       #seo-content a { color: #fbeebe; }
       body { background: #0a0a0a; margin: 0; }
+      /* Visitors (JavaScript on) never see it; the app replaces it on load.
+         Crawlers that don't run JavaScript still read it. */
+      .js #seo-content { display: none; }
     </style>
   </head>
   <body>
